@@ -230,44 +230,23 @@ bool isMyLegend;
 {
     if (!menuShowing) 
     {
+        menuView.hidden = NO;
         NSLog(@"show menu!");
         // Show
         [menuView setAlpha:0.0];
-        /*
-         if (segmentButton.selectedSegmentIndex == 1) 
-         {
-         [notesTable.view removeFromSuperview];
-         notesTable = nil;
-         if (self.notesTable == nil) 
-         {
-         self.notesTable = [[ViewNotesViewController alloc] initWithNibName:@"ViewNotesViewController" bundle:nil];
-         CGRect wFrame = menuView.frame;
-         CGRect bFrame = menuBar.frame;
-         NSInteger notesHeight =  wFrame.size.height - (bFrame.origin.y + bFrame.size.height);
-         CGRect nFrame = CGRectMake(0, wFrame.size.height - notesHeight, wFrame.size.width, notesHeight);
-         self.notesTable.view.frame = nFrame;
-         [menuView addSubview:self.notesTable.view];
-         }
-         NSLog(@"segment: %i", segmentButton.selectedSegmentIndex);
-         self.notesTable.view.hidden = NO;
-         NSInteger top = 0;
-         CGRect notesFrame = self.notesTable.notesTableView.frame;
-         CGRect newFrame = CGRectMake(notesFrame.origin.x, top, notesFrame.size.width, notesFrame.size.height);
-         self.notesTable.notesTableView.frame = newFrame;
-         }
-         */
+        
         [UIView beginAnimations:nil context:NULL];
         [UIView setAnimationDuration:0.3];
-        [containerView bringSubviewToFront:menuView];
         
         [menuView setAlpha:1.0];
         
         [UIView commitAnimations];
         
-        
-        menuShowing = YES;
-        menuView.hidden = NO;
+        [containerView bringSubviewToFront:menuView];
 
+
+        menuShowing = YES;
+        
         
     }
     else 
@@ -288,11 +267,14 @@ bool isMyLegend;
                                        userInfo:nil
                                         repeats:NO];
         
+        
+        
+        
         menuShowing = NO;
         
         menuView.hidden = YES;
 
-        
+        [containerView addSubview:legendView];
         /*
         if (doUpdate) 
         {
@@ -422,7 +404,7 @@ bool isMyLegend;
         
         if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
         {
-            chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, 210)];
+            chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, 211)];
         }
         else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
         {
@@ -430,6 +412,12 @@ bool isMyLegend;
         }
         
     }
+    
+
+    
+    
+    
+    
     
     // Set a different theme on the chart
     SChartMidnightTheme *midnight = [[SChartMidnightTheme alloc] init];
@@ -617,43 +605,13 @@ bool isMyLegend;
     isLegend = legendSwitch.on;
     isSymbol = symbolSwitch.on;
     isGradient = gradientSwitch.on;
+
     
-    
-    // Update Legend
-    if (isLegend) 
-    {
-        legendView.hidden = NO;
-        [self showButtons:1];
-    }
-    else 
-    {
-        legendView.hidden = YES;
-        [self showButtons:1];
-    }
-    
-    // Update Gradient
-    if (isGradient) 
-    {
-      //  [datasource toggleGradient:YES];
-    }
-    else 
-    {
-       // [datasource toggleGradient:NO];
-    }    
-    
-    // Update Symbols
-    if (isSymbol) 
-    {
-       // [datasource toggleSymbol:YES];
-    }
-    else 
-    {
-        //[datasource toggleSymbol:NO];
-    }    
     
     
     [containerView sendSubviewToBack:loadingView];
     // Add the chart to the view controller
+    /*
     [chart setAlpha:0.0];
     [containerView addSubview:chart];
     
@@ -663,10 +621,67 @@ bool isMyLegend;
     [chart setAlpha:1.0];
     [UIView commitAnimations];
     //[containerView bringSubviewToFront:legendView]; 
-    
+    */
     t2LogoImageView.hidden = YES;
     
+    
+    UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
+    
+    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    {
+        
+        [self showButtons:1];
+        
+        
+        // Add the chart to the view controller
+        [chart setAlpha:0.0];
+        [menuView setAlpha:0.0];
+        [legendView setAlpha:0.0];
+        menuView.hidden = NO;
+        [containerView addSubview:chart];
+
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.5];
+        [chart setAlpha:1.0];
+        [menuView setAlpha:1.0];
+        [UIView commitAnimations];
+        
+        // Update Legend
+        NSLog(@"isLEgend: %i", isLegend);
+        if (isLegend) 
+        {
+            legendView.hidden = NO;
+        }
+        else 
+        {
+            legendView.hidden = YES;
+        }
+
+        
+    }
+    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+    {
+        
+
+        [self showButtons:2];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     0.0,
+                                     menuViewSize.width, 320);
+        self.menuView.frame = menuRect;
+        
+        
+        [containerView addSubview:chart];
+        [containerView bringSubviewToFront:legendView];
+        [containerView bringSubviewToFront:menuView];
+        menuView.hidden = YES;
+        menuShowing = NO;
+    }
+    
+
     [self resetLegend];
+
 
 }
 
@@ -805,7 +820,24 @@ bool isMyLegend;
         
         self.legendView.frame = startRect;
     }
-    [containerView addSubview:legendView];
+    
+    UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
+    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+    {
+        [containerView addSubview:legendView];
+        [containerView bringSubviewToFront:legendView];
+    }
+    else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+    {
+        if (!menuShowing) 
+        {
+            [containerView addSubview:legendView];
+            [containerView bringSubviewToFront:legendView];
+
+        }    
+    }
+    
+
 }
 
 - (void)showLegend
@@ -1203,17 +1235,28 @@ bool isMyLegend;
     {
         NSLog(@"OrientationCHANGE: PORTRAIT");
         
-        menuView.hidden = NO;
         [chart removeFromSuperview];
-        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-        CGRect startRect = CGRectMake(0.0,
-                                      0.0,
-                                      chartViewSize.width, 210); 
         
-        chart.frame = startRect;
+
+        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+        CGRect chartRect = CGRectMake(0.0,
+                                      0.0,
+                                      chartViewSize.width, 211); 
+        
+        chart.frame = chartRect;
         [self showButtons:1];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                      211,
+                                      menuViewSize.width, 205);
+        self.menuView.frame = menuRect;
+        
+        menuView.hidden = NO;
+        [menuView setAlpha:1.0];
         [containerView addSubview:chart];
         [containerView bringSubviewToFront:legendView];
+        [containerView bringSubviewToFront:menuView];
 
 
         
@@ -1226,14 +1269,23 @@ bool isMyLegend;
         CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
         CGRect startRect = CGRectMake(0.0,
                                       0.0,
-                                      chartViewSize.width, 300); 
+                                      chartViewSize.width, 260); 
         
         chart.frame = startRect;
-        menuView.hidden = YES;
         [self showButtons:2];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     0.0,
+                                     menuViewSize.width, 320);
+        self.menuView.frame = menuRect;
+        
+        
         [containerView addSubview:chart];
         [containerView bringSubviewToFront:legendView];
-        
+        [containerView bringSubviewToFront:menuView];
+        menuView.hidden = YES;
+        menuShowing = NO;
 
     }
 
