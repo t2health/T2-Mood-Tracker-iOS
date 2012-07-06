@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<data>
+	<tips version="1.0">
+		<tip  text="The body is vulnerable to problems when it is not “maintained” properly.  Take timeout to relax or do enjoyable activities."/>
+		<tip text="Put effort into maintaining positive relationships at work.  After deployment you still need someone to watch your back. "/>
+		<!-- <tip text="If you talk about your deployment at work, test the waters first.  You don't have to give all the details."/> -->
+		<tip text="Blowing off steam is a bad idea:   anger creates more anger, and stress creates more stress.  Solve the problem."/>
+		<tip text="Problems with drinking and drugs can be tough to work through on your own.   Talk to a chaplain or health care professional."/>
+		<tip text="Getting involved in your community and spending time with others can help you feel less alone and allows you to give back to your community."/>
+		<tip text="Talking about feelings, although uncomfortable, is an important step to getting past grief."/>
+		<tip text="It’s common for depressed people to believe that nothing will help.  Today's treatments for depression are very effective. "/>
+		<tip text="If you're depressed avoid the urge to be alone. Be with other people. Confide in someone – it’s healthier than self-isolating. "/>
+		<tip text="Balance your life--don't let your day define your priorities, let your priorities define your day."/>
+		<tip text="If you're feeling guilty about something remember that self-forgiveness means recognizing mistakes and accepting shortcomings."/>
+		<tip text="Don't believe everything you think:  Challenge your negative thoughts.  Is there evidence to support the way you are perceiving the situation? "/>
+		<tip text="It's not the event that causes stress, it's how you interpret the event.  Changing your “all or nothing thinking” will allow you to reduce stress.  "/>
+		<tip text="If staying focused at work is a problem, jotting in a notebook or using a journal can be helpful"/>
+		<!-- <tip text="In some deployed settings it can be tough to schedule times to talk with loved ones .  Make a special effort to contact the family on important dates. "/> -->
+		<!-- <tip text="As you prepare for homecoming after deployment, it’s important to go slow, be patient, and allow several months to reestablish close family connections. "/> -->
+		<!-- <tip text="Lots of reassurance from both parents will help reduce the amount and intensity of children's negative reactions to deployment."/> -->
+		<!-- <tip text="Toddlers will generally copy the attitude of the at-home parent. If the at-home parent is coping well, the child will tend to do well."/> -->
+		<!-- <tip text="Dealing with deployment issues can be overwhelming.   Talk to family, or friends, or someone from the clergy."/> -->
+		<tip text="One source of anger is fear.  The next time you get angry, ask yourself what made you afraid.  If you work on the fear, the anger will get better."/>
+		<tip text="To break the habit of aggressive behavior, it is necessary to become aware of what triggers or sets off the anger.  "/>
+		<tip text="There is a difference between feelings and behavior – an individual may feel angry but the anger does not have to be acted on in an aggressive way. "/>
+		<tip text="There are often feelings behind anger that make the anger stronger like fear which can be based on embarrassment, powerlessness, frustration and hurt."/>
+		<tip text="Try to avoid words like “should,” “shouldn't,” “must”, “ought”, “always”, “have to”, or “need to”.  Statements including these words tend to increase anger.  "/>
+		<!-- <tip text="Like physical fitness, spiritual fitness must be tended to and practiced.  Veterans who have a spiritual practice report less severe and fewer PTSD symptoms."/> -->
+		<tip text="If you are struggling with spiritual question, take the time to talk to someone you trust."/>
+		<tip text="Participating in activities with family, friends, or a larger community adds  to your spiritual fitness by increasing your connection to other people. "/>
+		<tip text="The ability to make sense of a traumatic event in a way that 'fits' with one's previous beliefs  may lead to psychological or spiritual growth"/>
+		<tip text="Research shows that when people forgive others, they become less vengeful, and more generous and kind toward others.  "/>
+		<!-- <tip text="Acceptance is part of dealing with an injury.  Depending on the severity of the injury, this process can take between a couple of months and two years.  "/> -->
+		<!-- <tip text="Making sense of your injury may take days, weeks, or months. Give yourself time, but  try to identify how it can have a positive effect on your life. "/> -->
+		<tip text="If you are coping with an injury, remember to set some goals.  Goal-setting is important for both your physical recovery and for positive mental health."/>
+		<!-- <tip text="Goals while recovering from an injury,  should be challenging enough to keep your interest but not so difficult as to require superhuman effort. "/> -->
+		<tip text="If you are struggling with chronic pain, don't give up.  Be open to trying different treatments or combinations of treatments until you find something that works for you. "/>
+	</tips>
+	<groups>
+		<group title="Depression">
+			<scale min="Depressed" max ="Happy"/>
+			<scale min="Worthless" max ="Valuable"/>
+			<scale min="Tired" max ="Energetic"/>
+			<scale min="Sleepy" max ="Alert"/>
+			<scale min="Lonely" max ="Involved"/>
+			<scale min="Hopeless" max ="Hopeful"/>
+			<scale min="Distracted" max ="Focused"/>
+			<scale min="Slow" max ="Speedy"/>
+			<scale min="Restless" max ="Relaxed"/>
+			<scale min="Unsafe" max ="Safe"/>
+		</group>
+		<group title="Anxiety">
+			<scale min="Worried" max ="Untroubled"/>
+			<scale min="Pressured" max ="Calm"/>
+			<scale min="Tense" max ="Relaxed"/>
+			<scale min="Sleepless" max ="Rested"/>
+			<scale min="Distracted" max ="Focused"/>
+			<scale min="Irritable" max ="Cheerful"/>
+			<scale min="Unsafe" max ="Safe"/>
+			<scale min="Fearful" max ="Fearless"/>
+			<scale min="Panicked" max ="Content"/>
+			<scale min="Anxious" max ="Peaceful"/>
+		</group>
+		<group title="PTS (Post-traumatic Stress)">
+			<scale min="Avoiding" max ="Welcoming"/>
+			<scale min="Fearful" max ="Safe"/>
+			<scale min="Angry" max ="Content"/>
+			<scale min="Jumpy" max ="Relaxed"/>
+			<scale min="Guarded" max ="Trusting"/>
+			<scale min="Numb" max ="Responsive"/>
+			<scale min="Hyper" max ="Calm"/>
+			<scale min="Withdrawn" max ="Social"/>
+			<scale min="Bored" max ="Interested"/>
+			<scale min="Hopeless" max ="Hopeful"/>
+		</group>
+		<group title="Head Injury">
+			<scale min="Confused" max ="Alert"/>
+			<scale min="Forgetful" max ="Sharp"/>
+			<scale min="Dizzy" max ="Balanced"/>
+			<scale min="Distracted" max ="Attentive"/>
+			<scale min="Moody" max ="Stable"/>
+			<scale min="Headache" max ="No Headache"/>
+			<scale min="Irritable" max ="Cheerful"/>
+			<scale min="Disorganized" max ="Organized"/>
+			<scale min="Impulsive" max ="Thoughtful"/>
+			<scale min="Depressed" max ="Happy"/>
+		</group>
+		<group title="Stress">
+			<scale min="Stressed" max ="Relaxed"/>
+			<scale min="Pressured" max ="Calm"/>
+			<scale min="Angry" max ="Content"/>
+			<scale min="Withdrawn" max ="Social"/>
+			<scale min="Restless" max ="Peaceful"/>
+			<scale min="Moody" max ="Light Hearted"/>
+			<scale min="Irritable" max ="Cheerful"/>
+			<scale min="Tired" max ="Energetic"/>
+			<scale min="Distracted" max ="Focused"/>
+			<scale min="Hopeless" max ="Hopeful"/>
+		</group>
+		<group title="General Well-Being">
+			<scale min="Sad" max ="Happy"/>
+			<scale min="Tired" max ="Energetic"/>
+			<scale min="Worried" max ="Calm"/>
+			<scale min="Tense" max ="Relaxed"/>
+			<scale min="Pessimistic" max ="Optimistic"/>
+			<scale min="Hopeless" max ="Hopeful"/>
+			<scale min="Lonely" max ="Connected"/>
+			<scale min="Unsafe" max ="Safe"/>
+			<scale min="Unloved" max ="Loved"/>
+			<scale min="Angry" max ="Content"/>
+		</group>
+	</groups>
+</data>
