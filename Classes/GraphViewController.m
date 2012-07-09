@@ -24,6 +24,7 @@
 #import "HRColorUtil.h"
 #import "LegendTableViewController.h"
 #import "NotesTableViewController.h"
+#import "OptionsTableViewController.h"
 
 @implementation GraphViewController
 
@@ -36,6 +37,7 @@
 @synthesize t2LogoImageView, loadingView, symbolsDictionary,legendButton;
 @synthesize _tableView, optionView, legendSwitch, symbolSwitch, gradientSwitch;
 @synthesize optionsDictionary, legendView, legendTableViewController, _legendTableView, notesTableViewController, _notesTableView;
+@synthesize optionsTableViewController, _optionsTableView;
 
 CGRect menu_ShownFrame;
 CGRect menu_HiddenFrame;	
@@ -83,6 +85,8 @@ bool isMyLegend;
     noteView.hidden = YES;
     
     notesTableViewController.myNavController = self.navigationController;
+    optionsTableViewController.myNavController = self.navigationController;
+
     
     // Core Data
     UIApplication *app = [UIApplication sharedApplication];
@@ -98,6 +102,12 @@ bool isMyLegend;
     
     // Orientation
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    
+    // Listen for Actions from Option UITableViewController
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(legendToggle) name:@"toggleLegend" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(symbolToggle) name:@"toggleSymbol" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(gradientToggle) name:@"toggleGradient" object: nil];
+
     
     backgroundQueue = dispatch_queue_create("org.t2health.moodtracker.bgqueue", NULL);        
     [containerView bringSubviewToFront:loadingView];
@@ -275,18 +285,6 @@ bool isMyLegend;
         menuView.hidden = YES;
 
         [containerView addSubview:legendView];
-        /*
-        if (doUpdate) 
-        {
-            loadingLabel.text = @"Updating Chart";
-            [containerView bringSubviewToFront:loadingView]; 
-             [self resignLegend];
-            dispatch_async(backgroundQueue, ^(void) {
-                [self getDatasourceReload];
-            });   
-            doUpdate = NO;
-        }
-         */
     }
 }
 
@@ -299,105 +297,26 @@ bool isMyLegend;
 
 #pragma mark Graph Menu 
 
-- (void)getDatasourceReload
-{
-    datasource = [[GraphDataSource alloc] init];
-    
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self reloadData];
-    });
-    
-}
 
-- (void)reloadData
-{
-    double xMin, xMax, yMin, yMax;
-    xMin = [chart.xAxis.axisRange.minimum doubleValue];
-    xMax = [chart.xAxis.axisRange.maximum doubleValue];
-    yMin = [chart.yAxis.axisRange.minimum doubleValue];
-    yMax = [chart.yAxis.axisRange.maximum doubleValue];
-    
-    // Give the chart the data source
-    chart.datasource = datasource;
-    
-    // Update Series
-    if (doSeries) 
-    {
-        if ([[switchDictionary allKeys] count] > 0) 
-        {
-            [datasource toggleSeriesOn:switchDictionary];
-        }
-    }
-    
-    //NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	//NSString *defaultsKey;
-    [legendTableViewController refresh];
-    
-    // defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_SYMBOL"];
-    isLegend = legendSwitch.on;
-    isSymbol = symbolSwitch.on;
-    isGradient = gradientSwitch.on;
-    
-   // [self resetLegend];
-
-    
-    // Update Legend
-    if (isLegend) 
-    {
-        // Reload buttons
-        legendView.hidden = NO;
-        [self showButtons:1];
-    }
-    else 
-    {
-        // Reload buttons
-        legendView.hidden = YES;
-        [self showButtons:1];
-    }
-    
-    // Update Gradient
-    if (isGradient) 
-    {
-       // [datasource toggleGradient:YES];
-    }
-    else 
-    {
-      //  [datasource toggleGradient:NO];
-    }    
-    
-    // Update Symbols
-    if (isSymbol) 
-    {
-       // [datasource toggleSymbol:YES];
-    }
-    else 
-    {
-        //[datasource toggleSymbol:NO];
-    }    
-    
-    // Reload data
-    [chart reloadData];
-    [chart layoutSubviews];
-    
-    // Restore axes' ranges
-    [chart.xAxis setRangeWithMinimum:[NSNumber numberWithDouble: xMin] andMaximum:[NSNumber numberWithDouble: xMax] withAnimation:NO];
-    [chart.yAxis setRangeWithMinimum:[NSNumber numberWithDouble: yMin] andMaximum:[NSNumber numberWithDouble: yMax] withAnimation:NO];
-    
-    // Redraw chart
-    [chart redrawChartAndGL: YES];
-    
-    [containerView sendSubviewToBack:loadingView];
-    
-    [self resetLegend];
-
-}
 
 - (void)setupGraph
 {
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
         //Create the chart
-        chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, graphView.bounds.size.height)];
-    } else {
+        UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
+        
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+        {
+            chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, 512)];
+        }
+        else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+        {
+            chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, 700)];
+        }    
+    } 
+    else 
+    {
         //Create the chart
         
         UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
@@ -602,11 +521,10 @@ bool isMyLegend;
     chart.legend.style.borderColor = [UIColor clearColor];
     
     
-    isLegend = legendSwitch.on;
+    //isLegend = legendSwitch.on;
     isSymbol = symbolSwitch.on;
     isGradient = gradientSwitch.on;
 
-    
     
     
     [containerView sendSubviewToBack:loadingView];
@@ -624,11 +542,25 @@ bool isMyLegend;
     */
     t2LogoImageView.hidden = YES;
     
+
+    
+    
     
     UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
     
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
+        
+        int startHeight = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            startHeight = 512;
+        } 
+        else 
+        {
+            startHeight = 205;
+        }
+        
         
         [self showButtons:1];
         
@@ -647,7 +579,6 @@ bool isMyLegend;
         [UIView commitAnimations];
         
         // Update Legend
-        NSLog(@"isLEgend: %i", isLegend);
         if (isLegend) 
         {
             legendView.hidden = NO;
@@ -656,7 +587,6 @@ bool isMyLegend;
         {
             legendView.hidden = YES;
         }
-
         
     }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
@@ -695,7 +625,7 @@ bool isMyLegend;
         self.navigationItem.rightBarButtonItem = actionButton;
         [actionButton release];
         
-        NSLog(@"how many 1");
+
     }
     else 
     {
@@ -720,7 +650,7 @@ bool isMyLegend;
         [barButtonItemsArray release];
         [actionButton release];
         
-        NSLog(@"how many 2");
+
         
     }
 }
@@ -826,6 +756,7 @@ bool isMyLegend;
     {
         [containerView addSubview:legendView];
         [containerView bringSubviewToFront:legendView];
+        NSLog(@"bring legen view to front");
     }
     else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
     {
@@ -837,12 +768,25 @@ bool isMyLegend;
         }    
     }
     
+    NSLog(@"legendSwitch.on2: %i", isLegend);
+    if (isLegend) 
+    {
+        legendView.hidden = NO;
+        [legendView setAlpha:1.0];
+
+    }
+    else 
+    {
+        legendView.hidden = YES;
+        [legendView setAlpha:1.0];
+
+    }
 
 }
 
 - (void)showLegend
 {
-    NSLog(@"groupsArray: %@", groupsArray);
+  //  NSLog(@"groupsArray: %@", groupsArray);
     //legendView.hidden = NO;
     int legendItemCount = 0;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -1095,26 +1039,52 @@ bool isMyLegend;
 {
     
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSString *defaultsKey;
-	
-    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND"];
-    BOOL val = legendSwitch.on;
-    [defaults setBool:val forKey:defaultsKey];
-    [defaults synchronize];
-    
+	[self showButtons:2];
+    BOOL storedVal;
+    NSString *key;
+    key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND"];
+    if (![defaults boolForKey:key]) {
+        storedVal = NO;
+    }
+    else {
+        storedVal = [defaults boolForKey:key];				
+    }
     
     // Update Legend
-    if (val) 
+    if (storedVal) 
     {
         // Reload buttons
         legendView.hidden = NO;
-        [self showButtons:1];
+        isLegend = YES;
+        
+        UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            [self showButtons:1];
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            [self showButtons:2];
+            
+        }
+        
     }
     else 
     {
         // Reload buttons
         legendView.hidden = YES;
-        [self showButtons:1];
+        isLegend = NO;
+        UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            [self showButtons:1];
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            [self showButtons:2];
+        }   
     }
     
     //doUpdate = YES;
@@ -1122,14 +1092,7 @@ bool isMyLegend;
 
 - (void)symbolToggle
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSString *defaultsKey;
-	
-    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_SYMBOL"];
-    BOOL val = symbolSwitch.on;
-    [defaults setBool:val forKey:defaultsKey];
-    [defaults synchronize];
-    
+
     double xMin, xMax, yMin, yMax;
     xMin = [chart.xAxis.axisRange.minimum doubleValue];
     xMax = [chart.xAxis.axisRange.maximum doubleValue];
@@ -1153,13 +1116,7 @@ bool isMyLegend;
 
 - (void)gradientToggle
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSString *defaultsKey;
-	
-    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_GRADIENT"];
-    BOOL val = gradientSwitch.on;
-    [defaults setBool:val forKey:defaultsKey];
-    [defaults synchronize];
+
     
     double xMin, xMax, yMin, yMax;
     xMin = [chart.xAxis.axisRange.minimum doubleValue];
@@ -1229,27 +1186,42 @@ bool isMyLegend;
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 
 {
+
     UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
 
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
-        NSLog(@"OrientationCHANGE: PORTRAIT");
-        
+        int chartHeight = 0;
+        int menuHeight = 0;
+        int menuStart = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            chartHeight = 512;
+            menuStart = 512;
+            menuHeight = 512;
+        } 
+        else 
+        {
+            // iPhone
+            chartHeight = 211;
+            menuStart = 211;
+            menuHeight = 205;
+        }        
         [chart removeFromSuperview];
         
 
         CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
         CGRect chartRect = CGRectMake(0.0,
                                       0.0,
-                                      chartViewSize.width, 211); 
+                                      chartViewSize.width, chartHeight); 
         
         chart.frame = chartRect;
         [self showButtons:1];
         
         CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
         CGRect menuRect = CGRectMake(0.0,
-                                      211,
-                                      menuViewSize.width, 205);
+                                      menuStart,
+                                      menuViewSize.width, menuHeight);
         self.menuView.frame = menuRect;
         
         menuView.hidden = NO;
@@ -1263,21 +1235,38 @@ bool isMyLegend;
     }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
     {
+        int chartHeight = 0;
+        int menuHeight = 0;
+        int menuStart = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            chartHeight = 700;
+            menuStart = 0;
+            menuHeight = 700;
+        } 
+        else 
+        {
+            // iPhone
+            chartHeight = 260;
+            menuStart = 0;
+            menuHeight = 320;
+        } 
+        
         [chart removeFromSuperview];
 
         NSLog(@"OrientationCHANGE: LANDSCAPE");
         CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
         CGRect startRect = CGRectMake(0.0,
                                       0.0,
-                                      chartViewSize.width, 260); 
+                                      chartViewSize.width, chartHeight); 
         
         chart.frame = startRect;
         [self showButtons:2];
         
         CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
         CGRect menuRect = CGRectMake(0.0,
-                                     0.0,
-                                     menuViewSize.width, 320);
+                                     menuStart,
+                                     menuViewSize.width, menuHeight);
         self.menuView.frame = menuRect;
         
         
@@ -1288,31 +1277,9 @@ bool isMyLegend;
         menuShowing = NO;
 
     }
-
-    /*
-     if (menuShowing && segmentButton.selectedSegmentIndex == 1) 
-     {
-     [notesTable.view removeFromSuperview];
-     notesTable = nil;
-     if (self.notesTable == nil) 
-     {
-     self.notesTable = [[ViewNotesViewController alloc] initWithNibName:@"ViewNotesViewController" bundle:nil];
-     CGRect wFrame = menuView.frame;
-     CGRect bFrame = menuBar.frame;
-     NSInteger notesHeight =  wFrame.size.height - (bFrame.origin.y + bFrame.size.height);
-     CGRect nFrame = CGRectMake(0, wFrame.size.height - notesHeight, wFrame.size.width, notesHeight);
-     self.notesTable.view.frame = nFrame;
-     [menuView addSubview:self.notesTable.view];
-     }
-     //   NSLog(@"segment: %i", segmentButton.selectedSegmentIndex);
-     self.notesTable.view.hidden = NO;
-     NSInteger top = 0;
-     CGRect notesFrame = self.notesTable.notesTableView.frame;
-     CGRect newFrame = CGRectMake(notesFrame.origin.x, top, notesFrame.size.width, notesFrame.size.height);
-     self.notesTable.notesTableView.frame = newFrame;
-     }
-     */
     
+    // Reset Legend View
+    [self resetLegend];
 }
 
 
@@ -1576,17 +1543,19 @@ bool isMyLegend;
     
     // Fetch User Defaults for Legend
     key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND"];
-    if (![defaults objectForKey:key]) {
+    if (![defaults boolForKey:key]) {
         storedVal = NO;
     }
     else {
         storedVal = [defaults boolForKey:key];				
     }
-    legendSwitch.on = storedVal;
-    legendSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
-    [legendSwitch addTarget:self action:@selector(legendToggle) forControlEvents:UIControlEventValueChanged];
+    isLegend = storedVal;
+    NSLog(@"SWITCH_OPTION_STATE_LEGEND: %i", isLegend);
+
+   // legendSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
+  //  [legendSwitch addTarget:self action:@selector(legendToggle) forControlEvents:UIControlEventValueChanged];
     
-    
+    /*
     // Fetch User Defaults for Symbol
     key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_SYMBOL"];
     if (![defaults objectForKey:key]) {
@@ -1596,8 +1565,8 @@ bool isMyLegend;
         storedVal = NO;//[defaults boolForKey:key];				
     }
     symbolSwitch.on = storedVal;
-    symbolSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
-    [symbolSwitch addTarget:self action:@selector(symbolToggle) forControlEvents:UIControlEventValueChanged];
+   // symbolSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
+   // [symbolSwitch addTarget:self action:@selector(symbolToggle) forControlEvents:UIControlEventValueChanged];
     
     // Fetch User Defaults for Gradient
     key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_GRADIENT"];
@@ -1607,10 +1576,11 @@ bool isMyLegend;
     else {
         storedVal = NO;//[defaults boolForKey:key];				
     }
-    NSLog(@"storedVal: %i", storedVal);
+    
     gradientSwitch.on = storedVal;
-    gradientSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
-    [gradientSwitch addTarget:self action:@selector(gradientToggle) forControlEvents:UIControlEventValueChanged];  
+   // gradientSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
+   // [gradientSwitch addTarget:self action:@selector(gradientToggle) forControlEvents:UIControlEventValueChanged];  
+     */
     
 }
 

@@ -94,6 +94,7 @@
 		FBF91EE41522361700D1D138 /* Saved.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF91EE31522361600D1D138 /* Saved.m */; };
 		FBF91EED15239D3000D1D138 /* ViewSavedController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF91EEB15239D2700D1D138 /* ViewSavedController.m */; };
 		FBF91EEE15239D3000D1D138 /* ViewSavedController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBF91EEC15239D2900D1D138 /* ViewSavedController.xib */; };
+		FBFDA44315AB2C6F00C20E18 /* OptionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFDA44215AB2C6F00C20E18 /* OptionsTableViewController.m */; };
 		FE0A118D130DA1230013D958 /* EditScaleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0A118B130DA1230013D958 /* EditScaleViewController.m */; };
 		FE0A118E130DA1230013D958 /* EditScaleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE0A118C130DA1230013D958 /* EditScaleViewController.xib */; };
 		FE0A148E130EEE990013D958 /* iTunesArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = FE0A148D130EEE990013D958 /* iTunesArtwork.png */; };
@@ -313,6 +314,8 @@
 		FBF91EEA15239D2500D1D138 /* ViewSavedController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSavedController.h; sourceTree = "<group>"; };
 		FBF91EEB15239D2700D1D138 /* ViewSavedController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSavedController.m; sourceTree = "<group>"; };
 		FBF91EEC15239D2900D1D138 /* ViewSavedController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewSavedController.xib; sourceTree = "<group>"; };
+		FBFDA44115AB2C6F00C20E18 /* OptionsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptionsTableViewController.h; sourceTree = "<group>"; };
+		FBFDA44215AB2C6F00C20E18 /* OptionsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OptionsTableViewController.m; sourceTree = "<group>"; };
 		FE0A118A130DA1230013D958 /* EditScaleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditScaleViewController.h; sourceTree = "<group>"; };
 		FE0A118B130DA1230013D958 /* EditScaleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditScaleViewController.m; sourceTree = "<group>"; };
 		FE0A118C130DA1230013D958 /* EditScaleViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EditScaleViewController.xib; sourceTree = "<group>"; };
@@ -886,6 +889,8 @@
 				FBF7101C1592146F004728D9 /* SLegendTableViewController.m */,
 				FBF710201592598C004728D9 /* NotesTableViewController.h */,
 				FBF710211592598D004728D9 /* NotesTableViewController.m */,
+				FBFDA44115AB2C6F00C20E18 /* OptionsTableViewController.h */,
+				FBFDA44215AB2C6F00C20E18 /* OptionsTableViewController.m */,
 			);
 			name = Chart;
 			sourceTree = "<group>";
@@ -1371,6 +1376,7 @@
 				FBF710221592598D004728D9 /* NotesTableViewController.m in Sources */,
 				FBD06A41159B7FE900FD28A9 /* PDFImageConverter.m in Sources */,
 				FBD06A5C159CC26900FD28A9 /* ChartPrintDataSource.m in Sources */,
+				FBFDA44315AB2C6F00C20E18 /* OptionsTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

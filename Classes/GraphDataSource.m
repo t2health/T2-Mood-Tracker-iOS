@@ -82,7 +82,7 @@ bool symbolOn;
     }
     
     
-    NSLog(@"dataDict: %@",dataDict);
+   // NSLog(@"dataDict: %@",dataDict);
     
     return self;
 }
@@ -331,7 +331,7 @@ bool symbolOn;
 			[aSwitch addTarget:self action:@selector(switchFlipped:) forControlEvents:UIControlEventValueChanged];
 			
 			[self.switchDictionary setValue:aSwitch forKey:groupTitle];
-            NSLog(@"groupTitle: %@ - aSwitch: %i",groupTitle,  aSwitch.on);
+          //  NSLog(@"groupTitle: %@ - aSwitch: %i",groupTitle,  aSwitch.on);
 
 			[aSwitch release];
 		}

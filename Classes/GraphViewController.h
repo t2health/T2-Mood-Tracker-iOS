@@ -23,6 +23,8 @@
 @class ViewNotesViewController;
 @class LegendTableViewController;
 @class NotesTableViewController;
+@class OptionsTableViewController;
+
 
 @interface GraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, HRColorPickerViewControllerDelegate, UIGestureRecognizerDelegate> 
 {
@@ -55,7 +57,9 @@
     IBOutlet ViewNotesViewController *notesTable;
     IBOutlet LegendTableViewController *legendTableViewController;
     IBOutlet NotesTableViewController *notesTableViewController;
+    IBOutlet OptionsTableViewController *optionsTableViewController;
 
+    
     NSMutableDictionary *symbolsDictionary;
     NSMutableDictionary *optionsDictionary;
     IBOutlet UITableView *_tableView;
@@ -68,6 +72,7 @@
     IBOutlet UIView *legendView;
     IBOutlet UITableView *_legendTableView;
     IBOutlet UITableView *_notesTableView;
+    IBOutlet UITableView *_optionsTableView;
     IBOutlet UIView *noteView;
 	UISwipeGestureRecognizer *legendSwipeRight;
 	UISwipeGestureRecognizer *legendSwipeLeft;
@@ -94,6 +99,8 @@
 @property (nonatomic, retain) IBOutlet ViewNotesViewController *notesTable;
 @property (nonatomic, retain) IBOutlet LegendTableViewController *legendTableViewController;
 @property (nonatomic, retain) IBOutlet NotesTableViewController *notesTableViewController;
+@property (nonatomic, retain) IBOutlet OptionsTableViewController *optionsTableViewController;
+
 @property (nonatomic, retain) IBOutlet UITableView *_notesTableView;
 
 @property (nonatomic, retain) UISwipeGestureRecognizer *legendSwipeRight;
@@ -103,6 +110,8 @@
 
 @property (nonatomic, retain) IBOutlet UITableView *_tableView;
 @property (nonatomic, retain) IBOutlet UITableView *_legendTableView;
+@property (nonatomic, retain) IBOutlet UITableView *_optionsTableView;
+
 
 //0@property (nonatomic, retain) IBOutlet UITableView *_legendTable;
 
@@ -117,9 +126,7 @@
 @property (nonatomic, retain) IBOutlet UIView *legendView;
 
 - (void)initSetup;
-- (void)reloadData;
 - (void)getDatasource;
-- (void)getDatasourceReload;
 
 - (void)optionButtonClicked;
 - (void)shareClick;
@@ -147,8 +154,6 @@
 - (void)gradientToggle;
 - (IBAction) legendButtonClicked:(id)sender;
 
-- (IBAction) customChartButtonClick:(id)sender;
-- (void)customChartClick;
 
 - (void)sendMenuToBack;
 - (void)emailResults;

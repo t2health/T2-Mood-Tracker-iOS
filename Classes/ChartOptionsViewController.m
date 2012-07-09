@@ -35,7 +35,7 @@ int editWhat;
 - (void)viewDidLoad {
     [super viewDidLoad];
     _tableView.backgroundView = nil;
-
+    NSLog(@"CHART OPTION VIEW LOADED");
     // Default to color
     editWhat = 0;
 	pickerView.hidden = YES;
