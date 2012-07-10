@@ -35,7 +35,10 @@
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
 	self.managedObjectContext = appDelegate.managedObjectContext;
     [self fillGroupsDictionary];
+    
+    NSLog(@"groupsDictionary: %@", groupsDictionary);
 }
+
 
 - (void)refresh
 {
@@ -43,10 +46,9 @@
     [self.tableView reloadData];
     
     // Resize Legend Window
-    
-    
-    
+
 }
+
 
 #pragma mark groups
 

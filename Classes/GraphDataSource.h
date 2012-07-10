@@ -78,7 +78,6 @@
 - (void)fillColors;
 - (void)fillSymbols;
 - (void)printData;
-
 - (void)toggleSeries;
 - (void)toggleGradient;
 - (void)toggleSymbol;

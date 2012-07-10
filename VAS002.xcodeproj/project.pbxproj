@@ -55,7 +55,6 @@
 		FBDF3A02157FCF8D00E74F12 /* OutReachViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBDF3A00157FCF8D00E74F12 /* OutReachViewController.m */; };
 		FBDF3A03157FCF8D00E74F12 /* OutReachViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBDF3A01157FCF8D00E74F12 /* OutReachViewController.xib */; };
 		FBDF3A05157FDA3800E74F12 /* outreach_wefeature.html in Resources */ = {isa = PBXBuildFile; fileRef = FBDF3A04157FDA3800E74F12 /* outreach_wefeature.html */; };
-		FBDF3A121580F3B900E74F12 /* GraphViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBDF3A111580F3B900E74F12 /* GraphViewController.xib */; };
 		FBDF3A1D158271C700E74F12 /* LegendTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBDF3A1C158271C600E74F12 /* LegendTableViewController.m */; };
 		FBE85F3015191961003073F9 /* ResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE85F2E15191960003073F9 /* ResultsViewController.m */; };
 		FBE85F3115191961003073F9 /* ResultsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBE85F2F15191960003073F9 /* ResultsViewController.xib */; };
@@ -95,6 +94,7 @@
 		FBF91EED15239D3000D1D138 /* ViewSavedController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF91EEB15239D2700D1D138 /* ViewSavedController.m */; };
 		FBF91EEE15239D3000D1D138 /* ViewSavedController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBF91EEC15239D2900D1D138 /* ViewSavedController.xib */; };
 		FBFDA44315AB2C6F00C20E18 /* OptionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFDA44215AB2C6F00C20E18 /* OptionsTableViewController.m */; };
+		FBFDA44A15ACE8B600C20E18 /* GraphViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA44915ACE8B600C20E18 /* GraphViewController.xib */; };
 		FE0A118D130DA1230013D958 /* EditScaleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0A118B130DA1230013D958 /* EditScaleViewController.m */; };
 		FE0A118E130DA1230013D958 /* EditScaleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE0A118C130DA1230013D958 /* EditScaleViewController.xib */; };
 		FE0A148E130EEE990013D958 /* iTunesArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = FE0A148D130EEE990013D958 /* iTunesArtwork.png */; };
@@ -263,7 +263,6 @@
 		FBDF3A00157FCF8D00E74F12 /* OutReachViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutReachViewController.m; sourceTree = "<group>"; };
 		FBDF3A01157FCF8D00E74F12 /* OutReachViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OutReachViewController.xib; sourceTree = "<group>"; };
 		FBDF3A04157FDA3800E74F12 /* outreach_wefeature.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = outreach_wefeature.html; sourceTree = "<group>"; };
-		FBDF3A111580F3B900E74F12 /* GraphViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GraphViewController.xib; path = ../../../../../Downloads/update6612/GraphViewController.xib; sourceTree = "<group>"; };
 		FBDF3A1B158271C500E74F12 /* LegendTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegendTableViewController.h; sourceTree = "<group>"; };
 		FBDF3A1C158271C600E74F12 /* LegendTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegendTableViewController.m; sourceTree = "<group>"; };
 		FBE85F2D15191960003073F9 /* ResultsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResultsViewController.h; path = ../ResultsViewController.h; sourceTree = "<group>"; };
@@ -316,6 +315,7 @@
 		FBF91EEC15239D2900D1D138 /* ViewSavedController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewSavedController.xib; sourceTree = "<group>"; };
 		FBFDA44115AB2C6F00C20E18 /* OptionsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptionsTableViewController.h; sourceTree = "<group>"; };
 		FBFDA44215AB2C6F00C20E18 /* OptionsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OptionsTableViewController.m; sourceTree = "<group>"; };
+		FBFDA44915ACE8B600C20E18 /* GraphViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GraphViewController.xib; sourceTree = "<group>"; };
 		FE0A118A130DA1230013D958 /* EditScaleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditScaleViewController.h; sourceTree = "<group>"; };
 		FE0A118B130DA1230013D958 /* EditScaleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditScaleViewController.m; sourceTree = "<group>"; };
 		FE0A118C130DA1230013D958 /* EditScaleViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EditScaleViewController.xib; sourceTree = "<group>"; };
@@ -872,17 +872,17 @@
 		FBDF39FB157FC67E00E74F12 /* Chart */ = {
 			isa = PBXGroup;
 			children = (
+				FBFDA44915ACE8B600C20E18 /* GraphViewController.xib */,
 				FB620C1215470EC400C45A30 /* GraphViewController.h */,
 				FB620C1315470EC400C45A30 /* GraphViewController.m */,
-				FBDF3A111580F3B900E74F12 /* GraphViewController.xib */,
 				FB96546D15517FD400F80E27 /* GraphDataSource.h */,
 				FB96546E15517FD500F80E27 /* GraphDataSource.m */,
 				FBF4B6C5156D309C00D6FAF5 /* SGraphViewController.h */,
 				FBF4B6C6156D309C00D6FAF5 /* SGraphViewController.m */,
+				FBF4B6C8156D31A400D6FAF5 /* SGraphViewController.xib */,
 				FBF4B6BF156D2CE800D6FAF5 /* SGraphDataSource.h */,
 				FBF4B6C0156D2CE800D6FAF5 /* SGraphDataSource.m */,
 				FB9654701551812000F80E27 /* GraphViewController_landscape.xib */,
-				FBF4B6C8156D31A400D6FAF5 /* SGraphViewController.xib */,
 				FBDF3A1B158271C500E74F12 /* LegendTableViewController.h */,
 				FBDF3A1C158271C600E74F12 /* LegendTableViewController.m */,
 				FBF7101B1592146F004728D9 /* SLegendTableViewController.h */,
@@ -1298,11 +1298,11 @@
 				FBDF39D9157FB93C00E74F12 /* icon-settings@2x.png in Resources */,
 				FBDF3A03157FCF8D00E74F12 /* OutReachViewController.xib in Resources */,
 				FBDF3A05157FDA3800E74F12 /* outreach_wefeature.html in Resources */,
-				FBDF3A121580F3B900E74F12 /* GraphViewController.xib in Resources */,
 				FB5AA7D31587EB3200014B78 /* SChartOptionsViewController.xib in Resources */,
 				FB5AA8041588DF4700014B78 /* SymbolViewController.xib in Resources */,
 				FBF7103215936B80004728D9 /* tab-legend.png in Resources */,
 				FBF7103415936BC1004728D9 /* tab-legend@2x.png in Resources */,
+				FBFDA44A15ACE8B600C20E18 /* GraphViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

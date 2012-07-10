@@ -137,6 +137,7 @@ bool symbolOn;
     
 }
 
+
 - (void) printData
 {
     //   NSLog(@"dataDict: %@", dataDict);
@@ -340,6 +341,58 @@ bool symbolOn;
 
 - (NSDictionary *)getChartDictionary
 {
+    // Get data range
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *defaultsKey;
+    
+    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
+    NSString *theRange = [defaults objectForKey:defaultsKey];
+    
+    
+    NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:[[NSDate alloc] init]];
+    
+    // Today's Date
+    [components setHour:-[components hour]];
+    [components setMinute:-[components minute]];
+    [components setSecond:-[components second]];
+    NSDate *today = [cal dateByAddingComponents:components toDate:[[NSDate alloc] init] options:0];
+    NSDate *fromDate;
+    BOOL isAll = NO;
+    
+    if ([theRange isEqualToString:@"30 days"]) 
+    {
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        [components setMonth:([components month] - 1)]; 
+        fromDate = [cal dateFromComponents:components];
+    }
+    else if ([theRange isEqualToString:@"90 days"]) 
+    {
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        [components setMonth:([components month] - 3)]; 
+        fromDate = [cal dateFromComponents:components];
+    }
+    else if ([theRange isEqualToString:@"1 year"]) 
+    {
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        [components setYear:([components year] - 1)]; 
+       fromDate = [cal dateFromComponents:components];
+    }
+    else // All and anything else
+    {
+        isAll = YES;
+    }
+    //------------------DATE STUFF------------------------------------//
+    // Beginning of current month
+    /*
+    components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+    [components setDay:([components day] - ([components weekday] - 1))]; 
+    [components setDay:([components day] - 7)];
+    [components setDay:([components day] - ([components day] -1))]; 
+    NSDate *thisMonth = [cal dateFromComponents:components];
+    NSLog(@"thisMonth: %@", thisMonth);
+    */
+    //------------------DATE STUFF------------------------------------//
+        
     NSMutableArray *arrayByDate = [[NSMutableArray alloc] init];
     [arrayByDate addObject:@"0"];
     
@@ -357,187 +410,177 @@ bool symbolOn;
 	[fetchRequest setSortDescriptors:sortDescriptors];
 	
 	NSString *groupPredicateString = @"";
-	
+	NSString *timePredicateString = @"";
 	NSArray *results;
 	NSPredicate *titlePredicate;
 	NSPredicate *visiblePredicate;
+    NSPredicate *timePredicate;
 	NSArray *finalPredicateArray;
 	NSPredicate *finalPredicate;
-    
-    // NSLog(@"PUKE: %@", groupsDictionary);
-    
+        
 	for (NSString *groupTitle in self.groupsDictionary) 
     {
-		//Group *currentGroup = [self.groupsDictionary objectForKey:groupTitle];
-        //NSLog(@"switchDictionary: %@", switchDictionary);
-		UISwitch *currentSwitch = [switchDictionary objectForKey:groupTitle];
+        groupPredicateString = [NSString stringWithFormat:@"group.title like %%@"];
+        titlePredicate = [NSPredicate predicateWithFormat:groupPredicateString, groupTitle];
+        visiblePredicate = [NSPredicate predicateWithFormat:@"group.visible == TRUE"];
+        
+        if (isAll) 
+        {
+            finalPredicateArray = [NSArray arrayWithObjects:titlePredicate, visiblePredicate, nil];
 
-			groupPredicateString = [NSString stringWithFormat:@"group.title like %%@"];
+        }
+        else 
+        {
+            timePredicateString = [NSString stringWithFormat:@"(timestamp >= %%@) && (timestamp <= %%@)"];
+            timePredicate = [NSPredicate predicateWithFormat:timePredicateString, fromDate, today];
+            finalPredicateArray = [NSArray arrayWithObjects:titlePredicate,timePredicate, visiblePredicate, nil];
+        }
+        
+        finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
+        [fetchRequest setPredicate:finalPredicate];
+        [fetchRequest setFetchBatchSize:0];
+        
+        NSError *error = nil;
+        results = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        
+        if (error) {
+            [Error showErrorByAppendingString:@"could not get result data for graph" withError:error];
+        } 
+        else 
+        {
+            NSMutableArray *tempTotalArray = [[NSMutableArray alloc] init];
+            NSMutableArray *tempCountArray = [[NSMutableArray alloc] init];
             
-			titlePredicate = [NSPredicate predicateWithFormat:groupPredicateString, groupTitle];
-			visiblePredicate = [NSPredicate predicateWithFormat:@"group.visible == TRUE"];
-			finalPredicateArray = [NSArray arrayWithObjects:titlePredicate,visiblePredicate, nil];
-			finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
-			[fetchRequest setPredicate:finalPredicate];
-			[fetchRequest setFetchBatchSize:0];
-			
-			NSError *error = nil;
-			results = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
             
-			if (error) {
-				[Error showErrorByAppendingString:@"could not get result data for graph" withError:error];
-			} 
-			else 
-            {
-                NSMutableArray *tempTotalArray = [[NSMutableArray alloc] init];
-                NSMutableArray *tempCountArray = [[NSMutableArray alloc] init];
+            if (results.count > 0) 
+            { 
                 
                 
-                if (results.count > 0) 
-                { 
+                int value = 0;
+                int day = 0;
+                int month = 0;
+                int year = 0; 
+                NSString *timeStamp = @"";
+                NSString *lastTimeStamp = @"";
+                NSString *nn = @"";
+                
+                int count = 1;
+                int totalCount = 1;
+                int totalValue = 0;
+                bool initRun = YES;
+                int avgValue = 0;
+                
+                // Set up temp arrays for averaging
+                for (Result *groupResult in results) 
+                {
+                    timeStamp = [NSString stringWithFormat:@"%@",groupResult.timestamp];
+                    value = [groupResult.value intValue];
+                    day = [groupResult.day intValue] - 1;
+                    month = [groupResult.month intValue];
+                    year = [groupResult.year intValue]; 
+                    nn = groupResult.group.title;
                     
                     
-                    int value = 0;
-                    int day = 0;
-                    int month = 0;
-                    int year = 0; 
-                    NSString *timeStamp = @"";
-                    NSString *lastTimeStamp = @"";
-                    NSString *nn = @"";
-                    
-                    int count = 1;
-                    int totalCount = 1;
-                    int totalValue = 0;
-                    bool initRun = YES;
-                    int avgValue = 0;
-                    
-                    // Set up temp arrays for averaging
-                    for (Result *groupResult in results) 
+                    if ([lastTimeStamp isEqualToString:timeStamp]) 
                     {
-                        timeStamp = [NSString stringWithFormat:@"%@",groupResult.timestamp];
-                        value = [groupResult.value intValue];
-                        day = [groupResult.day intValue] - 1;
-                        month = [groupResult.month intValue];
-                        year = [groupResult.year intValue]; 
-                        nn = groupResult.group.title;
-                        
-                        
-                        if ([lastTimeStamp isEqualToString:timeStamp]) 
+                        count++;  
+                        totalValue = totalValue + value;
+                        if (totalCount == results.count) 
                         {
-                            count++;  
-                            totalValue = totalValue + value;
-                            if (totalCount == results.count) 
-                            {
-                                //NSLog(@"count: %i totalcount: %i totalvalue: %i", count, results.count, totalValue);
-                                
-                                //End of Results; Do Average
-                                avgValue = totalValue / count;
-                                
-                                // Format DateTime
-                                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-                                [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
-                                NSDate *date  = [dateFormatter dateFromString:lastTimeStamp];
-                                
-                                // Convert Date 
-                                [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
-                                NSString *newDate = [dateFormatter stringFromDate:date];
-                                
-                                // Add to array
-                                [tempTotalArray addObject:[NSString stringWithFormat:@"%@",newDate]];
-                                [tempTotalArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
-                                [tempTotalArray addObject:[NSString stringWithFormat:@"%@",nn]];
-                                
-                                [tempCountArray addObject:[NSString stringWithFormat:@"%@",newDate]];
-                                [tempCountArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
-                                [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
-                                avgValue = 0;
-                            }
+                            //End of Results; Do Average
+                            avgValue = totalValue / count;
+                            
+                            // Format DateTime
+                            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                            [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
+                            NSDate *date  = [dateFormatter dateFromString:lastTimeStamp];
+                            
+                            // Convert Date 
+                            [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
+                            NSString *newDate = [dateFormatter stringFromDate:date];
+                            
+                            // Add to array
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%@",newDate]];
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%@",nn]];
+                            
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%@",newDate]];
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
+                            avgValue = 0;
+                        }
+                    }
+                    else 
+                    {
+                        if (initRun) 
+                        {
+                            initRun = NO; 
+                            totalValue = value;
                         }
                         else 
                         {
-                            if (initRun) 
-                            {
-                                initRun = NO; 
-                                totalValue = value;
-                            }
-                            else 
-                            {
-                                // NSLog(@"resultRow: %@ - %@: value=%i totalValue:%i averageValue:%i", nn, timeStamp, value, totalValue, avgValue);
-                                
-                                //End of common timestamps; Do Average
-                                avgValue = totalValue / count;       
-                                
-                                // Format DateTime
-                                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-                                [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
-                                NSDate *date  = [dateFormatter dateFromString:lastTimeStamp];
-                                
-                                // Convert Date 
-                                [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
-                                NSString *newDate = [dateFormatter stringFromDate:date];
-                                
-                                // Add to array
-                                [tempTotalArray addObject:[NSString stringWithFormat:@"%@",newDate]];
-                                [tempTotalArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
-                                [tempTotalArray addObject:[NSString stringWithFormat:@"%@",nn]];
-                                
-                                [tempCountArray addObject:[NSString stringWithFormat:@"%@",newDate]];
-                                [tempCountArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
-                                [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
-                                
-                                count = 1;
-                                totalValue = value;
-                                
-                            }
+                            //End of common timestamps; Do Average
+                            avgValue = totalValue / count;       
                             
-                        }
-                        
-                        totalCount++;
-                        lastTimeStamp = timeStamp;
-                        
-                    }
-                    //NSLog(@"tempTotalArray: %@", tempTotalArray);
-                    bool doesExist = NO;
-                    
-                    for (int i = 0; i < tempTotalArray.count; i+=3) 
-                    {
-                        doesExist = NO;
-                        
-                        for (int a = 0; a < arrayByDate.count; a++) 
-                        {
-                            //NSLog(@"arrayByDate:%@ count:%i",[arrayByDate objectAtIndex:a], a);
-                            //NSLog(@"tempTotalArray:%@ count:%i",[tempTotalArray objectAtIndex:i], i);
+                            // Format DateTime
+                            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                            [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
+                            NSDate *date  = [dateFormatter dateFromString:lastTimeStamp];
                             
+                            // Convert Date 
+                            [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
+                            NSString *newDate = [dateFormatter stringFromDate:date];
                             
-                            
-                            if ([[arrayByDate objectAtIndex:a] isEqualToString:[tempTotalArray objectAtIndex:i]] && [[arrayByDate objectAtIndex:a + 3] isEqualToString:[tempTotalArray objectAtIndex:i + 2]])
-                            {
-                                doesExist = YES;
-                                
-                                // Update array; Add value to total; 
-                                [arrayByDate replaceObjectAtIndex:a + 1 withObject:[NSString stringWithFormat:@"%i",[[arrayByDate objectAtIndex:a + 1] intValue] + [[tempTotalArray objectAtIndex:i + 1] intValue]]];
-                                // +1 to value count
-                                [arrayByDate replaceObjectAtIndex:a + 2 withObject:[NSString stringWithFormat:@"%i",[[arrayByDate objectAtIndex:a + 2] intValue] + 1]];
-                                
-                            }
-                        }
-                        
-                        if (!doesExist) 
-                        {
                             // Add to array
-                            [arrayByDate addObject:[tempTotalArray objectAtIndex:i]];
-                            [arrayByDate addObject:[tempTotalArray objectAtIndex:i + 1]];
-                            [arrayByDate addObject:@"1"];
-                            [arrayByDate addObject:[NSString stringWithFormat:@"%@",nn]];
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%@",newDate]];
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%@",nn]];
+                            
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%@",newDate]];
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
+                            
+                            count = 1;
+                            totalValue = value;
+                            
+                        }
+                        
+                    }
+                    
+                    totalCount++;
+                    lastTimeStamp = timeStamp;
+                    
+                }
+                bool doesExist = NO;
+                
+                for (int i = 0; i < tempTotalArray.count; i+=3) 
+                {
+                    doesExist = NO;
+                    
+                    for (int a = 0; a < arrayByDate.count; a++) 
+                    {
+                        if ([[arrayByDate objectAtIndex:a] isEqualToString:[tempTotalArray objectAtIndex:i]] && [[arrayByDate objectAtIndex:a + 3] isEqualToString:[tempTotalArray objectAtIndex:i + 2]])
+                        {
+                            doesExist = YES;
+                            
+                            // Update array; Add value to total; 
+                            [arrayByDate replaceObjectAtIndex:a + 1 withObject:[NSString stringWithFormat:@"%i",[[arrayByDate objectAtIndex:a + 1] intValue] + [[tempTotalArray objectAtIndex:i + 1] intValue]]];
+                            // +1 to value count
+                            [arrayByDate replaceObjectAtIndex:a + 2 withObject:[NSString stringWithFormat:@"%i",[[arrayByDate objectAtIndex:a + 2] intValue] + 1]];
                         }
                     }
                     
-                    
-                    
-                } // Results    
-                
-			}			
-		
+                    if (!doesExist) 
+                    {
+                        // Add to array
+                        [arrayByDate addObject:[tempTotalArray objectAtIndex:i]];
+                        [arrayByDate addObject:[tempTotalArray objectAtIndex:i + 1]];
+                        [arrayByDate addObject:@"1"];
+                        [arrayByDate addObject:[NSString stringWithFormat:@"%@",nn]];
+                    }
+                }
+            } // Results    
+        }			
 	}
 	
     

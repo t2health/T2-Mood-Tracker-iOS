@@ -189,8 +189,8 @@
         else {
             storedVal = [defaults boolForKey:key];				
         }
-        
-        aSwitch.on = storedVal;
+        NSLog(@"config: symbol: %i", storedVal);
+        aSwitch.on = NO;
         aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
         [aSwitch addTarget:self action:@selector(symbolToggle) forControlEvents:UIControlEventValueChanged];
         symbolSwitch = aSwitch;
@@ -213,8 +213,9 @@
         else {
             storedVal = [defaults boolForKey:key];				
         }
-        
-        aSwitch.on = storedVal;
+        NSLog(@"config: gradient: %i", storedVal);
+
+        aSwitch.on = NO;
         aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
         [aSwitch addTarget:self action:@selector(gradientToggle) forControlEvents:UIControlEventValueChanged];
         gradientSwitch = aSwitch;
@@ -233,8 +234,11 @@
     else if (row == 4) 
     {
         cellName = [dataSourceArray objectAtIndex:row];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSString *defaultsKey;
         
-        cell.detailTextLabel.text = @"30 days";
+        defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
+        cell.detailTextLabel.text = [defaults objectForKey:defaultsKey];
     }
 
     
@@ -280,89 +284,12 @@
 
     }
     
-    /*
-    if (indexPath.section == 0) 
+    // Date Range
+    else if (row == 4) 
     {
-        int startHeight = 0;
-        int startWeight = 0;
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-        {
-            //iPad
-            UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
-            if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
-            {
-                startHeight = 329;
-                startWeight = 768;
-            }
-            else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
-            {
-                startHeight = 585;
-                startWeight = 1024;
-                
-            }
-        }
-        else 
-        {
-            //iPhone
-            UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
-            if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
-            {
-                startHeight = 329;
-                startWeight = 320;
-                
-            }
-            else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
-            {
-                startHeight = 423;
-                startWeight = 480;
-                
-            }
-        }
-        
-        
-        UITableViewCell *targetCell = [self.tableView cellForRowAtIndexPath:indexPath];
-        self.datePicker.date = [self.dateFormatter dateFromString:targetCell.detailTextLabel.text];
-        // check if our date picker is already on screen
-        if (self.datePicker.superview == nil)
-        {
-            
-            [self.view addSubview: self.datePicker];
-            // size up the picker view to our screen and compute the start/end frame origin for our slide up animation
-            //
-            // compute the start frame
-            CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
-            CGSize pickerSize = [self.datePicker sizeThatFits:CGSizeZero];
-            CGRect startRect = CGRectMake(0.0,
-                                          screenRect.origin.y + screenRect.size.height,
-                                          startWeight, pickerSize.height);
-            self.datePicker.frame = startRect;
-            // NSLog(@"startheight: %i", startHeight);
-            // compute the end frame
-            CGRect pickerRect = CGRectMake(0.0,
-                                           (screenRect.origin.y + screenRect.size.height) - startHeight,
-                                           startWeight,
-                                           pickerSize.height);
-            // start the slide up animation
-            [UIView beginAnimations:nil context:NULL];
-            [UIView setAnimationDuration:0.3];
-            
-            // we need to perform some post operations after the animation is complete
-            [UIView setAnimationDelegate:self];
-            
-            self.datePicker.frame = pickerRect;
-            
-            // shrink the table vertical size to make room for the date picker
-            CGRect newFrame = self.tableView.frame;
-            newFrame.size.height -= self.datePicker.frame.size.height;
-            self.tableView.frame = newFrame;
-            [UIView commitAnimations];
-            
-            // add the "Done" button to the nav bar
-            self.navigationItem.rightBarButtonItem = self.doneButton;
-        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"showPicker" object: nil];
     }
-     */
+     
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath 

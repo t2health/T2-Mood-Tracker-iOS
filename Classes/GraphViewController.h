@@ -26,7 +26,7 @@
 @class OptionsTableViewController;
 
 
-@interface GraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, HRColorPickerViewControllerDelegate, UIGestureRecognizerDelegate> 
+@interface GraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, HRColorPickerViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource> 
 {
     
     ShinobiChart            *chart;
@@ -50,6 +50,7 @@
 	NSMutableDictionary *ledgendColorsDictionary;
 	NSDictionary *groupsDictionary;
     NSArray *groupsArray;
+    NSArray *pickerArray;
     IBOutlet UIButton *legendButton;
     
     NSMutableArray *chartChangeArray;
@@ -77,11 +78,16 @@
 	UISwipeGestureRecognizer *legendSwipeRight;
 	UISwipeGestureRecognizer *legendSwipeLeft;
     UITapGestureRecognizer *legendTap;
+    
+    IBOutlet UIBarButtonItem *doneButton;	// this button appears only when the date picker is open
+    IBOutlet UIPickerView *rangePicker;
+
 
     
 }
 
 @property (nonatomic, retain) IBOutlet UIButton *legendButton;
+@property (nonatomic, retain) IBOutlet UIPickerView *rangePicker;
 
 @property (nonatomic, retain) IBOutlet UIView *menuView;
 @property (nonatomic, retain) IBOutlet UIView *containerView;
@@ -106,6 +112,7 @@
 @property (nonatomic, retain) UISwipeGestureRecognizer *legendSwipeRight;
 @property (nonatomic, retain) UISwipeGestureRecognizer *legendSwipeLeft;
 @property (nonatomic, retain) UITapGestureRecognizer *legendTap;
+@property (nonatomic, retain) NSArray *pickerArray;
 
 
 @property (nonatomic, retain) IBOutlet UITableView *_tableView;
@@ -125,8 +132,14 @@
 
 @property (nonatomic, retain) IBOutlet UIView *legendView;
 
+@property (nonatomic, retain) IBOutlet UIBarButtonItem *doneButton;
+
 - (void)initSetup;
 - (void)getDatasource;
+- (void)setupGraph;
+- (void)reloadGraph;
+- (void)updateGraphData;
+- (void)redrawGraph;
 
 - (void)optionButtonClicked;
 - (void)shareClick;
@@ -159,5 +172,9 @@
 - (void)emailResults;
 - (void)deviceOrientationChanged:(NSNotification *)notification;
 - (void)thisImage:(UIImage *)image hasBeenSavedInPhotoAlbumWithError:(NSError *)error usingContextInfo:(void*)ctxInfo;
+
+- (IBAction)doneAction:(id)sender;
+- (void)resignPicker;
+- (void)slideDownDidStop;
 
 @end
