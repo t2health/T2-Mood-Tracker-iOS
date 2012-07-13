@@ -15,7 +15,7 @@
 
 @implementation ViewNoteViewController
 
-@synthesize note;
+@synthesize note,prevNote;
 @synthesize noteView, notesController;
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -35,6 +35,15 @@
 	UIBarButtonItem *saveButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(save:)];
 	self.navigationItem.rightBarButtonItem = saveButton;
 	[saveButton release];
+    
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
+	self.navigationItem.leftBarButtonItem = cancelButton;
+	[cancelButton release];
+    
+    self.prevNote = noteView.text;
+    
+    NSLog(@"prevNote: %@", prevNote);
+    NSLog(@"noteView.text: %@", noteView.text);
 }
 
 // Override to allow orientations other than the default portrait orientation.
@@ -62,8 +71,54 @@
     }
 }
 
-- (void)save:(id)sender {
-	NSString *newNote = noteView.text;
+#pragma mark ActionSheet
+-(void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
+    {
+        //    NSLog(@"Ummm.");
+        
+    } 
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    
+    NSLog(@"button press: %i", buttonIndex);
+    
+    if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
+    {
+        [self save];
+    } 
+    if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
+    {
+        [self.navigationController popViewControllerAnimated:YES];
+        
+    } 
+}
+
+- (void)cancel
+{
+    NSLog(@"prevNote: %@", prevNote);
+    NSLog(@"noteView.text: %@", noteView.text);
+    if (![prevNote isEqualToString:noteView.text]) 
+    {
+        UIActionSheet *actionSheet = [[[UIActionSheet alloc]
+                                       initWithTitle:@"" 
+                                       delegate:self 
+                                       cancelButtonTitle:@"Cancel" 
+                                       destructiveButtonTitle:nil 
+                                       otherButtonTitles:@"Save Note", @"Don't Save Note", nil] autorelease];
+        [actionSheet showInView:self.view];          
+    }
+    else 
+    {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+- (void)save
+{
+    NSString *newNote = noteView.text;
 	if (![newNote isEqual:@""]) {
 		if (![newNote isEqual:note.note]) {
 			VAS002AppDelegate *delegate = (VAS002AppDelegate *)[UIApplication sharedApplication].delegate;
@@ -77,6 +132,12 @@
 		}
 	}	
 	[self.navigationController popViewControllerAnimated:YES];
+    
+}
+
+- (void)save:(id)sender 
+{
+    [self save];
 }
 
 - (void)viewDidUnload {

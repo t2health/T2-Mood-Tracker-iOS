@@ -89,39 +89,7 @@ bool symbolOn;
 
 - (void)toggleSeries;
 {
-    
-  //  seriesMode = !seriesName;
-    /*
-    NSMutableDictionary *tempDictWorking = [NSMutableDictionary dictionaryWithDictionary:dataDictCopy];
-    
-    NSEnumerator *enumerator = [switchDictionary keyEnumerator];
-	id key;
-	
-	UISwitch *mySwitch;
-	
-	while ((key = [enumerator nextObject])) 
-    {
-        
-		mySwitch = [switchDictionary objectForKey:key];
-        
-        if (!mySwitch.on) // is Off
-        {
-            // Turn Off
-            [tempDictWorking removeObjectForKey:key];
-        }
-        else // is On
-        {
-            // Turn On
-            [tempDictWorking setObject:[dataDict objectForKey:key] forKey:key];
-            
-        }
-        
-	}
-    
-    [dataDictCopy removeAllObjects];
-    [dataDictCopy addEntriesFromDictionary:tempDictWorking];
-    */
-    
+
     [self createSwitches];
     
 }
@@ -359,6 +327,12 @@ bool symbolOn;
     NSDate *fromDate;
     BOOL isAll = NO;
     
+
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        [components setDay:([components day] + 1)]; 
+        today = [cal dateFromComponents:components];
+    
+    
     if ([theRange isEqualToString:@"30 days"]) 
     {
         components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
@@ -454,8 +428,6 @@ bool symbolOn;
             
             if (results.count > 0) 
             { 
-                
-                
                 int value = 0;
                 int day = 0;
                 int month = 0;
@@ -469,6 +441,7 @@ bool symbolOn;
                 int totalValue = 0;
                 bool initRun = YES;
                 int avgValue = 0;
+                NSNumber *positiveDesc = 0;
                 
                 // Set up temp arrays for averaging
                 for (Result *groupResult in results) 
@@ -479,7 +452,9 @@ bool symbolOn;
                     month = [groupResult.month intValue];
                     year = [groupResult.year intValue]; 
                     nn = groupResult.group.title;
-                    
+                    positiveDesc = groupResult.group.positiveDescription;
+                  //  NSLog(@"positive: %@ - %@", nn,positiveDesc);
+
                     
                     if ([lastTimeStamp isEqualToString:timeStamp]) 
                     {
@@ -577,6 +552,8 @@ bool symbolOn;
                         [arrayByDate addObject:[tempTotalArray objectAtIndex:i + 1]];
                         [arrayByDate addObject:@"1"];
                         [arrayByDate addObject:[NSString stringWithFormat:@"%@",nn]];
+                        [arrayByDate addObject:[NSString stringWithFormat:@"%@",positiveDesc]];
+
                     }
                 }
             } // Results    
@@ -600,10 +577,18 @@ bool symbolOn;
         int averageValue = 0;
         NSString *tempDate = @"";
         
-        for (int i = 1; i < [arrayByDate count]; i+=4) 
+        for (int i = 1; i < [arrayByDate count]; i+=5) 
         {
             // Average
             averageValue = [[arrayByDate objectAtIndex:i + 1] intValue] / [[arrayByDate objectAtIndex:i + 2] intValue];
+           // NSLog(@"positive: %i", [[arrayByDate objectAtIndex:i + 4] intValue]);
+            
+            if ([[arrayByDate objectAtIndex:i + 4] intValue] == 0) 
+            {
+                averageValue = 100 - averageValue;
+            }
+            
+            
             tempDate = [arrayByDate objectAtIndex:i];
             [rawValuesArray addObject:[arrayByDate objectAtIndex:i + 3]];
             [rawValuesArray addObject:[arrayByDate objectAtIndex:i]];
@@ -637,7 +622,7 @@ bool symbolOn;
 	[fetchRequest release];
     [arrayByDate release];
     
-    // NSLog(@"chartDictionary:%@",chartDictionary);
+     NSLog(@"chartDictionary:%@",chartDictionary);
     
 	return chartDictionary;
 }

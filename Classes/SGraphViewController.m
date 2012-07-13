@@ -20,20 +20,25 @@
 #import "DateMath.h"
 #import "AddNoteViewController.h"
 #import "MailData.h"
+#import "SLegendTableViewController.h"
+#import "NotesTableViewController.h"
+#import "OptionsTableViewController.h"
 
 @implementation SGraphViewController
 
-@synthesize menuView, containerView, graphView, notesTable;
+@synthesize menuView, containerView, graphView, notesTable, noteView;
 @synthesize managedObjectContext;
 
 @synthesize switchDictionary, menuBar, loadingLabel;
-@synthesize ledgendColorsDictionary;
+@synthesize ledgendColorsDictionary, legendTap, legendSwipeRight, legendSwipeLeft;;
 @synthesize groupsDictionary, groupsArray;
-@synthesize t2LogoImageView, loadingView;
+@synthesize t2LogoImageView, loadingView, legendButton;
 @synthesize groupName;
 @synthesize scalesDictionary;
 @synthesize scalesArray, symbolsDictionary;
-@synthesize _tableView, optionView, legendSwitch, symbolSwitch, gradientSwitch, legendView, sLegendTableViewController, _legendTableView;
+@synthesize _tableView, optionView, legendSwitch, symbolSwitch, gradientSwitch, legendView, sLegendTableViewController, _legendTableView, notesTableViewController, _notesTableView;
+@synthesize optionsTableViewController, _optionsTableView, doneButton, rangePicker, pickerArray;
+
 CGRect menu_ShownFrame;
 CGRect menu_HiddenFrame;	
 bool menuShowing;
@@ -43,13 +48,18 @@ bool isSymbol;
 bool isGradient;
 bool doUpdate;
 bool doSeries;
-bool initSetup;
+bool isRefreshTable;
+bool isMyLegend;
+bool isPortrait;
 
 
 #pragma mark - Load/Init
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    _notesTableView.backgroundView = nil;
+    _tableView.backgroundView = nil;
+    
     //loadingLabel.text = @"Generating Chart";
     
     // Init view state
@@ -60,8 +70,11 @@ bool initSetup;
     t2LogoImageView.hidden = NO;
     // Menu state
     menuShowing = YES;
-    initSetup = YES;
     
+    // Fill Picker Array
+    self.pickerArray = [[NSArray alloc] initWithObjects:
+                        @"30 days", @"90 days", @"1 year",
+                        @"All", nil];
     
     // isOptions default
     isOptions = NO;
@@ -69,12 +82,19 @@ bool initSetup;
     isSymbol = NO;
     isGradient = NO;
     
+    isMyLegend = NO;
     doUpdate = NO;
     doSeries = NO;
+    isRefreshTable = NO;
     
     // Views
     optionView.hidden = YES;
     _tableView.hidden = NO;
+    noteView.hidden = YES;
+
+    notesTableViewController.myNavController = self.navigationController;
+    optionsTableViewController.myNavController = self.navigationController;
+    optionsTableViewController.whichGraph = @"Scale";
     
     // Core Data
     UIApplication *app = [UIApplication sharedApplication];
@@ -92,6 +112,28 @@ bool initSetup;
     // Orientation
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
     
+    // NOTIFICATIONS----------------------------------------------//
+    // Listen for Actions from Option UITableViewController
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(legendToggle) name:@"toggleLegend" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(symbolToggle) name:@"toggleSymbol" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(gradientToggle) name:@"toggleGradient" object: nil];
+    
+    // // Listen for Actions from Picker
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(showPicker) name:@"showPicker_Scale" object: nil];
+    // NOTIFICATIONS----------------------------------------------//
+    
+    // Capture initial orientation
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    {
+        isPortrait = YES;
+    }
+    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+    {
+        isPortrait = NO;
+    }
+    
     backgroundQueue = dispatch_queue_create("org.t2health.moodtracker.bgqueue", NULL);        
     
     self.title = [NSString stringWithFormat:@"%@",self.groupName];
@@ -100,35 +142,682 @@ bool initSetup;
     
 }
 
-- (void)initSetup
+-(void) viewWillAppear:(BOOL)animated {
+    [_tableView reloadData];    
+    [_legendTableView reloadData];
+}
+
+-(void) viewWillDisappear:(BOOL)animated {
+    if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) 
+    {
+        // back button was pressed.  We know this is true because self is no longer
+        // in the navigation stack. 
+        
+    }
+    [super viewWillDisappear:animated];
+}
+
+#pragma mark Graph Menu 
+
+
+- (void)reloadGraph
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [containerView bringSubviewToFront:loadingView];
+    [_optionsTableView reloadData];
+    [chart removeFromSuperview];
     
-    [defaults setObject:self.groupName forKey:@"subGraphSelected"];
-    
-    
-    [containerView bringSubviewToFront:menuView]; 
-    // NavBar Button
-    NSMutableArray *barButtonItemsArray = [[NSMutableArray alloc] init];    
-    UIImage *image = [UIImage imageNamed:@"icon-settings.png"];
-    
-    UIBarButtonItem *optionButton = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStyleBordered target:self action:@selector(optionButtonClicked)];
-    
-    UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareClick)];
-    
-    
-    [barButtonItemsArray addObject:optionButton];
-    [barButtonItemsArray addObject:actionButton];
-    
-    self.navigationItem.rightBarButtonItems = barButtonItemsArray;
-    [optionButton release];
-    [barButtonItemsArray release];
-    [actionButton release];
+    dispatch_async(backgroundQueue, ^(void) {
+        [self getDatasource];
+    }); 
     
     
     // dispatch_async(backgroundQueue, ^(void) {
-    //     [self getDatasource];
-    // }); 
+    //   [self updateGraphData];
+    //}); 
+}
+
+- (void)updateGraphData
+{
+    // Initialise the data source we will use for the chart
+    datasource = [[SGraphDataSource alloc] init];
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self redrawGraph];
+    });
+}
+
+- (void)redrawGraph
+{
+    
+    chart.datasource = datasource;
+    
+    // Reload data
+    [chart reloadData];
+    [chart layoutSubviews];
+    
+    // Redraw chart
+    [chart redrawChartAndGL: YES];
+    
+    [containerView sendSubviewToBack:loadingView];
+    
+}
+
+
+- (void)initSetup
+{
+    loadingLabel.text = @"Loading Data";
+    dispatch_async(backgroundQueue, ^(void) {
+        [self getDatasource];
+    }); 
+    
+    
+}
+
+- (void)getDatasource
+{
+    // Initialise the data source we will use for the chart
+    datasource = nil;
+    
+    datasource = [[SGraphDataSource alloc] init];
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self setupGraph];
+    });
+    
+    
+}
+
+- (void)setupGraph
+
+{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        //Create the chart
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+        {
+            chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, 512)];
+        }
+        else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+        {
+            chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, 700)];
+        }    
+    } 
+    else 
+    {
+        //Create the chart
+        
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+        {
+            chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, 211)];
+        }
+        else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+        {
+            chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, graphView.bounds.size.height)];
+        }
+        
+    }
+    
+    // Set a different theme on the chart
+    SChartMidnightTheme *midnight = [[SChartMidnightTheme alloc] init];
+    [chart setTheme:midnight];
+    [midnight release];
+    
+    //As the chart is a UIView, set its resizing mask to allow it to automatically resize when screen orientation changes.
+    chart.autoresizingMask = ~UIViewAutoresizingNone;
+    
+    // Initialise the data source we will use for the chart
+    // datasource = [[GraphDataSource alloc] init];
+    
+    // Give the chart the data source
+    chart.datasource = datasource;
+    
+    //  SChartDateRange *xRange = [[SChartDateRange alloc] initWithDateMinimum:date1 andDateMaximum:date];
+    //  NSLog(@"dateRange:  %@ - %@", date1, date);
+    // Create a date time axis to use as the x axis.    
+    SChartDateTimeAxis *xAxis = [[SChartDateTimeAxis alloc] init];
+    // Enable panning and zooming on the x-axis.
+    xAxis.enableGesturePanning = YES;
+    xAxis.enableGestureZooming = YES;
+    xAxis.enableMomentumPanning = YES;
+    xAxis.enableMomentumZooming = YES;
+    xAxis.axisPositionValue = [NSNumber numberWithInt: 0];
+    xAxis.style.majorGridLineStyle.showMajorGridLines = YES;
+    
+    chart.xAxis = xAxis;
+    [xAxis release];
+    //[xRange release];
+    
+    //Create a number axis to use as the y axis.
+    SChartNumberAxis *yAxis = [[SChartNumberAxis alloc] init];
+    
+    //Enable panning and zooming on Y
+    yAxis.enableGesturePanning = NO;
+    yAxis.enableGestureZooming = NO;
+    yAxis.enableMomentumPanning = NO;
+    yAxis.enableMomentumZooming = NO;
+    //yAxis.axisLabelsAreFixed = YES;
+    // yAxis.majorTickFrequency = YES;
+    yAxis.titleLabel.textColor = [UIColor grayColor];
+    yAxis.titleLabel.text = @"<<<   Low                    Hi    >>>";
+    //yAxis.titleLabel.frame
+    yAxis.style.majorGridLineStyle.showMajorGridLines = YES;
+    yAxis.style.majorTickStyle.showLabels = NO;
+    yAxis.style.majorTickStyle.showTicks = YES;
+    
+    chart.yAxis = yAxis;
+    [yAxis release];
+    
+    
+    //Set the chart title
+    chart.title = @"Results";
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        chart.titleLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:27.0f];
+    } else {
+        chart.titleLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:17.0f];
+    }
+    chart.titleLabel.textColor = [UIColor whiteColor];
+    
+    // If you have a trial version, you need to enter your licence key here:
+    //    chart.licenseKey = @"";
+    
+    
+    
+    //Additional legend config
+    chart.legend.style.font = [UIFont fontWithName:@"Futura" size:12.0f];
+    chart.legend.symbolWidth = [NSNumber numberWithInt:75];
+    chart.legend.style.borderColor = [UIColor clearColor];
+    
+    
+    //isLegend = legendSwitch.on;
+    isSymbol = symbolSwitch.on;
+    isGradient = gradientSwitch.on;
+    
+    
+    [containerView sendSubviewToBack:loadingView];
+    
+    t2LogoImageView.hidden = YES;
+    
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    {
+        
+        int startHeight = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            startHeight = 512;
+        } 
+        else 
+        {
+            startHeight = 205;
+        }
+        
+        
+        [self showButtons:1];
+        
+        
+        // Add the chart to the view controller
+        [chart setAlpha:0.0];
+        [menuView setAlpha:0.0];
+        [legendView setAlpha:0.0];
+        menuView.hidden = NO;
+        [containerView addSubview:chart];
+        
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.5];
+        [chart setAlpha:1.0];
+        [menuView setAlpha:1.0];
+        [UIView commitAnimations];
+        
+        // Update Legend
+        if (isLegend) 
+        {
+            legendView.hidden = NO;
+        }
+        else 
+        {
+            legendView.hidden = YES;
+        }
+        
+    }
+    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+    {
+        
+        
+        [self showButtons:2];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     0.0,
+                                     menuViewSize.width, 320);
+        self.menuView.frame = menuRect;
+        
+        
+        [containerView addSubview:chart];
+        [containerView bringSubviewToFront:legendView];
+        [containerView bringSubviewToFront:menuView];
+        menuView.hidden = YES;
+        menuShowing = NO;
+    }
+    
+    
+    [self resetLegend];
+    
+}
+
+- (void)showButtons:(int)howMany;
+{
+    if (howMany == 1) 
+    {
+        self.navigationItem.rightBarButtonItems = nil;
+        
+        UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareClick)];
+        self.navigationItem.rightBarButtonItem = actionButton;
+        [actionButton release];
+        
+        
+    }
+    else 
+    {
+        self.navigationItem.rightBarButtonItem = nil;
+        
+        
+        // NavBar Button
+        NSMutableArray *barButtonItemsArray = [[NSMutableArray alloc] init];    
+        UIImage *image = [UIImage imageNamed:@"icon-settings.png"];
+        
+        UIBarButtonItem *optionButton = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStyleBordered target:self action:@selector(optionButtonClicked)];
+        
+        UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareClick)];
+        
+        
+        
+        [barButtonItemsArray addObject:optionButton];
+        [barButtonItemsArray addObject:actionButton];
+        
+        self.navigationItem.rightBarButtonItems = barButtonItemsArray;
+        [optionButton release];
+        [barButtonItemsArray release];
+        [actionButton release];
+        
+        
+        
+    }
+}
+
+#pragma mark Legend
+
+
+- (void)legendButtonClicked
+{
+    if (isMyLegend) 
+    {
+        [self resignLegend];
+        isMyLegend = NO;
+    }
+    else 
+    {
+        [self showLegend];
+        isMyLegend = YES;
+    } 
+}
+
+- (IBAction) legendButtonClicked:(id)sender
+{
+    [self legendButtonClicked];
+}
+
+
+- (void)resetLegend
+{
+    [legendView removeFromSuperview];
+    int startWidth = 0;
+    
+    NSString *version = [UIDevice currentDevice].systemVersion;
+	if ([version compare:@"3.2"] != kCFCompareLessThan) {
+		self.legendSwipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)];
+		self.legendSwipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)];
+        
+        self.legendTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)];
+        
+		self.legendSwipeRight.delegate = self;
+		self.legendSwipeLeft.delegate = self;
+        
+        self.legendTap.delegate = self;
+        
+		self.legendSwipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
+		
+		[legendView addGestureRecognizer:self.legendSwipeRight];
+		[legendView addGestureRecognizer:self.legendSwipeLeft];	
+        [legendView addGestureRecognizer:self.legendTap];	
+	}
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        // iPad
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            startWidth = 768;
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            startWidth = 1024;
+        }
+        //
+        // compute the start frame
+        CGSize legendViewSize = [self.legendView sizeThatFits:CGSizeZero];
+        CGRect startRect = CGRectMake(startWidth - 46,
+                                      0.0,
+                                      legendViewSize.width, legendViewSize.height); 
+        
+        self.legendView.frame = startRect;
+    }
+    else 
+    {
+        // iPhone
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            startWidth = 320;
+            NSLog(@"PORTRAIT");
+            
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            startWidth = 480;
+            NSLog(@"LANDSCAPE");
+            
+        }
+        
+        
+        //
+        // compute the start frame
+        CGSize legendViewSize = [self.legendView sizeThatFits:CGSizeZero];
+        NSLog(@"startWidth3: %i", startWidth - 46);
+        CGRect startRect = CGRectMake(startWidth - 46,
+                                      0.0,
+                                      legendViewSize.width, legendViewSize.height);  
+        
+        self.legendView.frame = startRect;
+    }
+    
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+    {
+        [containerView addSubview:legendView];
+        [containerView bringSubviewToFront:legendView];
+        NSLog(@"bring legen view to front");
+    }
+    else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+    {
+        if (!menuShowing) 
+        {
+            [containerView addSubview:legendView];
+            [containerView bringSubviewToFront:legendView];
+            
+        }    
+    }
+    
+    NSLog(@"legendSwitch.on2: %i", isLegend);
+    if (isLegend) 
+    {
+        legendView.hidden = NO;
+        [legendView setAlpha:1.0];
+        
+    }
+    else 
+    {
+        legendView.hidden = YES;
+        [legendView setAlpha:1.0];
+        
+    }
+    
+}
+
+- (void)showLegend
+{
+    //  NSLog(@"groupsArray: %@", groupsArray);
+    //legendView.hidden = NO;
+    int legendItemCount = 0;
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *defaultsKey = @"";
+    BOOL val;
+    for (Group *aGroup in groupsArray) 
+    {
+        
+        defaultsKey = [NSString stringWithFormat:@"SWITCH_STATE_%@",aGroup.title];
+        
+        if (![defaults objectForKey:defaultsKey]) 
+        {
+            val = YES;
+        }
+        else 
+        {
+            val = [defaults boolForKey:defaultsKey];				
+        }
+        
+        if (val) 
+        {
+            legendItemCount++;
+        }
+	}
+    
+    int startHeight = 0;
+    int addSize = 44 * legendItemCount;
+    
+    startHeight = startHeight + addSize;
+    // NSLog(@"startHeight: %i", startHeight);
+    
+    if (legendItemCount < 3) 
+    {
+        startHeight = 44 * 3;
+    }
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        // iPad
+        int startWidth = 0;
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            startWidth = 768;
+            if (startHeight > 1024) 
+            {
+                startHeight = 1024;
+                _legendTableView.userInteractionEnabled = YES;
+                
+            }
+            else 
+            {
+                _legendTableView.userInteractionEnabled = NO;
+                startHeight = startHeight; 
+            }
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            startWidth = 1024;
+            if (startHeight > 768) 
+            {
+                startHeight = 768;
+                _legendTableView.userInteractionEnabled = YES;
+            }
+            else 
+            {
+                startHeight = startHeight; 
+                _legendTableView.userInteractionEnabled = NO;
+            }
+        }
+        
+        //
+        // compute the start frame
+        CGSize legendViewSize = [self.legendView sizeThatFits:CGSizeZero];
+        CGRect startRect = CGRectMake(startWidth - 46,
+                                      0.0,
+                                      legendViewSize.width, startHeight);
+        self.legendView.frame = startRect;
+        // compute the end frame
+        CGRect endRect = CGRectMake(startWidth - legendViewSize.width,
+                                    0.0,
+                                    legendViewSize.width,
+                                    startHeight);
+        
+        
+        [containerView bringSubviewToFront:legendView]; 
+        // start the slide up animation
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.3];
+        
+        // we need to perform some post operations after the animation is complete
+        [UIView setAnimationDelegate:self];
+        
+        self.legendView.frame = endRect;
+        [UIView commitAnimations];
+        
+        
+    } 
+    else 
+    {
+        // iPhone/iPod
+        int startWidth = 0;
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            startWidth = 320;
+            if (startHeight > 205) 
+            {
+                startHeight = 205;
+                _legendTableView.userInteractionEnabled = YES;
+            }
+            else 
+            {
+                startHeight = startHeight; 
+                _legendTableView.userInteractionEnabled = NO;
+            }
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            startWidth = 480;
+            
+            // NSLog(@"startWidth2: %i", startWidth);
+            if (startHeight > 280) 
+            {
+                startHeight = 280;
+                _legendTableView.userInteractionEnabled = YES;
+            }
+            else 
+            {
+                startHeight = startHeight; 
+                _legendTableView.userInteractionEnabled = NO;
+            }
+        }
+        //
+        // compute the start frame
+        CGSize legendViewSize = [self.legendView sizeThatFits:CGSizeZero];
+        CGRect startRect = CGRectMake(startWidth  - 46,
+                                      0.0,
+                                      legendViewSize.width, startHeight);
+        self.legendView.frame = startRect;
+        // compute the end frame
+        CGRect endRect = CGRectMake(startWidth - legendViewSize.width,
+                                    0.0,
+                                    legendViewSize.width,
+                                    startHeight);
+        
+        
+        [containerView bringSubviewToFront:legendView]; 
+        // start the slide up animation
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.3];
+        
+        // we need to perform some post operations after the animation is complete
+        [UIView setAnimationDelegate:self];
+        
+        self.legendView.frame = endRect;
+        [UIView commitAnimations];
+        
+    }
+}
+
+- (void)resignLegend
+{
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        
+        int startWidth = 0;
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            startWidth = 768;
+            
+        }  
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            startWidth = 1024;
+            
+        }
+        
+        
+        //CGSize legendViewSize = [self.legendView sizeThatFits:CGSizeZero];
+        
+        CGRect endFrame = self.legendView.frame;
+        endFrame.origin.x = startWidth - 46;
+        
+        // start the slide down animation
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.3];
+        
+        // we need to perform some post operations after the animation is complete
+        [UIView setAnimationDelegate:self];
+        // [UIView setAnimationDidStopSelector:@selector(slideDownDidStop)];
+        
+        self.legendView.frame = endFrame;
+        [UIView commitAnimations];
+    } 
+    else 
+    {
+        int startWidth = 0;
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            startWidth = 320;
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            startWidth = 480;
+            
+        }
+        
+        
+        //CGSize legendViewSize = [self.legendView sizeThatFits:CGSizeZero];
+        
+        CGRect endFrame = self.legendView.frame;
+        endFrame.origin.x = startWidth - 46;
+        
+        // start the slide down animation
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.3];
+        
+        // we need to perform some post operations after the animation is complete
+        [UIView setAnimationDelegate:self];
+        // [UIView setAnimationDidStopSelector:@selector(slideDownDidStop)];
+        
+        self.legendView.frame = endFrame;
+        [UIView commitAnimations];
+        
+    }
     
 }
 
@@ -137,49 +826,347 @@ bool initSetup;
 {
     
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSString *defaultsKey;
-	
-    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND_SUB"];
-    BOOL val = legendSwitch.on;
-    [defaults setBool:val forKey:defaultsKey];
-    [defaults synchronize];
-    doUpdate = YES;
+	[self showButtons:2];
+    BOOL storedVal;
+    NSString *key;
+    key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND"];
+    if (![defaults boolForKey:key]) {
+        storedVal = NO;
+    }
+    else {
+        storedVal = [defaults boolForKey:key];				
+    }
+    
+    // Update Legend
+    if (storedVal) 
+    {
+        // Reload buttons
+        legendView.hidden = NO;
+        isLegend = YES;
+        
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            [self showButtons:1];
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            [self showButtons:2];
+            
+        }
+        
+    }
+    else 
+    {
+        // Reload buttons
+        legendView.hidden = YES;
+        isLegend = NO;
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            [self showButtons:1];
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            [self showButtons:2];
+        }   
+    }
+    
+    //doUpdate = YES;
 }
 
 - (void)symbolToggle
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSString *defaultsKey;
-	
-    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_SYMBOL_SUB"];
-    BOOL val = symbolSwitch.on;
-    [defaults setBool:val forKey:defaultsKey];
-    [defaults synchronize];
-    doUpdate = YES;
+    
+    double xMin, xMax, yMin, yMax;
+    xMin = [chart.xAxis.axisRange.minimum doubleValue];
+    xMax = [chart.xAxis.axisRange.maximum doubleValue];
+    yMin = [chart.yAxis.axisRange.minimum doubleValue];
+    yMax = [chart.yAxis.axisRange.maximum doubleValue];
+    
+    // Change series type
+    [datasource toggleSymbol];
+    
+    // Reload data
+    [chart reloadData];
+    [chart layoutSubviews];
+    
+    // Restore axes' ranges
+    [chart.xAxis setRangeWithMinimum:[NSNumber numberWithDouble: xMin] andMaximum:[NSNumber numberWithDouble: xMax] withAnimation:NO];
+    [chart.yAxis setRangeWithMinimum:[NSNumber numberWithDouble: yMin] andMaximum:[NSNumber numberWithDouble: yMax] withAnimation:NO];
+    
+    // Redraw chart
+    [chart redrawChartAndGL: YES];
 }
 
 - (void)gradientToggle
 {
     
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    double xMin, xMax, yMin, yMax;
+    xMin = [chart.xAxis.axisRange.minimum doubleValue];
+    xMax = [chart.xAxis.axisRange.maximum doubleValue];
+    yMin = [chart.yAxis.axisRange.minimum doubleValue];
+    yMax = [chart.yAxis.axisRange.maximum doubleValue];
+    
+    // Change series type
+    [datasource toggleGradient];
+    
+    // Reload data
+    [chart reloadData];
+    [chart layoutSubviews];
+    
+    // Restore axes' ranges
+    [chart.xAxis setRangeWithMinimum:[NSNumber numberWithDouble: xMin] andMaximum:[NSNumber numberWithDouble: xMax] withAnimation:NO];
+    [chart.yAxis setRangeWithMinimum:[NSNumber numberWithDouble: yMin] andMaximum:[NSNumber numberWithDouble: yMax] withAnimation:NO];
+    
+    // Redraw chart
+    [chart redrawChartAndGL: YES];
+    
+}
+
+-(void)switchSeriesType {
+    double xMin, xMax, yMin, yMax;
+    xMin = [chart.xAxis.axisRange.minimum doubleValue];
+    xMax = [chart.xAxis.axisRange.maximum doubleValue];
+    yMin = [chart.yAxis.axisRange.minimum doubleValue];
+    yMax = [chart.yAxis.axisRange.maximum doubleValue];
+    
+    // Change series type
+    [datasource toggleSeriesType];
+    
+    chart.legend.hidden = NO;
+    // Reload data
+    [chart reloadData];
+    [chart layoutSubviews];
+    
+    // Restore axes' ranges
+    [chart.xAxis setRangeWithMinimum:[NSNumber numberWithDouble: xMin] andMaximum:[NSNumber numberWithDouble: xMax] withAnimation:NO];
+    [chart.yAxis setRangeWithMinimum:[NSNumber numberWithDouble: yMin] andMaximum:[NSNumber numberWithDouble: yMax] withAnimation:NO];
+    
+    // Redraw chart
+    [chart redrawChartAndGL: YES];
+}
+
+#pragma mark Rotation
+
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations.
+	//return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	BOOL shouldRotate = NO;	
+	
+	if (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    {
+		shouldRotate = YES;
+	}
+	
+	if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft || interfaceOrientation == UIInterfaceOrientationLandscapeRight) 
+    {
+		shouldRotate = YES;
+	}
+	
+	return shouldRotate;
+}
+
+- (void)deviceOrientationChanged:(NSNotification *)notification 
+{
+
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    {
+        if (!isPortrait) 
+        {
+            int chartHeight = 0;
+            int menuHeight = 0;
+            int menuStart = 0;
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+            {
+                chartHeight = 512;
+                menuStart = 512;
+                menuHeight = 512;
+            } 
+            else 
+            {
+                // iPhone
+                chartHeight = 211;
+                menuStart = 211;
+                menuHeight = 205;
+            }        
+            [chart removeFromSuperview];
+            
+            
+            CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+            CGRect chartRect = CGRectMake(0.0,
+                                          0.0,
+                                          chartViewSize.width, chartHeight); 
+            
+            chart.frame = chartRect;
+            [self showButtons:1];
+            
+            CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+            CGRect menuRect = CGRectMake(0.0,
+                                         menuStart,
+                                         menuViewSize.width, menuHeight);
+            self.menuView.frame = menuRect;
+            
+            menuView.hidden = NO;
+            [menuView setAlpha:1.0];
+            [containerView addSubview:chart];
+            [containerView bringSubviewToFront:legendView];
+            [containerView bringSubviewToFront:menuView];
+            
+            [self slideDownDidStop];
+            [self resetLegend];
+            
+            isPortrait = YES;
+        }        
+    }
+    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+    {
+        if (isPortrait) 
+        {
+            int chartHeight = 0;
+            int menuHeight = 0;
+            int menuStart = 0;
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+            {
+                chartHeight = 700;
+                menuStart = 0;
+                menuHeight = 700;
+            } 
+            else 
+            {
+                // iPhone
+                chartHeight = 260;
+                menuStart = 0;
+                menuHeight = 320;
+            } 
+            
+            [chart removeFromSuperview];
+            
+            NSLog(@"OrientationCHANGE: LANDSCAPE");
+            CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+            CGRect startRect = CGRectMake(0.0,
+                                          0.0,
+                                          chartViewSize.width, chartHeight); 
+            
+            chart.frame = startRect;
+            [self showButtons:2];
+            
+            CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+            CGRect menuRect = CGRectMake(0.0,
+                                         menuStart,
+                                         menuViewSize.width, menuHeight);
+            self.menuView.frame = menuRect;
+            
+            
+            [containerView addSubview:chart];
+            [containerView bringSubviewToFront:legendView];
+            [containerView bringSubviewToFront:menuView];
+            menuView.hidden = YES;
+            menuShowing = NO;
+            
+            [self slideDownDidStop];
+            [self resetLegend];
+            isPortrait = NO;
+        }
+        
+    }
+    
+    
+}
+
+
+
+
+#pragma mark switch
+
+-(void)createSwitches {
+	if (self.switchDictionary == nil) {
+		self.switchDictionary = [NSMutableDictionary dictionary];
+		
+		NSInteger switchWidth = 96;
+		NSInteger height = 24;
+		NSInteger xOff = 8;
+		NSInteger yOff = 8;
+		
+		CGRect switchRect = CGRectMake(xOff, yOff , switchWidth, height);
+		
+		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+		BOOL storedVal;
+		NSString *key;
+		
+		NSArray *grpArray = [[self.scalesDictionary allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+		for (NSString *groupTitle in grpArray) {			
+			UISwitch *aSwitch = [[UISwitch alloc] initWithFrame:switchRect];
+			key = [NSString stringWithFormat:@"SWITCH_STATE_%@",groupTitle];
+			if (![defaults objectForKey:key]) {
+				storedVal = YES;
+			}
+			else {
+				storedVal = [defaults boolForKey:key];				
+			}
+            
+			aSwitch.on = storedVal;
+			aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
+			[aSwitch addTarget:self action:@selector(switchFlipped:) forControlEvents:UIControlEventValueChanged];
+			
+			[self.switchDictionary setValue:aSwitch forKey:groupTitle];
+			[aSwitch release];
+		}
+	}
+}
+
+-(void)switchFlipped:(id)sender 
+{
+    [containerView bringSubviewToFront:loadingView];
+    loadingLabel.text = @"";
+    //  dispatch_async(backgroundQueue, ^(void) {
+    // [self switchProcess];
+    //  }); 
+    [containerView bringSubviewToFront:loadingView];
+    
+    
+	NSEnumerator *enumerator = [self.switchDictionary keyEnumerator];
+	id key;
+	
+	UISwitch *currentValue;
+	NSString *switchTitle = @"";
+	
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSString *defaultsKey;
 	
-    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_GRADIENT_SUB"];
-    BOOL val = gradientSwitch.on;
-    [defaults setBool:val forKey:defaultsKey];
-    [defaults synchronize];
-    doUpdate = YES;
-}
-
-
--(void) viewWillDisappear:(BOOL)animated {
-    if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) 
+	while ((key = [enumerator nextObject])) 
     {
-        // back button was pressed.  We know this is true because self is no longer
-        // in the navigation stack.  
-    }
-    [super viewWillDisappear:animated];
+		currentValue = [self.switchDictionary objectForKey:key];
+		if (currentValue == sender) 
+        {
+			switchTitle = key;
+			defaultsKey = [NSString stringWithFormat:@"SWITCH_STATE_%@",switchTitle];
+			BOOL val = ((UISwitch *)currentValue).on;
+			[defaults setBool:val forKey:defaultsKey];
+			[defaults synchronize];
+			NSDictionary *usrDict = [NSDictionary dictionaryWithObjectsAndKeys:switchTitle, [NSNumber numberWithBool:val],nil];
+			[FlurryUtility report:EVENT_GRAPHRESULTS_SWITCHFLIPPED withData:usrDict]; 
+            
+		}
+	}
+    
+    
+    
+    [NSTimer scheduledTimerWithTimeInterval:0.01
+                                     target:self 
+                                   selector:@selector(switchProcess) 
+                                   userInfo:nil 
+                                    repeats:NO];
+    
 }
+
+
 
 
 #pragma mark ActionSheet
@@ -235,11 +1222,6 @@ bool initSetup;
     
 }
 
-- (IBAction)actionButtonClicked:(id)sender
-{
-    [self shareClick];
-}
-
 - (void)shareClick
 {
     UIActionSheet *actionSheet = [[[UIActionSheet alloc]
@@ -267,53 +1249,39 @@ bool initSetup;
     }
 }
 
+
 #pragma mark Refresh Chart
 // Main chart options button 
 - (void)optionButtonClicked
 {
     if (!menuShowing) 
     {
+        menuView.hidden = NO;
+        NSLog(@"show menu!");
         // Show
         [menuView setAlpha:0.0];
-        if (segmentButton.selectedSegmentIndex == 1) 
-        {
-            [notesTable.view removeFromSuperview];
-            notesTable = nil;
-            if (self.notesTable == nil) 
-            {
-                self.notesTable = [[ViewNotesViewController alloc] initWithNibName:@"ViewNotesViewController" bundle:nil];
-                CGRect wFrame = menuView.frame;
-                CGRect bFrame = menuBar.frame;
-                NSInteger notesHeight =  wFrame.size.height - (bFrame.origin.y + bFrame.size.height);
-                CGRect nFrame = CGRectMake(0, wFrame.size.height - notesHeight, wFrame.size.width, notesHeight);
-                self.notesTable.view.frame = nFrame;
-                [menuView addSubview:self.notesTable.view];
-            }
-            NSLog(@"segment: %i", segmentButton.selectedSegmentIndex);
-            self.notesTable.view.hidden = NO;
-            NSInteger top = 0;
-            CGRect notesFrame = self.notesTable.notesTableView.frame;
-            CGRect newFrame = CGRectMake(notesFrame.origin.x, top, notesFrame.size.width, notesFrame.size.height);
-            self.notesTable.notesTableView.frame = newFrame;
-        }
         
         [UIView beginAnimations:nil context:NULL];
-        [UIView setAnimationDuration:0.5];
-        [containerView bringSubviewToFront:menuView];
+        [UIView setAnimationDuration:0.3];
         
         [menuView setAlpha:1.0];
         
         [UIView commitAnimations];
         
+        [containerView bringSubviewToFront:menuView];
+        
         
         menuShowing = YES;
+        
+        
     }
     else 
     {
-        // Hide
+        
+        //Hide
         
         [UIView beginAnimations:nil context:NULL];
-        [UIView setAnimationDuration:0.5];
+        [UIView setAnimationDuration:0.3];
         
         [menuView setAlpha:0.0];
         
@@ -325,40 +1293,15 @@ bool initSetup;
                                        userInfo:nil
                                         repeats:NO];
         
+        
+        
+        
         menuShowing = NO;
         
-        // reload chart somehow
-        // Delay to prevent block
+        menuView.hidden = YES;
         
-        
-        if (initSetup) 
-        {
-            NSLog(@"initSetup");
-            dispatch_async(backgroundQueue, ^(void) {
-                [self getDatasource];
-            });    
-        }
-        else 
-        {
-            NSLog(@"reload");
-            
-            if (doUpdate) 
-            {
-                loadingLabel.text = @"Updating Chart";
-                [containerView bringSubviewToFront:loadingView]; 
-                
-                dispatch_async(backgroundQueue, ^(void) {
-                    [self getDatasourceReload];
-                });
-                
-            }
-        }
-        
-        doUpdate = NO;
-        initSetup = NO;
-        
+        [containerView addSubview:legendView];
     }
-    
 }
 
 - (void)sendMenuToBack
@@ -367,362 +1310,9 @@ bool initSetup;
 }
 
 
-
-
-#pragma mark Graph Menu 
-- (void)getDatasourceReload
+- (void)switchProcess
 {
-    datasource = nil;
-    
-    datasource = [[SGraphDataSource alloc] init];
-    
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self reloadData];
-    });
-    
-}
-
-- (void)getDatasource
-{
-    // Initialise the data source we will use for the chart
-    datasource = nil;
-    
-    datasource = [[SGraphDataSource alloc] init];
-    
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self setupGraph];
-    });
-    
-    
-}
-
-- (void)reloadData
-{
-    
-    // Initialise the data source we will use for the chart
-    //datasource = [[GraphDataSource alloc] init];
-    
-    
-    double xMin, xMax, yMin, yMax;
-    xMin = [chart.xAxis.axisRange.minimum doubleValue];
-    xMax = [chart.xAxis.axisRange.maximum doubleValue];
-    yMin = [chart.yAxis.axisRange.minimum doubleValue];
-    yMax = [chart.yAxis.axisRange.maximum doubleValue];
-    
-    // Give the chart the data source
-    chart.datasource = datasource;
-    
-    // Update Series
-    if (doSeries) 
-    {
-        if ([[switchDictionary allKeys] count] > 0) 
-        {
-            [datasource toggleSeriesOn:switchDictionary];
-        }
-    }
-    
-    isLegend = legendSwitch.on;
-    isSymbol = symbolSwitch.on;
-    isGradient = gradientSwitch.on;
-    
-    // Update Legend
-    if (isLegend) 
-    {
-        chart.legend.hidden = NO;
-    }
-    else 
-    {
-        chart.legend.hidden = YES;
-    }
-    
-    // Update Gradient
-    if (isGradient) 
-    {
-        [datasource toggleGradient:YES];
-    }
-    else 
-    {
-        [datasource toggleGradient:NO];
-    }    
-    
-    // Update Symbols
-    if (isSymbol) 
-    {
-        [datasource toggleSymbol:YES];
-    }
-    else 
-    {
-        [datasource toggleSymbol:NO];
-    }    
-    
-    // Reload data
-    [chart reloadData];
-    [chart layoutSubviews];
-    
-    // Restore axes' ranges
-    [chart.xAxis setRangeWithMinimum:[NSNumber numberWithDouble: xMin] andMaximum:[NSNumber numberWithDouble: xMax] withAnimation:NO];
-    [chart.yAxis setRangeWithMinimum:[NSNumber numberWithDouble: yMin] andMaximum:[NSNumber numberWithDouble: yMax] withAnimation:NO];
-    
-    // Redraw chart
-    [chart redrawChartAndGL: YES];
-    
-    [containerView sendSubviewToBack:loadingView];
-    
-    
-}
-
-- (void)setupGraph
-
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        //Create the chart
-        chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, graphView.bounds.size.height)];
-    } else {
-        //Create the chart
-        chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, graphView.bounds.size.width, graphView.bounds.size.height)];
-    }
-    
-    // Set a different theme on the chart
-    SChartMidnightTheme *midnight = [[SChartMidnightTheme alloc] init];
-    [chart setTheme:midnight];
-    [midnight release];
-    
-    
-    
-    //As the chart is a UIView, set its resizing mask to allow it to automatically resize when screen orientation changes.
-    chart.autoresizingMask = ~UIViewAutoresizingNone;
-    
-    // Initialise the data source we will use for the chart
-    // datasource = [[GraphDataSource alloc] init];
-    
-    // Give the chart the data source
-    chart.datasource = datasource;
-    
-    
-    // Zooming with Range
-    NSCalendar *cal = [NSCalendar currentCalendar];
-    NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:[[NSDate alloc] init]];
-    
-    [components setHour:-[components hour]];
-    [components setMinute:-[components minute]];
-    [components setSecond:-[components second]];
-    NSDate *today = [cal dateByAddingComponents:components toDate:[[NSDate alloc] init] options:0]; //This variable should now be pointing at a date object that is the start of today (midnight);
-    
-    [components setHour:-24];
-    [components setMinute:0];
-    [components setSecond:0];
-    
-    components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
-    [components setDay:([components day] - ([components weekday] - 1))]; 
-    [components setDay:([components day] - 7)];
-    [components setDay:([components day] - ([components day] -1))]; 
-    NSDate *thisMonth = [cal dateFromComponents:components];
-    
-    
-    // Subtract 40 years because of some calendar thing with the chart...i dunno
-    NSCalendar *calendar= [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSCalendarUnit unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
-    
-    
-    NSDateComponents *dateComponents = [calendar components:unitFlags fromDate:today];
-    NSInteger year = [dateComponents year];
-    NSInteger month = [dateComponents month];
-    NSInteger day = [dateComponents day];
-    year = year - 41;
-    
-    NSDateComponents *dateComponents1 = [calendar components:unitFlags fromDate:thisMonth];
-    NSInteger year1 = [dateComponents1 year];
-    NSInteger month1 = [dateComponents1 month];
-    NSInteger day1 = [dateComponents1 day];
-    year1 = year1 - 41;
-    
-    [calendar release];
-    NSString *monthStr = @"";
-    NSString *monthStr1 = @"";
-    NSString *dayStr = @"";
-    NSString *dayStr1 = @"";
-    
-    
-    if ([[NSString stringWithFormat:@"%i",day] length] < 2) 
-    {
-        dayStr = [NSString stringWithFormat:@"0%i",day];
-    }
-    else 
-    {
-        dayStr = [NSString stringWithFormat:@"%i",day];
-    }
-    
-    if ([[NSString stringWithFormat:@"%i",day1] length] < 2) 
-    {
-        dayStr1 = [NSString stringWithFormat:@"0%i",day1];
-    }
-    else 
-    {
-        dayStr1 = [NSString stringWithFormat:@"%i",day1];
-    }
-    
-    if ([[NSString stringWithFormat:@"%i",month] length] < 2) 
-    {
-        monthStr = [NSString stringWithFormat:@"0%i",month];
-    }
-    else 
-    {
-        monthStr = [NSString stringWithFormat:@"%i",month];
-    }
-    
-    if ([[NSString stringWithFormat:@"%i",month1] length] < 2) 
-    {
-        monthStr1 = [NSString stringWithFormat:@"0%i",month1];
-    }
-    else 
-    {
-        monthStr1 = [NSString stringWithFormat:@"%i",month1];
-    }
-    
-    
-    NSString *string = [NSString stringWithFormat:@"%@-%@-%i", dayStr, monthStr, year];   
-    NSString *string1 = [NSString stringWithFormat:@"%@-%@-%i", dayStr1, monthStr1, year1];  
-    
-    
-    //This is a sample date. The Z stands for GMT timezone
-    //The 0901 is 09h 01m on a 24 hour clock not 12.
-    //As long as I can get the hours/min & date from the string I can deal with the time zone later
-    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init]; 
-    [dateFormat setDateFormat:@"dd-MM-yyyy"];
-    NSDate *date = [dateFormat dateFromString:string];
-    NSDate *date1 = [dateFormat dateFromString:string1];
-    
-    
-    SChartDateRange *xRange = [[SChartDateRange alloc] initWithDateMinimum:date1 andDateMaximum:date];
-    
-    // Create a date time axis to use as the x axis.    
-    SChartDateTimeAxis *xAxis = [[SChartDateTimeAxis alloc] initWithRange:xRange];
-    // Enable panning and zooming on the x-axis.
-    xAxis.enableGesturePanning = YES;
-    xAxis.enableGestureZooming = YES;
-    xAxis.enableMomentumPanning = YES;
-    xAxis.enableMomentumZooming = YES;
-    xAxis.axisPositionValue = [NSNumber numberWithInt: 0];
-    xAxis.style.majorGridLineStyle.showMajorGridLines = YES;
-    
-    chart.xAxis = xAxis;
-    [xAxis release];
-    [xRange release];
-    
-    //Create a number axis to use as the y axis.
-    SChartNumberAxis *yAxis = [[SChartNumberAxis alloc] init];
-    
-    //Enable panning and zooming on Y
-    yAxis.enableGesturePanning = NO;
-    yAxis.enableGestureZooming = NO;
-    yAxis.enableMomentumPanning = NO;
-    yAxis.enableMomentumZooming = NO;
-    //yAxis.axisLabelsAreFixed = YES;
-    // yAxis.majorTickFrequency = YES;
-    yAxis.titleLabel.textColor = [UIColor grayColor];
-    yAxis.titleLabel.text = @"<<<   Low                    Hi    >>>";
-    //yAxis.titleLabel.frame
-    yAxis.style.majorGridLineStyle.showMajorGridLines = YES;
-    yAxis.style.majorTickStyle.showLabels = NO;
-    yAxis.style.majorTickStyle.showTicks = YES;
-    
-    chart.yAxis = yAxis;
-    [yAxis release];
-    
-    
-    //Set the chart title
-    chart.title = [NSString stringWithFormat:@"%@ Results",self.groupName];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        chart.titleLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:27.0f];
-    } else {
-        chart.titleLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:17.0f];
-    }
-    chart.titleLabel.textColor = [UIColor whiteColor];
-    
-    // If you have a trial version, you need to enter your licence key here:
-    //    chart.licenseKey = @"";
-    
-    
-    //Show the legend
-    chart.legend.hidden = YES;
-    
-    //Additional legend config
-    chart.legend.style.font = [UIFont fontWithName:@"Futura" size:12.0f];
-    chart.legend.symbolWidth = [NSNumber numberWithInt:75];
-    chart.legend.style.borderColor = [UIColor clearColor];
-    
-    isLegend = legendSwitch.on;
-    isSymbol = symbolSwitch.on;
-    isGradient = gradientSwitch.on;
-    
-    
-    // Update Legend
-    if (isLegend) 
-    {
-        chart.legend.hidden = NO;
-    }
-    else 
-    {
-        chart.legend.hidden = YES;
-    }
-    
-    // Update Gradient
-    if (isGradient) 
-    {
-        [datasource toggleGradient:YES];
-    }
-    else 
-    {
-        [datasource toggleGradient:NO];
-    }    
-    
-    // Update Symbols
-    if (isSymbol) 
-    {
-        [datasource toggleSymbol:YES];
-    }
-    else 
-    {
-        [datasource toggleSymbol:NO];
-    }    
-    
-    
-    [containerView sendSubviewToBack:loadingView];
-    // Add the chart to the view controller
-    [chart setAlpha:0.0];
-    [containerView addSubview:chart];
-    
-    
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.5];
-    [chart setAlpha:1.0];
-    [UIView commitAnimations];
-    
-    t2LogoImageView.hidden = YES;
-    
-    
-    /*
-     // NavBar Button
-     NSMutableArray *barButtonItemsArray = [[NSMutableArray alloc] init];    
-     UIImage *image = [UIImage imageNamed:@"icon-settings.png"];
-     
-     UIBarButtonItem *optionButton = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStyleBordered target:self action:@selector(optionButtonClicked)];
-     
-     UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareClick)];
-     
-     
-     [barButtonItemsArray addObject:optionButton];
-     [barButtonItemsArray addObject:actionButton];
-     
-     self.navigationItem.rightBarButtonItems = barButtonItemsArray;
-     [optionButton release];
-     [barButtonItemsArray release];
-     [actionButton release];
-     */
-    
-}
-
--(void)switchSeriesType {
+    // Change series type
     double xMin, xMax, yMin, yMax;
     xMin = [chart.xAxis.axisRange.minimum doubleValue];
     xMax = [chart.xAxis.axisRange.maximum doubleValue];
@@ -730,9 +1320,8 @@ bool initSetup;
     yMax = [chart.yAxis.axisRange.maximum doubleValue];
     
     // Change series type
-    [datasource toggleSeriesType];
+    [datasource toggleSeries];
     
-    chart.legend.hidden = NO;
     // Reload data
     [chart reloadData];
     [chart layoutSubviews];
@@ -742,127 +1331,14 @@ bool initSetup;
     [chart.yAxis setRangeWithMinimum:[NSNumber numberWithDouble: yMin] andMaximum:[NSNumber numberWithDouble: yMax] withAnimation:NO];
     
     // Redraw chart
-    [chart redrawChartAndGL: YES];
-}
-
-#pragma mark Rotation
-
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations.
-	//return (interfaceOrientation == UIInterfaceOrientationPortrait);
-	BOOL shouldRotate = NO;	
-	
-	if (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
-    {
-		shouldRotate = YES;
-	}
-	
-	if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft || interfaceOrientation == UIInterfaceOrientationLandscapeRight) 
-    {
-		shouldRotate = YES;
-	}
-	
-	return shouldRotate;
-}
-
-- (void)deviceOrientationChanged:(NSNotification *)notification 
-{
+    [chart redrawChartAndGL: YES]; 
     
-    if (menuShowing && segmentButton.selectedSegmentIndex == 1) 
-    {
-        [notesTable.view removeFromSuperview];
-        notesTable = nil;
-        if (self.notesTable == nil) 
-        {
-            self.notesTable = [[ViewNotesViewController alloc] initWithNibName:@"ViewNotesViewController" bundle:nil];
-            CGRect wFrame = menuView.frame;
-            CGRect bFrame = menuBar.frame;
-            NSInteger notesHeight =  wFrame.size.height - (bFrame.origin.y + bFrame.size.height);
-            CGRect nFrame = CGRectMake(0, wFrame.size.height - notesHeight, wFrame.size.width, notesHeight);
-            self.notesTable.view.frame = nFrame;
-            [menuView addSubview:self.notesTable.view];
-        }
-        // NSLog(@"segment: %i", segmentButton.selectedSegmentIndex);
-        self.notesTable.view.hidden = NO;
-        NSInteger top = 0;
-        CGRect notesFrame = self.notesTable.notesTableView.frame;
-        CGRect newFrame = CGRectMake(notesFrame.origin.x, top, notesFrame.size.width, notesFrame.size.height);
-        self.notesTable.notesTableView.frame = newFrame;
-    }
-}
-
-
-
-#pragma mark switch
-
--(void)createSwitches {
-	if (self.switchDictionary == nil) {
-		self.switchDictionary = [NSMutableDictionary dictionary];
-		
-		NSInteger switchWidth = 96;
-		NSInteger height = 24;
-		NSInteger xOff = 8;
-		NSInteger yOff = 8;
-		
-		CGRect switchRect = CGRectMake(xOff, yOff , switchWidth, height);
-		
-		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-		BOOL storedVal;
-		NSString *key;
-		
-		NSArray *grpArray = [[self.scalesDictionary allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-		for (NSString *groupTitle in grpArray) {			
-			UISwitch *aSwitch = [[UISwitch alloc] initWithFrame:switchRect];
-			key = [NSString stringWithFormat:@"SWITCH_STATE_%@",groupTitle];
-			if (![defaults objectForKey:key]) {
-				storedVal = YES;
-			}
-			else {
-				storedVal = [defaults boolForKey:key];				
-			}
-            
-			aSwitch.on = storedVal;
-			aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
-			[aSwitch addTarget:self action:@selector(switchFlipped:) forControlEvents:UIControlEventValueChanged];
-			
-			[self.switchDictionary setValue:aSwitch forKey:groupTitle];
-			[aSwitch release];
-		}
-	}
-}
-
--(void)switchFlipped:(id)sender 
-{
-	NSEnumerator *enumerator = [self.switchDictionary keyEnumerator];
-	id key;
-	
-	UISwitch *currentValue;
-	NSString *switchTitle = @"";
-	
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSString *defaultsKey;
-	
-	while ((key = [enumerator nextObject])) 
-    {
-		currentValue = [self.switchDictionary objectForKey:key];
-		if (currentValue == sender) 
-        {
-			switchTitle = key;
-			defaultsKey = [NSString stringWithFormat:@"SWITCH_STATE_%@",switchTitle];
-			BOOL val = ((UISwitch *)currentValue).on;
-			[defaults setBool:val forKey:defaultsKey];
-			[defaults synchronize];
-			NSDictionary *usrDict = [NSDictionary dictionaryWithObjectsAndKeys:switchTitle, [NSNumber numberWithBool:val],nil];
-			[FlurryUtility report:EVENT_GRAPHRESULTS_SWITCHFLIPPED withData:usrDict]; 
-            
-		}
-	}
-    
-    doUpdate = YES;
-    doSeries = YES;
+    [self resetLegend];
+    [sLegendTableViewController refresh];
+    [containerView sendSubviewToBack:loadingView];
     
 }
+
 
 #pragma mark fill scales
 
@@ -942,48 +1418,21 @@ bool initSetup;
 
 - (void)fillOptions
 {
-    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     BOOL storedVal;
     NSString *key;
     
     
     // Fetch User Defaults for Legend
-    key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND_SUB"];
-    if (![defaults objectForKey:key]) {
+    key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND"];
+    if (![defaults boolForKey:key]) {
         storedVal = NO;
     }
     else {
         storedVal = [defaults boolForKey:key];				
     }
-    legendSwitch.on = storedVal;
-    legendSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
-    [legendSwitch addTarget:self action:@selector(legendToggle) forControlEvents:UIControlEventValueChanged];
-    
-    
-    // Fetch User Defaults for Symbol
-    key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_SYMBOL_SUB"];
-    if (![defaults objectForKey:key]) {
-        storedVal = NO;
-    }
-    else {
-        storedVal = [defaults boolForKey:key];				
-    }
-    symbolSwitch.on = storedVal;
-    symbolSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
-    [symbolSwitch addTarget:self action:@selector(symbolToggle) forControlEvents:UIControlEventValueChanged];
-    
-    // Fetch User Defaults for Gradient
-    key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_GRADIENT_SUB"];
-    if (![defaults objectForKey:key]) {
-        storedVal = NO;
-    }
-    else {
-        storedVal = [defaults boolForKey:key];				
-    }
-    gradientSwitch.on = storedVal;
-    gradientSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
-    [gradientSwitch addTarget:self action:@selector(gradientToggle) forControlEvents:UIControlEventValueChanged];  
+    isLegend = storedVal;
+    NSLog(@"SWITCH_OPTION_STATE_LEGEND: %i", isLegend);
     
 }
 
@@ -1113,42 +1562,250 @@ bool initSetup;
             isOptions = NO;
             optionView.hidden = YES;
             _tableView.hidden = NO;
+            noteView.hidden = YES;
+            
+            
 			break;
 		case 1:
-            // NSLog(@"Notes:");
             
-            [notesTable.view removeFromSuperview];
-            notesTable = nil;
-			if (self.notesTable == nil) {
-				self.notesTable = [[ViewNotesViewController alloc] initWithNibName:@"ViewNotesViewController" bundle:nil];
-				CGRect wFrame = menuView.frame;
-                CGRect bFrame = menuBar.frame;
-				NSInteger notesHeight =  wFrame.size.height - (bFrame.origin.y + bFrame.size.height);
-				CGRect nFrame = CGRectMake(0, wFrame.size.height - notesHeight, wFrame.size.width, notesHeight);
-				self.notesTable.view.frame = nFrame;
-				[menuView addSubview:self.notesTable.view];
-			}
-			
-            self.notesTable.view.hidden = NO;
-            NSInteger top = 0;
-            CGRect notesFrame = self.notesTable.notesTableView.frame;
-            CGRect newFrame = CGRectMake(notesFrame.origin.x, top, notesFrame.size.width, notesFrame.size.height);
-            self.notesTable.notesTableView.frame = newFrame;
+            noteView.hidden = NO;
             optionView.hidden = YES;
-            _tableView.hidden = YES;			
+            _tableView.hidden = YES;	
+            
+            
             break;
 		case 2:
-            //NSLog(@"Other:");
             if (self.notesTable != nil) {
 				self.notesTable.view.hidden = YES;
 			}
             isOptions = YES;
             optionView.hidden = NO;
             _tableView.hidden = YES;
+            noteView.hidden = YES;
+            
 			break;            
 	}
 }
 
+#pragma mark Range Picker
+- (void)resignPicker
+{
+    
+	CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
+	CGRect endFrame = self.rangePicker.frame;
+	endFrame.origin.y = screenRect.origin.y + screenRect.size.height;
+	
+	// start the slide down animation
+	[UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:0.3];
+	
+    // we need to perform some post operations after the animation is complete
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationDidStopSelector:@selector(slideDownDidStop)];
+	
+    self.rangePicker.frame = endFrame;
+	[UIView commitAnimations];
+	
+	// grow the table back again in vertical size to make room for the date picker
+	//CGRect newFrame = self.tableView.frame;
+	//newFrame.size.height += self.datePicker.frame.size.height;
+	//self.tableView.frame = newFrame;
+	
+	// remove the "Done" button in the nav bar
+	self.navigationItem.rightBarButtonItem = nil;
+    
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    {
+        [self showButtons:1];
+    }
+    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+    {
+        [self showButtons:2];
+    }
+    
+	
+	// deselect the current table row
+	NSIndexPath *indexPath = [self._optionsTableView indexPathForSelectedRow];
+	//[self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [_optionsTableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    // UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(generateReport:)];
+	//self.navigationItem.rightBarButtonItem = nextButton;   
+    
+    // If Data Range changed, Refresh all data
+    if (doUpdate) 
+    {
+        [self reloadGraph];
+    }
+    
+}
+
+- (void)slideDownDidStop
+{
+	// the date picker has finished sliding downwards, so remove it
+	[self.rangePicker removeFromSuperview];
+}
+- (IBAction)doneAction:(id)sender
+{
+    [self resignPicker];
+}
+
+#pragma mark PickerView Delegate
+-(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row
+      inComponent:(NSInteger)component
+{
+    
+    
+    NSString *pickedRange = [pickerArray objectAtIndex:row];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *defaultsKey;
+    
+    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
+    NSString *oldRange = [defaults objectForKey:defaultsKey];
+    
+    [defaults setObject:pickedRange forKey:defaultsKey];
+    [defaults synchronize];
+    
+    // Set to UPDATE if selection changed
+    if (![pickedRange isEqualToString:oldRange]) 
+    {
+        doUpdate = YES;
+    }
+    
+    NSLog(@"picked: %@", [defaults objectForKey:defaultsKey]);
+}
+
+#pragma mark -
+#pragma mark PickerView DataSource
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+{
+    return 1;
+}
+- (NSInteger)pickerView:(UIPickerView *)pickerView
+numberOfRowsInComponent:(NSInteger)component
+{
+    return [pickerArray count];
+}
+- (NSString *)pickerView:(UIPickerView *)pickerView
+             titleForRow:(NSInteger)row
+            forComponent:(NSInteger)component
+{
+    return [pickerArray objectAtIndex:row];
+} 
+
+- (void) showPicker
+{
+    NSLog(@"shwpickers: %@", pickerArray);
+    int startHeight = 0;
+    int startWeight = 0;
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        //iPad
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            startHeight = 329;
+            startWeight = 768;
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            startHeight = 585;
+            startWeight = 1024;
+            
+        }
+    }
+    else 
+    {
+        //iPhone
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait) 
+        {
+            startHeight = 280;
+            startWeight = 320;
+            
+        }
+        if (interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            startHeight = 260;
+            startWeight = 320;
+            
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            startHeight = 374;
+            startWeight = 480;
+            
+        }
+    }
+    
+    // check if our rangePicker is already on screen
+    if (self.rangePicker.superview == nil)
+    {
+        NSLog(@"MADEIT");
+        [self.view addSubview: self.rangePicker];
+        // size up the picker view to our screen and compute the start/end frame origin for our slide up animation
+        //
+        // compute the start frame
+        CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
+        CGSize pickerSize = [self.rangePicker sizeThatFits:CGSizeZero];
+        CGRect startRect = CGRectMake(0.0,
+                                      screenRect.origin.y + screenRect.size.height,
+                                      startWeight, pickerSize.height);
+        self.rangePicker.frame = startRect;
+        // compute the end frame
+        CGRect pickerRect = CGRectMake(0.0,
+                                       (screenRect.origin.y + screenRect.size.height) - startHeight,
+                                       startWeight,
+                                       pickerSize.height);
+        // start the slide up animation
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.3];
+        
+        // we need to perform some post operations after the animation is complete
+        [UIView setAnimationDelegate:self];
+        
+        self.rangePicker.frame = pickerRect;
+        
+        // shrink the table vertical size to make room for the date picker
+        //CGRect newFrame = self.containerView.frame;
+        //newFrame.size.height -= self.rangePicker.frame.size.height;
+        //self.containerView.frame = newFrame;
+        [UIView commitAnimations];
+        
+        // add the "Done" button to the nav bar
+        self.navigationItem.rightBarButtonItem = nil;
+        
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSString *defaultsKey;
+        
+        defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
+        NSString *theRange = [defaults objectForKey:defaultsKey];
+        int whatRow = 0;
+        if ([theRange isEqualToString:@"30 days"]) 
+        {
+            whatRow = 0;
+        }
+        else if ([theRange isEqualToString:@"90 days"])  
+        {
+            whatRow = 1;
+        }
+        else if ([theRange isEqualToString:@"1 year"]) 
+        {
+            whatRow = 2;
+        }
+        else if ([theRange isEqualToString:@"All"]) 
+        {
+            whatRow = 3;
+        }
+        
+        [self.rangePicker selectRow:whatRow inComponent:0 animated:YES];
+        self.navigationItem.rightBarButtonItem = self.doneButton;
+    }
+}
 
 
 #pragma mark tableView

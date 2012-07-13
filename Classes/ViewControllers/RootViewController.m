@@ -47,10 +47,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    // Initial CheckPin 
+  //  [self chkPin];
+
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
 	
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
@@ -83,23 +84,25 @@
         // NSLog(@"subsymbol: %@", [defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]);
         
     }
-	
-	if (pinString != nil && ![pinString isEqual:@""]) {
-		[appDelegate.navigationController setNavigationBarHidden:YES];
-		UIViewController *passwordViewController = [[PasswordViewController alloc] initWithNibName:@"PasswordViewController" bundle:nil];
-		[appDelegate.navigationController pushViewController:passwordViewController animated:YES];
-		[passwordViewController release];
-	}
-	else {
-		BOOL showTips = [defaults boolForKey:@"SHOW_TIPS_ON_STARTUP"];
-		
-		if (showTips == YES) {
-			UIViewController *tipViewController = [[TipViewController alloc] initWithNibName:@"TipViewController" bundle:nil];
+
+	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
+    
+    
+    if (pinString != nil && ![pinString isEqual:@""]) 
+    {
+        [self chkPin];
+    }
+    else 
+    {
+        BOOL showTips = [defaults boolForKey:@"SHOW_TIPS_ON_STARTUP"];
+        
+        if (showTips == YES) {
+            UIViewController *tipViewController = [[TipViewController alloc] initWithNibName:@"TipViewController" bundle:nil];
             tipViewController.hidesBottomBarWhenPushed = YES;
-			[appDelegate.navigationController pushViewController:tipViewController animated:YES];
-			[tipViewController release];
-		}
-	}
+            [appDelegate.navigationController pushViewController:tipViewController animated:YES];
+            [tipViewController release];
+        }
+    }
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleUnusualEntryNotification:) name:@"UnusualEntryAdded" object:nil];
 	[FlurryUtility report:EVENT_MAIN_ACTIVITY];
@@ -113,7 +116,36 @@
 	tableViewFrame.size.height += noteButton.bounds.size.height;
 	self.tableView.frame = tableViewFrame;
     
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
+
+    
 }
+
+- (void)chkPin
+{
+    NSLog(@"rootview:");
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
+
+    
+    if (pinString != nil && ![pinString isEqual:@""]) {
+		[self.navigationController setNavigationBarHidden:YES];
+        self.tabBarController.tabBar.hidden = YES;  
+		UIViewController *passwordViewController = [[PasswordViewController alloc] initWithNibName:@"PasswordViewController" bundle:nil];
+		[self.navigationController pushViewController:passwordViewController animated:YES];
+		[passwordViewController release];
+	}
+}
+- (void)rsnPin
+{
+    [self.navigationController setNavigationBarHidden:NO];
+    [self.navigationController popViewControllerAnimated:YES];
+    self.tabBarController.tabBar.hidden = NO;  
+}
+
 
 #pragma mark colors
 

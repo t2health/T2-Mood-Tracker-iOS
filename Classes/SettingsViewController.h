@@ -23,4 +23,7 @@
 - (void)switchFlipped:(id)sender;
 - (void)addNoteClicked:(id)sender;
 
+- (void)chkPin;
+- (void)rsnPin;
+
 @end

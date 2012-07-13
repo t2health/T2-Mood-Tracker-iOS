@@ -19,8 +19,11 @@
 
 @class ViewNotesViewController;
 @class SLegendTableViewController;
+@class NotesTableViewController;
+@class OptionsTableViewController;
 
-@interface SGraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate> 
+
+@interface SGraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource> 
 {
     
     ShinobiChart            *chart;
@@ -47,9 +50,13 @@
     NSArray *groupsArray;
     NSDictionary *scalesDictionary;
 	NSArray *scalesArray;
+    NSArray *pickerArray;
+    IBOutlet UIButton *legendButton;
     
     IBOutlet ViewNotesViewController *notesTable;
     IBOutlet SLegendTableViewController *sLegendTableViewController;
+    IBOutlet NotesTableViewController *notesTableViewController;
+    IBOutlet OptionsTableViewController *optionsTableViewController;
     
     NSMutableDictionary *symbolsDictionary;
     IBOutlet UITableView *_tableView;
@@ -61,9 +68,20 @@
     
     IBOutlet UIView *legendView;
     IBOutlet UITableView *_legendTableView;
+    IBOutlet UITableView *_notesTableView;
+    IBOutlet UITableView *_optionsTableView;
+    IBOutlet UIView *noteView;
+	UISwipeGestureRecognizer *legendSwipeRight;
+	UISwipeGestureRecognizer *legendSwipeLeft;
+    UITapGestureRecognizer *legendTap;
     
+    IBOutlet UIBarButtonItem *doneButton;	// this button appears only when the date picker is open
+    IBOutlet UIPickerView *rangePicker;
+
 }
 
+@property (nonatomic, retain) IBOutlet UIButton *legendButton;
+@property (nonatomic, retain) IBOutlet UIPickerView *rangePicker;
 
 @property (nonatomic, retain) IBOutlet UIView *menuView;
 @property (nonatomic, retain) IBOutlet UIView *containerView;
@@ -80,13 +98,24 @@
 @property (nonatomic, retain) NSString *groupName;
 @property (nonatomic, retain) IBOutlet ViewNotesViewController *notesTable;
 @property (nonatomic, retain) IBOutlet SLegendTableViewController *sLegendTableViewController;
+@property (nonatomic, retain) IBOutlet NotesTableViewController *notesTableViewController;
+@property (nonatomic, retain) IBOutlet OptionsTableViewController *optionsTableViewController;
+
+@property (nonatomic, retain) IBOutlet UITableView *_notesTableView;
+
+@property (nonatomic, retain) UISwipeGestureRecognizer *legendSwipeRight;
+@property (nonatomic, retain) UISwipeGestureRecognizer *legendSwipeLeft;
+@property (nonatomic, retain) UITapGestureRecognizer *legendTap;
+@property (nonatomic, retain) NSArray *pickerArray;
 
 @property (nonatomic, retain) NSDictionary *scalesDictionary;
 @property (nonatomic, retain) NSArray *scalesArray;
 @property (nonatomic, retain) IBOutlet UITableView *_tableView;
 @property (nonatomic, retain) IBOutlet UITableView *_legendTableView;
+@property (nonatomic, retain) IBOutlet UITableView *_optionsTableView;
 
 @property (nonatomic, retain) IBOutlet UIView *optionView;
+@property (nonatomic, retain) IBOutlet UIView *noteView;
 @property (nonatomic, retain) IBOutlet UISwitch *legendSwitch;
 @property (nonatomic, retain) IBOutlet UISwitch *symbolSwitch;
 @property (nonatomic, retain) IBOutlet UISwitch *gradientSwitch;
@@ -94,23 +123,26 @@
 
 @property (nonatomic, retain) IBOutlet UIView *legendView;
 
+@property (nonatomic, retain) IBOutlet UIBarButtonItem *doneButton;
 
 - (void)initSetup;
-- (void)reloadData;
 - (void)getDatasource;
-- (void)getDatasourceReload;
+- (void)setupGraph;
+- (void)reloadGraph;
+- (void)updateGraphData;
+- (void)redrawGraph;
 
 - (void)optionButtonClicked;
 - (void)shareClick;
 
 - (void)createSwitches;
 - (void)switchFlipped:(id)sender;
+- (void)switchProcess;
 - (void)fillGroupsDictionary;
 - (void)fillScalesDictionary;
 - (void)fillColors;
 - (void)fillSymbols;
 - (void)fillOptions;
-
 
 - (void)saveToGallery;
 
@@ -125,13 +157,16 @@
 - (void)legendToggle;
 - (void)symbolToggle;
 - (void)gradientToggle;
+- (IBAction) legendButtonClicked:(id)sender;
 
-- (IBAction) customChartButtonClick:(id)sender;
-- (void)customChartClick;
 
 - (void)sendMenuToBack;
 - (void)emailResults;
 - (void)deviceOrientationChanged:(NSNotification *)notification;
 - (void)thisImage:(UIImage *)image hasBeenSavedInPhotoAlbumWithError:(NSError *)error usingContextInfo:(void*)ctxInfo;
+
+- (IBAction)doneAction:(id)sender;
+- (void)resignPicker;
+- (void)slideDownDidStop;
 
 @end

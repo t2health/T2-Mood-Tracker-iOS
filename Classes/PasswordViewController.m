@@ -143,11 +143,14 @@
 	
 	if ([answer1String isEqual:guess1] && [answer2String isEqual:guess2]) {
 		[defaults setValue:@"" forKey:SECURITY_PIN_SETTING];
-		UIApplication *app = [UIApplication sharedApplication];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ResignPin" object: nil];
 
-		VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
-		[appDelegate.navigationController setNavigationBarHidden:NO];
-		[appDelegate.navigationController popViewControllerAnimated:YES];
+//		UIApplication *app = [UIApplication sharedApplication];
+
+//		VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
+//		[appDelegate.navigationController setNavigationBarHidden:NO];
+//		[appDelegate.navigationController popViewControllerAnimated:YES];
 	}
 }
 
@@ -159,10 +162,17 @@
 
 		if ([pinField.text isEqual:pinString]) {
 			[pinField resignFirstResponder];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ResignPin" object: nil];
+            
+            /*
 			UIApplication *app = [UIApplication sharedApplication];
 			VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
 			[appDelegate.navigationController setNavigationBarHidden:NO];
 			[appDelegate.navigationController popViewControllerAnimated:YES];
+            appDelegate.tabBarController.tabBar.hidden = NO;  
+             */
+
 		}
 	}
 }

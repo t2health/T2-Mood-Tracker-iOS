@@ -17,7 +17,7 @@
     NSManagedObjectContext *managedObjectContext;
     NSArray *dataSourceArray;
     UINavigationController *myNavController;
-
+    NSString *whichGraph;
     UISwitch *legendSwitch;
     UISwitch *symbolSwitch;
     UISwitch *gradientSwitch;
@@ -30,6 +30,7 @@
 @property (nonatomic, retain) UISwitch *legendSwitch;
 @property (nonatomic, retain) UISwitch *symbolSwitch;
 @property (nonatomic, retain) UISwitch *gradientSwitch;
+@property (nonatomic, retain) NSString *whichGraph;
 
 
 - (void)legendToggle;

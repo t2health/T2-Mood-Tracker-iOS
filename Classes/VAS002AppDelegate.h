@@ -51,6 +51,8 @@ void uncaughtExceptionHandler(NSException *exception);
 
 #define SQL_FILE_BASE @"VAS002"
 #define SQL_FILE_NAME @"VAS002.sqlite"
+#define SECURITY_PIN_SETTING @"Security_Pin_Setting"
+
 
 // Flury Unique ID: 61LDTFTR6XGJZA437D5W
 

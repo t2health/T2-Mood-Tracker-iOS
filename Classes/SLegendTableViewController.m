@@ -42,7 +42,7 @@
 
 - (void)refresh
 {
-    [self fillGroupsDictionary];
+    [self fillScalesDictionary];
     [self.tableView reloadData];
     
     // Resize Legend Window

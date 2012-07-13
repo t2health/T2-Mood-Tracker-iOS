@@ -56,4 +56,6 @@
 - (NSArray *)scalesForGroup:(Group *)group;
 - (void)handleUnusualEntryNotification:(id)sender;
 
+- (void)chkPin;
+- (void)rsnPin;
 @end

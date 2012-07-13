@@ -15,6 +15,7 @@
 #import "VASAnalytics.h"
 #import "VAS002AppDelegate.h"
 #import "EditScaleViewController.h"
+#import "UICustomSwitch.h"
 
 @implementation EditGroupViewController
 
@@ -45,6 +46,13 @@
 		self.title = @"New Category";
 	}
 	
+	UICustomSwitch *switchView = [[UICustomSwitch alloc] initWithFrame:CGRectZero];
+    
+	switchView = [UICustomSwitch switchWithLeftText:@"YES" andRight:@"NO"];
+	switchView.center = CGPointMake(160.0f, 60.0f);
+	switchView.on = YES;
+	[self.view addSubview:switchView];
+    
 	[FlurryUtility report:EVENT_GROUP_ACTIVITY];
 }
 

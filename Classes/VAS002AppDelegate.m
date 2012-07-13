@@ -16,6 +16,7 @@
 #import "FlurryAPI.h"
 #import "AddNoteViewController.h"
 #import "GraphMenuViewController.h"
+#import "PasswordViewController.h"
 
 
 @implementation VAS002AppDelegate
@@ -70,8 +71,6 @@
 	
 	[self setFirstLauchPreferences];
     
-
-	
     return YES;
 }
 
@@ -178,6 +177,9 @@ void uncaughtExceptionHandler(NSException *exception) {
     /*
      Called as part of  transition from the background to the inactive state: here you can undo many of the changes made on entering the background.
      */
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"CheckPin" object: nil];
+    
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {

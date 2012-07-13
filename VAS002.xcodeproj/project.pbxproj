@@ -95,6 +95,11 @@
 		FBF91EEE15239D3000D1D138 /* ViewSavedController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBF91EEC15239D2900D1D138 /* ViewSavedController.xib */; };
 		FBFDA44315AB2C6F00C20E18 /* OptionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFDA44215AB2C6F00C20E18 /* OptionsTableViewController.m */; };
 		FBFDA44A15ACE8B600C20E18 /* GraphViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA44915ACE8B600C20E18 /* GraphViewController.xib */; };
+		FBFDA45F15AF275600C20E18 /* UICustomSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFDA45E15AF275600C20E18 /* UICustomSwitch.m */; };
+		FBFDA46315AF28F100C20E18 /* switchBlueBg.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA46015AF28F100C20E18 /* switchBlueBg.png */; };
+		FBFDA46415AF28F100C20E18 /* switchOffPlain.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA46115AF28F100C20E18 /* switchOffPlain.png */; };
+		FBFDA46515AF28F100C20E18 /* switchThumb.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA46215AF28F100C20E18 /* switchThumb.png */; };
+		FBFDA46715B0A41C00C20E18 /* mt-horizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA46615B0A41C00C20E18 /* mt-horizontal.png */; };
 		FE0A118D130DA1230013D958 /* EditScaleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0A118B130DA1230013D958 /* EditScaleViewController.m */; };
 		FE0A118E130DA1230013D958 /* EditScaleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE0A118C130DA1230013D958 /* EditScaleViewController.xib */; };
 		FE0A148E130EEE990013D958 /* iTunesArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = FE0A148D130EEE990013D958 /* iTunesArtwork.png */; };
@@ -316,6 +321,12 @@
 		FBFDA44115AB2C6F00C20E18 /* OptionsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptionsTableViewController.h; sourceTree = "<group>"; };
 		FBFDA44215AB2C6F00C20E18 /* OptionsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OptionsTableViewController.m; sourceTree = "<group>"; };
 		FBFDA44915ACE8B600C20E18 /* GraphViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GraphViewController.xib; sourceTree = "<group>"; };
+		FBFDA45D15AF275500C20E18 /* UICustomSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICustomSwitch.h; sourceTree = "<group>"; };
+		FBFDA45E15AF275600C20E18 /* UICustomSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UICustomSwitch.m; sourceTree = "<group>"; };
+		FBFDA46015AF28F100C20E18 /* switchBlueBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchBlueBg.png; sourceTree = "<group>"; };
+		FBFDA46115AF28F100C20E18 /* switchOffPlain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchOffPlain.png; sourceTree = "<group>"; };
+		FBFDA46215AF28F100C20E18 /* switchThumb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchThumb.png; sourceTree = "<group>"; };
+		FBFDA46615B0A41C00C20E18 /* mt-horizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mt-horizontal.png"; sourceTree = "<group>"; };
 		FE0A118A130DA1230013D958 /* EditScaleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditScaleViewController.h; sourceTree = "<group>"; };
 		FE0A118B130DA1230013D958 /* EditScaleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditScaleViewController.m; sourceTree = "<group>"; };
 		FE0A118C130DA1230013D958 /* EditScaleViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EditScaleViewController.xib; sourceTree = "<group>"; };
@@ -781,6 +792,7 @@
 		FBDF39F3157FC50B00E74F12 /* AddEditCategory */ = {
 			isa = PBXGroup;
 			children = (
+				FBFDA45315AF248700C20E18 /* CustomSwitch */,
 				FBDF39F7157FC58200E74F12 /* ManageScales */,
 				FBDF39F6157FC55500E74F12 /* Groups */,
 				FBDF39F5157FC53800E74F12 /* EditScale */,
@@ -952,6 +964,18 @@
 			name = Symbols;
 			sourceTree = "<group>";
 		};
+		FBFDA45315AF248700C20E18 /* CustomSwitch */ = {
+			isa = PBXGroup;
+			children = (
+				FBFDA46015AF28F100C20E18 /* switchBlueBg.png */,
+				FBFDA46115AF28F100C20E18 /* switchOffPlain.png */,
+				FBFDA46215AF28F100C20E18 /* switchThumb.png */,
+				FBFDA45D15AF275500C20E18 /* UICustomSwitch.h */,
+				FBFDA45E15AF275600C20E18 /* UICustomSwitch.m */,
+			);
+			name = CustomSwitch;
+			sourceTree = "<group>";
+		};
 		FE2CB6D512C8F737009E418B /* Mail */ = {
 			isa = PBXGroup;
 			children = (
@@ -1020,6 +1044,7 @@
 		FE6F394C12BFE6E100357BEF /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				FBFDA46615B0A41C00C20E18 /* mt-horizontal.png */,
 				FE6F394D12BFE6E100357BEF /* add_blue.png */,
 				FE6F394E12BFE6E100357BEF /* add_blueL.png */,
 				FECD10B812DB800E00A410B0 /* check.png */,
@@ -1303,6 +1328,10 @@
 				FBF7103215936B80004728D9 /* tab-legend.png in Resources */,
 				FBF7103415936BC1004728D9 /* tab-legend@2x.png in Resources */,
 				FBFDA44A15ACE8B600C20E18 /* GraphViewController.xib in Resources */,
+				FBFDA46315AF28F100C20E18 /* switchBlueBg.png in Resources */,
+				FBFDA46415AF28F100C20E18 /* switchOffPlain.png in Resources */,
+				FBFDA46515AF28F100C20E18 /* switchThumb.png in Resources */,
+				FBFDA46715B0A41C00C20E18 /* mt-horizontal.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1377,6 +1406,7 @@
 				FBD06A41159B7FE900FD28A9 /* PDFImageConverter.m in Sources */,
 				FBD06A5C159CC26900FD28A9 /* ChartPrintDataSource.m in Sources */,
 				FBFDA44315AB2C6F00C20E18 /* OptionsTableViewController.m in Sources */,
+				FBFDA45F15AF275600C20E18 /* UICustomSwitch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

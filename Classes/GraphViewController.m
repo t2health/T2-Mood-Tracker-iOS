@@ -27,8 +27,6 @@
 
 @implementation GraphViewController
 
-
-
 @synthesize menuView, containerView, graphView, notesTable, noteView;
 @synthesize managedObjectContext;
 
@@ -37,7 +35,7 @@
 @synthesize groupsDictionary, groupsArray;
 @synthesize t2LogoImageView, loadingView, symbolsDictionary,legendButton;
 @synthesize _tableView, optionView, legendSwitch, symbolSwitch, gradientSwitch;
-@synthesize optionsDictionary, legendView, legendTableViewController, _legendTableView, notesTableViewController, _notesTableView;
+@synthesize legendView, legendTableViewController, _legendTableView, notesTableViewController, _notesTableView;
 @synthesize optionsTableViewController, _optionsTableView, doneButton, rangePicker, pickerArray;
 
 CGRect menu_ShownFrame;
@@ -93,7 +91,7 @@ bool isPortrait;
     
     notesTableViewController.myNavController = self.navigationController;
     optionsTableViewController.myNavController = self.navigationController;
-
+    optionsTableViewController.whichGraph = @"Category";
     
     // Core Data
     UIApplication *app = [UIApplication sharedApplication];
@@ -117,7 +115,7 @@ bool isPortrait;
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(gradientToggle) name:@"toggleGradient" object: nil];
 
     // // Listen for Actions from Picker
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(showPicker) name:@"showPicker" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(showPicker) name:@"showPicker_Category" object: nil];
      // NOTIFICATIONS----------------------------------------------//
     
     // Capture initial orientation
@@ -202,7 +200,7 @@ bool isPortrait;
 
 - (void)initSetup
 {
-    loadingLabel.text = @"Reloading Data";
+    loadingLabel.text = @"Loading Data";
     dispatch_async(backgroundQueue, ^(void) {
         [self getDatasource];
     }); 
@@ -221,6 +219,7 @@ bool isPortrait;
 
 - (void)setupGraph
 {
+
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
         //Create the chart
@@ -338,18 +337,26 @@ bool isPortrait;
     {
         
         int startHeight = 0;
+        int menuHeight = 0;
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
         {
             startHeight = 512;
+            menuHeight = 512;
+
         } 
         else 
         {
             startHeight = 205;
         }
         
-        
         [self showButtons:1];
         
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     startHeight,
+                                     menuViewSize.width, menuHeight);
+        self.menuView.frame = menuRect;
+            
         
         // Add the chart to the view controller
         [chart setAlpha:0.0];
@@ -357,6 +364,9 @@ bool isPortrait;
         [legendView setAlpha:0.0];
         menuView.hidden = NO;
         [containerView addSubview:chart];
+        [containerView addSubview:menuView];
+        [containerView bringSubviewToFront:menuView];
+
 
         [UIView beginAnimations:nil context:NULL];
         [UIView setAnimationDuration:0.5];
@@ -397,7 +407,6 @@ bool isPortrait;
     
 
     [self resetLegend];
-
 
 }
 
@@ -1647,7 +1656,7 @@ numberOfRowsInComponent:(NSInteger)component
 
 - (void) showPicker
 {
-    NSLog(@"shw");
+
     int startHeight = 0;
     int startWeight = 0;
 
@@ -1750,6 +1759,11 @@ numberOfRowsInComponent:(NSInteger)component
         {
             whatRow = 3;
         }
+        else 
+        {
+            whatRow = 3;
+        }
+        
         
         [self.rangePicker selectRow:whatRow inComponent:0 animated:YES];
         self.navigationItem.rightBarButtonItem = self.doneButton;

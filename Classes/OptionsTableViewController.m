@@ -16,7 +16,7 @@
 @implementation OptionsTableViewController
 
 @synthesize fetchedResultsController;
-@synthesize managedObjectContext;
+@synthesize managedObjectContext, whichGraph;
 @synthesize dataSourceArray, myNavController;
 @synthesize legendSwitch, symbolSwitch, gradientSwitch;
 
@@ -219,7 +219,7 @@
         aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
         [aSwitch addTarget:self action:@selector(gradientToggle) forControlEvents:UIControlEventValueChanged];
         gradientSwitch = aSwitch;
-        
+    
         cell.accessoryView = aSwitch;
         [aSwitch release];
     }
@@ -238,7 +238,16 @@
         NSString *defaultsKey;
         
         defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
-        cell.detailTextLabel.text = [defaults objectForKey:defaultsKey];
+        NSString *rangeString = [defaults objectForKey:defaultsKey];
+        if (rangeString==nil) 
+        {
+            cell.detailTextLabel.text = @"All";
+        }
+        else 
+        {
+            cell.detailTextLabel.text = [defaults objectForKey:defaultsKey];
+
+        }
     }
 
     
@@ -287,7 +296,9 @@
     // Date Range
     else if (row == 4) 
     {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"showPicker" object: nil];
+        NSString *notifyName = [NSString stringWithFormat:@"showPicker_%@", whichGraph];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:notifyName object: nil];
     }
      
 }

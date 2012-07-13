@@ -18,6 +18,8 @@
 #import "AddNoteViewController.h"
 #import "ChartOptionsViewController.h"
 #import "AddNoteViewController.h"
+#import "PasswordViewController.h"
+
 
 @implementation SettingsViewController
 
@@ -38,6 +40,33 @@
 	menuTableView.backgroundView = nil;
 	[FlurryUtility report:EVENT_SETTINGS_ACTIVITY];	
 	//self.title	= @"ddd";
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
+
+}
+
+- (void)chkPin
+{
+    NSLog(@"rootview:");
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
+    
+    
+    if (pinString != nil && ![pinString isEqual:@""]) {
+		[self.navigationController setNavigationBarHidden:YES];
+        self.tabBarController.tabBar.hidden = YES;  
+		UIViewController *passwordViewController = [[PasswordViewController alloc] initWithNibName:@"PasswordViewController" bundle:nil];
+		[self.navigationController pushViewController:passwordViewController animated:YES];
+		[passwordViewController release];
+	}
+}
+- (void)rsnPin
+{
+    [self.navigationController setNavigationBarHidden:NO];
+    [self.navigationController popViewControllerAnimated:YES];
+    self.tabBarController.tabBar.hidden = NO;  
 }
 
 // Override to allow orientations other than the default portrait orientation.

@@ -47,6 +47,9 @@ int seriesCount;
         // Initialize the calendar
         cal = [[NSCalendar currentCalendar] retain];
         stepLineMode = NO;
+        gradientMode = NO;
+        gradientOn = NO;
+        symbolOn = NO;
         
         UIApplication *app = [UIApplication sharedApplication];
         VAS002AppDelegate *appDelegate = (VAS002AppDelegate *)[app delegate];
@@ -85,63 +88,21 @@ int seriesCount;
     return self;
 }
 
-- (void)toggleSeriesOn:(NSMutableDictionary *)switchDict
+- (void)toggleSeries;
 {
-    NSMutableDictionary *tempDictWorking = [NSMutableDictionary dictionaryWithDictionary:dataDictCopy];
     
-    NSEnumerator *enumerator = [switchDict keyEnumerator];
-	id key;
-	
-	UISwitch *mySwitch;
-	
-	while ((key = [enumerator nextObject])) 
-    {
-        
-		mySwitch = [switchDict objectForKey:key];
-        
-        if (!mySwitch.on) // is Off
-        {
-            // Turn Off
-            [tempDictWorking removeObjectForKey:key];
-        }
-        else // is On
-        {
-            // Turn On
-            [tempDictWorking setObject:[dataDict objectForKey:key] forKey:key];
-            
-        }
-        
-	}
-    
-    [dataDictCopy removeAllObjects];
-    [dataDictCopy addEntriesFromDictionary:tempDictWorking];
+    [self createSwitches];
     
 }
 
-- (void)toggleGradient:(bool)isOn
+- (void)toggleGradient
 {
-    
-    if (isOn) 
-    {
-        gradientOn = YES;
-    }
-    else 
-    {
-        gradientOn = NO;
-    }
-    
+    gradientMode = !gradientMode;
 }
 
-- (void)toggleSymbol:(bool)isOn
+- (void)toggleSymbol
 {
-    if (isOn) 
-    {
-        symbolOn = YES;
-    }
-    else 
-    {
-        symbolOn = NO;
-    }
+    symbolMode = !symbolMode;
     
 }
 
@@ -153,48 +114,15 @@ int seriesCount;
 
 - (NSDate *)dateFromString:(NSString *)str
 {
-    static BOOL monthLookupTableInitialised = NO;
-    static NSMutableArray *monthIdx;
-    static NSArray *monthNames;
-    static NSDictionary *months;
     
-    if (!monthLookupTableInitialised) {
-        monthIdx = [[NSMutableArray alloc] init ];
-        for (int i = 1; i <= 12; ++i) {
-            [monthIdx addObject:[NSNumber numberWithInt:i]];
-        }
-        
-        monthNames = [[NSArray alloc] initWithObjects:@"Jan", @"Feb", @"Mar", @"Apr", @"May", @"Jun", @"Jul", @"Aug", @"Sep", @"Oct", @"Nov", @"Dec", nil];
-        months = [[NSDictionary alloc] initWithObjects:monthIdx forKeys:monthNames];
-        monthLookupTableInitialised = YES;
-    }
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
+    NSDate *myDate = [df dateFromString: str];
     
-    NSRange dayRange = NSMakeRange(0,2);
-    NSString *dayString = [str substringWithRange:dayRange];
-    NSUInteger day = [dayString intValue];
     
-    NSRange monthRange = NSMakeRange(3, 3);
-    NSString *monthString = [str substringWithRange:monthRange];
-    NSUInteger month = [[months objectForKey:monthString] unsignedIntValue];
     
-    NSRange yearRange = NSMakeRange(7, 4);
-    NSString *yearString = [str substringWithRange:yearRange];
-    NSUInteger year = [yearString intValue];
-    
-    NSDateComponents *components = [[NSDateComponents alloc] init];
-    [components setDay:day];
-    [components setMonth:month];
-    [components setYear:year];
-    
-    gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDate *date = [gregorian dateFromComponents:components];
-    
-    [components release];
-    [gregorian release];
-    
-    return date;
+    return myDate;
 }
-
 #pragma mark Data
 
 
@@ -422,6 +350,53 @@ int seriesCount;
 #pragma mark Get Chart Dictionary
 - (NSDictionary *)getChartDictionary
 {
+    // Get data range
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *defaultsKey;
+    
+    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
+    NSString *theRange = [defaults objectForKey:defaultsKey];
+    
+    
+    NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:[[NSDate alloc] init]];
+    
+    // Today's Date
+    [components setHour:-[components hour]];
+    [components setMinute:-[components minute]];
+    [components setSecond:-[components second]];
+    NSDate *today = [cal dateByAddingComponents:components toDate:[[NSDate alloc] init] options:0];
+    NSDate *fromDate;
+    BOOL isAll = NO;
+    
+    
+    components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+    [components setDay:([components day] + 1)]; 
+    today = [cal dateFromComponents:components];
+    
+    
+    if ([theRange isEqualToString:@"30 days"]) 
+    {
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        [components setMonth:([components month] - 1)]; 
+        fromDate = [cal dateFromComponents:components];
+    }
+    else if ([theRange isEqualToString:@"90 days"]) 
+    {
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        [components setMonth:([components month] - 3)]; 
+        fromDate = [cal dateFromComponents:components];
+    }
+    else if ([theRange isEqualToString:@"1 year"]) 
+    {
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        [components setYear:([components year] - 1)]; 
+        fromDate = [cal dateFromComponents:components];
+    }
+    else // All and anything else
+    {
+        isAll = YES;
+    }
+
     NSMutableArray *arrayByDate = [[NSMutableArray alloc] init];
     [arrayByDate addObject:@"0"];
 	
@@ -444,152 +419,153 @@ int seriesCount;
 	NSString *groupPredicateString;
 	NSPredicate *groupPredicate;
 	NSPredicate *scalePredicate;
-	//NSString *timePredicateString;
-	//NSPredicate *timePredicate;
+	NSString *timePredicateString;
+	NSPredicate *timePredicate;
 	NSArray *finalPredicateArray;
 	NSPredicate *finalPredicate;
     
     //NSLog(@"1");
-	for (NSString *scaleMinLabel in self.scalesDictionary) {
-		UISwitch *currentSwitch = [switchDictionary objectForKey:scaleMinLabel];
+	for (NSString *scaleMinLabel in self.scalesDictionary) 
+    {
+        groupPredicateString = [NSString stringWithFormat:@"group.title like %%@"];
+        groupPredicate = [NSPredicate predicateWithFormat:groupPredicateString, groupName];
+        scalePredicateString = [NSString stringWithFormat:@"scale.minLabel like %%@"];
+        scalePredicate = [NSPredicate predicateWithFormat:scalePredicateString, scaleMinLabel];
+
         
-        //   NSLog(@"2");
-		if (currentSwitch.on == YES) {
-			Scale *currentScale = [scalesDictionary objectForKey:scaleMinLabel];
-			Group *currentGroup = currentScale.group;
-			
-			groupPredicateString = [NSString stringWithFormat:@"group.title like %%@"];
-			groupPredicate = [NSPredicate predicateWithFormat:groupPredicateString, currentGroup.title];
-			scalePredicateString = [NSString stringWithFormat:@"scale.minLabel like %%@"];
-			scalePredicate = [NSPredicate predicateWithFormat:scalePredicateString, scaleMinLabel];
-			//timePredicateString = [NSString stringWithFormat:@"(year == %%@) && (month == %%@)"];
-			//timePredicate = [NSPredicate predicateWithFormat:timePredicateString, [ NSNumber numberWithInt:self.chartYear], [NSNumber numberWithInt:self.chartMonth]];
-			
-			finalPredicateArray = [NSArray arrayWithObjects:groupPredicate, scalePredicate, nil];
-			
-			finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
-			
-			[fetchRequest setPredicate:finalPredicate];
-			
-			[fetchRequest setFetchBatchSize:0];
-			
-			NSError *error = nil;
-			results = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        if (isAll) 
+        {
+            finalPredicateArray = [NSArray arrayWithObjects:groupPredicate, scalePredicate, nil];
             
+        }
+        else 
+        {
+            timePredicateString = [NSString stringWithFormat:@"(timestamp >= %%@) && (timestamp <= %%@)"];
+            timePredicate = [NSPredicate predicateWithFormat:timePredicateString, fromDate, today];
+            finalPredicateArray = [NSArray arrayWithObjects:groupPredicate,timePredicate, scalePredicate, nil];
+        }
+			
+        finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
+        
+        [fetchRequest setPredicate:finalPredicate];
+        [fetchRequest setFetchBatchSize:0];
+        
+        NSError *error = nil;
+        results = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        
+        if (error) 
+        {
+            [Error showErrorByAppendingString:@"could not get result data for graph" withError:error];
+        } 
+        else 
+        {
+            NSMutableArray *tempTotalArray = [[NSMutableArray alloc] init];
+            NSMutableArray *tempCountArray = [[NSMutableArray alloc] init];
             
-            
-            
-			if (error) {
-				[Error showErrorByAppendingString:@"could not get result data for graph" withError:error];
-			} 
-			else 
-            {
-                NSMutableArray *tempTotalArray = [[NSMutableArray alloc] init];
-                NSMutableArray *tempCountArray = [[NSMutableArray alloc] init];
+            if (results.count > 0) 
+            { 
+                int value = 0;
+                int day = 0;
+                int month = 0;
+                int year = 0; 
+                NSString *nn = @"";
+                NSString *monthStr = @"";
+                NSString *dayStr = @"";
                 
-                if (results.count > 0) 
-                { 
-                    int value = 0;
-                    int day = 0;
-                    int month = 0;
-                    int year = 0; 
-                    NSString *nn = @"";
-                    NSString *monthStr = @"";
-                    NSString *dayStr = @"";
+                // Set up temp arrays for averaging
+                for (GroupResult *groupResult in results) 
+                {
+                    value = [groupResult.value intValue];
+                    day = [groupResult.day intValue] - 1;
+                    month = [groupResult.month intValue];
+                    year = [groupResult.year intValue]; 
+                    nn = scaleMinLabel;
                     
-                    // Set up temp arrays for averaging
-                    for (GroupResult *groupResult in results) 
+                    //  NSLog(@"name: %@ value:%i day:%i month:%i year:%i", nn, value, day, month, year);
+                    // Yah yah, dateformatter would have been better....
+                    if (month == 1) {monthStr = @"Jan";}
+                    if (month == 2) {monthStr = @"Feb";}
+                    if (month == 3) {monthStr = @"Mar";}
+                    if (month == 4) {monthStr = @"Apr";}
+                    if (month == 5) {monthStr = @"May";}
+                    if (month == 6) {monthStr = @"Jun";}
+                    if (month == 7) {monthStr = @"Jul";}
+                    if (month == 8) {monthStr = @"Aug";}
+                    if (month == 9) {monthStr = @"Sep";}
+                    if (month == 10) {monthStr = @"Oct";}
+                    if (month == 11) {monthStr = @"Nov";}
+                    if (month == 12) {monthStr = @"Dec";}
+                    
+                    if ([[NSString stringWithFormat:@"%i",day] length] < 2) 
                     {
-                        value = [groupResult.value intValue];
-                        day = [groupResult.day intValue] - 1;
-                        month = [groupResult.month intValue];
-                        year = [groupResult.year intValue]; 
-                        nn = scaleMinLabel;
-                        //  NSLog(@"name: %@ value:%i day:%i month:%i year:%i", nn, value, day, month, year);
-                        // Yah yah, dateformatter would have been better....
-                        if (month == 1) {monthStr = @"Jan";}
-                        if (month == 2) {monthStr = @"Feb";}
-                        if (month == 3) {monthStr = @"Mar";}
-                        if (month == 4) {monthStr = @"Apr";}
-                        if (month == 5) {monthStr = @"May";}
-                        if (month == 6) {monthStr = @"Jun";}
-                        if (month == 7) {monthStr = @"Jul";}
-                        if (month == 8) {monthStr = @"Aug";}
-                        if (month == 9) {monthStr = @"Sep";}
-                        if (month == 10) {monthStr = @"Oct";}
-                        if (month == 11) {monthStr = @"Nov";}
-                        if (month == 12) {monthStr = @"Dec";}
-                        
-                        if ([[NSString stringWithFormat:@"%i",day] length] < 2) 
-                        {
-                            dayStr = [NSString stringWithFormat:@"0%i",day];
-                        }
-                        else 
-                        {
-                            dayStr = [NSString stringWithFormat:@"%i",day];
-                        }
-                        
-                        // Convert Date 
-                        NSString *dateString = [NSString stringWithFormat:@"%@-%@-%i", dayStr, monthStr, year];
-                        
-                        
-                        [tempTotalArray addObject:[NSString stringWithFormat:@"%@",dateString]];
-                        [tempTotalArray addObject:[NSString stringWithFormat:@"%i",value]];
-                        [tempTotalArray addObject:[NSString stringWithFormat:@"%@",nn]];
-                        
-                        [tempCountArray addObject:[NSString stringWithFormat:@"%@",dateString]];
-                        [tempCountArray addObject:[NSString stringWithFormat:@"%i",value]];
-                        [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
-                        
+                        dayStr = [NSString stringWithFormat:@"0%i",day];
+                    }
+                    else 
+                    {
+                        dayStr = [NSString stringWithFormat:@"%i",day];
                     }
                     
-                    bool doesExist = NO;
+                    // Convert Date 
+                    NSString *dateString = [NSString stringWithFormat:@"%@-%@-%i", dayStr, monthStr, year];
                     
-                    for (int i = 0; i < tempTotalArray.count; i+=3) 
+                    
+                    [tempTotalArray addObject:[NSString stringWithFormat:@"%@",dateString]];
+                    [tempTotalArray addObject:[NSString stringWithFormat:@"%i",value]];
+                    [tempTotalArray addObject:[NSString stringWithFormat:@"%@",nn]];
+                    
+                    [tempCountArray addObject:[NSString stringWithFormat:@"%@",dateString]];
+                    [tempCountArray addObject:[NSString stringWithFormat:@"%i",value]];
+                    [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
+                    
+                }
+                
+                bool doesExist = NO;
+                
+                for (int i = 0; i < tempTotalArray.count; i+=3) 
+                {
+                    doesExist = NO;
+                    
+                    for (int a = 0; a < arrayByDate.count; a++) 
                     {
-                        doesExist = NO;
+                        //NSLog(@"arrayByDate:%@ count:%i",[arrayByDate objectAtIndex:a], a);
+                        //NSLog(@"tempTotalArray:%@ count:%i",[tempTotalArray objectAtIndex:i], i);
                         
-                        for (int a = 0; a < arrayByDate.count; a++) 
-                        {
-                            //NSLog(@"arrayByDate:%@ count:%i",[arrayByDate objectAtIndex:a], a);
-                            //NSLog(@"tempTotalArray:%@ count:%i",[tempTotalArray objectAtIndex:i], i);
-                            
-                            
-                            
-                            if ([[arrayByDate objectAtIndex:a] isEqualToString:[tempTotalArray objectAtIndex:i]] && [[arrayByDate objectAtIndex:a + 3] isEqualToString:[tempTotalArray objectAtIndex:i + 2]])
-                            {
-                                doesExist = YES;
-                                
-                                // Update array; Add value to total; 
-                                [arrayByDate replaceObjectAtIndex:a + 1 withObject:[NSString stringWithFormat:@"%i",[[arrayByDate objectAtIndex:a + 1] intValue] + [[tempTotalArray objectAtIndex:i + 1] intValue]]];
-                                // +1 to value count
-                                [arrayByDate replaceObjectAtIndex:a + 2 withObject:[NSString stringWithFormat:@"%i",[[arrayByDate objectAtIndex:a + 2] intValue] + 1]];
-                                
-                            }
-                        }
                         
-                        if (!doesExist) 
+                        
+                        if ([[arrayByDate objectAtIndex:a] isEqualToString:[tempTotalArray objectAtIndex:i]] && [[arrayByDate objectAtIndex:a + 3] isEqualToString:[tempTotalArray objectAtIndex:i + 2]])
                         {
-                            // Add to array
-                            [arrayByDate addObject:[tempTotalArray objectAtIndex:i]];
-                            [arrayByDate addObject:[tempTotalArray objectAtIndex:i + 1]];
-                            [arrayByDate addObject:@"1"];
-                            [arrayByDate addObject:[NSString stringWithFormat:@"%@",nn]];
+                            doesExist = YES;
+                            
+                            // Update array; Add value to total; 
+                            [arrayByDate replaceObjectAtIndex:a + 1 withObject:[NSString stringWithFormat:@"%i",[[arrayByDate objectAtIndex:a + 1] intValue] + [[tempTotalArray objectAtIndex:i + 1] intValue]]];
+                            // +1 to value count
+                            [arrayByDate replaceObjectAtIndex:a + 2 withObject:[NSString stringWithFormat:@"%i",[[arrayByDate objectAtIndex:a + 2] intValue] + 1]];
+                            
                         }
                     }
                     
-                    
-                    
-                } // Results    
+                    if (!doesExist) 
+                    {
+                        // Add to array
+                        [arrayByDate addObject:[tempTotalArray objectAtIndex:i]];
+                        [arrayByDate addObject:[tempTotalArray objectAtIndex:i + 1]];
+                        [arrayByDate addObject:@"1"];
+                        [arrayByDate addObject:[NSString stringWithFormat:@"%@",nn]];
+                    }
+                }
                 
-			}			
-		}
+                
+                
+            } // Results    
+            
+        }			
+		
 	}
 	
     
     // Raw Data rawValuesArray
     //NSLog(@"arrayByDate: %@", arrayByDate);
-    
+
     NSArray *objects = [self.scalesDictionary allKeys];
     NSMutableDictionary *chartDictionary = [[NSMutableDictionary alloc] init];
     

@@ -97,4 +97,7 @@
 - (void)fillSubColors;
 - (void)fillSubSymbols;
 
+- (void)chkPin;
+- (void)rsnPin;
+
 @end

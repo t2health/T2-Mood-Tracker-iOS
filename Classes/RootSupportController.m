@@ -62,6 +62,33 @@
 	tableViewFrame.size.height += noteButton.bounds.size.height;
 	self.tableView.frame = tableViewFrame;
     
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
+
+    
+}
+
+- (void)chkPin
+{
+    NSLog(@"rootview:");
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
+    
+    
+    if (pinString != nil && ![pinString isEqual:@""]) {
+		[self.navigationController setNavigationBarHidden:YES];
+        self.tabBarController.tabBar.hidden = YES;  
+		UIViewController *passwordViewController = [[PasswordViewController alloc] initWithNibName:@"PasswordViewController" bundle:nil];
+		[self.navigationController pushViewController:passwordViewController animated:YES];
+		[passwordViewController release];
+	}
+}
+- (void)rsnPin
+{
+    [self.navigationController setNavigationBarHidden:NO];
+    [self.navigationController popViewControllerAnimated:YES];
+    self.tabBarController.tabBar.hidden = NO;  
 }
 
 - (IBAction)textFieldFinished:(id)sender

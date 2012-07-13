@@ -16,9 +16,6 @@
 #import "ShinobiCharts/ShinobiChart+Screenshot.h"
 #import <MessageUI/MFMailComposeViewController.h>
 #import <dispatch/dispatch.h>
-#import "HRColorPickerViewController.h"
-
-
 
 @class ViewNotesViewController;
 @class LegendTableViewController;
@@ -26,7 +23,7 @@
 @class OptionsTableViewController;
 
 
-@interface GraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, HRColorPickerViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource> 
+@interface GraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource> 
 {
     
     ShinobiChart            *chart;
@@ -60,9 +57,7 @@
     IBOutlet NotesTableViewController *notesTableViewController;
     IBOutlet OptionsTableViewController *optionsTableViewController;
 
-    
     NSMutableDictionary *symbolsDictionary;
-    NSMutableDictionary *optionsDictionary;
     IBOutlet UITableView *_tableView;
     IBOutlet UIView *optionView;
     IBOutlet UISwitch *legendSwitch;
@@ -128,8 +123,6 @@
 @property (nonatomic, retain) IBOutlet UISwitch *symbolSwitch;
 @property (nonatomic, retain) IBOutlet UISwitch *gradientSwitch;
 
-@property (nonatomic, retain) NSMutableDictionary *optionsDictionary;
-
 @property (nonatomic, retain) IBOutlet UIView *legendView;
 
 @property (nonatomic, retain) IBOutlet UIBarButtonItem *doneButton;
@@ -166,7 +159,6 @@
 - (void)symbolToggle;
 - (void)gradientToggle;
 - (IBAction) legendButtonClicked:(id)sender;
-
 
 - (void)sendMenuToBack;
 - (void)emailResults;

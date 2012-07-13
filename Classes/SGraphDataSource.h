@@ -24,6 +24,9 @@
 {
     NSCalendar *cal; //Calendar used for constructing date objects.
     BOOL stepLineMode;
+    BOOL gradientMode;
+    BOOL symbolMode;
+    BOOL seriesMode;
     
     NSManagedObjectContext *managedObjectContext;
     NSInteger chartMonth;
@@ -82,8 +85,8 @@
 - (void)fillSymbols;
 - (void)printData;
 
-- (void)toggleSeriesOn:(NSMutableDictionary *)switchDict;
-- (void)toggleGradient:(bool)isOn;
-- (void)toggleSymbol:(bool)isOn;
+- (void)toggleSeries;
+- (void)toggleGradient;
+- (void)toggleSymbol;
 
 @end

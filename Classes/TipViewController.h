@@ -13,5 +13,6 @@
 
 - (IBAction)showTipSwitchFlipped;
 - (IBAction)closeTipsPressed;
-
+- (void)chkPin;
+- (void)rsnPin;
 @end
