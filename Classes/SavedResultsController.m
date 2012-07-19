@@ -17,7 +17,7 @@
 
 @implementation SavedResultsController
 
-@synthesize managedObjectContext;
+@synthesize managedObjectContext, savingScreen;
 @synthesize fetchedResultsController;
 
 id viewToDelete;
@@ -55,6 +55,7 @@ id viewToDelete;
 	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
 	self.managedObjectContext = appDeleate.managedObjectContext;
 	
+    
 	//UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addResult:)];
 	//self.navigationItem.rightBarButtonItem = plusButton;
 	
@@ -186,11 +187,12 @@ id viewToDelete;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
         NSString *documentsDir = [paths objectAtIndex:0];
         NSString *finalPath = [NSString stringWithFormat:@"%@%@",documentsDir, cell.detailTextLabel.text];
-        
+        NSString *finalPNGPath = [NSString stringWithFormat:@"%@%@.png",documentsDir, cell.detailTextLabel.text];
         if ([fileMgr removeItemAtPath:finalPath error:nil] != YES)
-        { 
             NSLog(@"Unable to delete file");
-        }
+        if ([fileMgr removeItemAtPath:finalPNGPath error:nil] != YES)
+            NSLog(@"Unable to delete PNG");
+
         
         [resultsTableView reloadData];
     }
@@ -280,10 +282,11 @@ id viewToDelete;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
         NSString *documentsDir = [paths objectAtIndex:0];
         NSString *finalPath = [NSString stringWithFormat:@"%@%@",documentsDir, saved.filename];
-
+        NSString *finalPNGPath = [NSString stringWithFormat:@"%@%@.png",documentsDir, saved.filename];
         if ([fileMgr removeItemAtPath:finalPath error:nil] != YES)
             NSLog(@"Unable to delete file");
-
+        if ([fileMgr removeItemAtPath:finalPNGPath error:nil] != YES)
+            NSLog(@"Unable to delete PNG");
 		
 		NSError *error;
 		if (![context save:&error]) {
@@ -295,22 +298,21 @@ id viewToDelete;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    
-    
 	ViewSavedController *vsc = [[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil];
 	Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	vsc.saved = saved;
     NSLog(@"saved: %@", saved);
 	[self.navigationController pushViewController:vsc animated:YES];
 	[vsc release];
-     
+    
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     // The table view should not be re-orderable.
     return NO;
 }
+
+
 
 
 #pragma mark Email delegates

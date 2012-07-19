@@ -27,7 +27,7 @@
 
 @implementation ViewSavedController
 
-@synthesize saved;
+@synthesize saved, loadView;
 @synthesize printContentWebView, pdfPath;
 
 int imageName = 0;
@@ -47,6 +47,8 @@ static bool emailPDF = YES;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+
     // Do any additional setup after loading the view from its nib.
     self.title = @"View Result";
     backgroundQueue = dispatch_queue_create("org.t2health.moodtracker.bgqueue", NULL);        
@@ -63,38 +65,41 @@ static bool emailPDF = YES;
     self.navigationItem.rightBarButtonItem = actionButton;
     [actionButton release];
     
-    // Screenshot
- ///   dispatch_async(backgroundQueue, ^(void) {
-        [self getScreenShot];
-        [self finishSetup];
-        [self createWebViewWithHTML];
-  //  }); 
     
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:self.saved.filename forKey:@"savedName"];
+    [defaults synchronize];
+    
+    [self.view bringSubviewToFront:loadView];
+        NSLog(@"shiet");
+   // dispatch_async(backgroundQueue, ^(void) {
+     //   [self getScreenShot];
+   // }); 
+    [self getScreenShot];
+    [self finishSetup];
+    [self createWebViewWithHTML];
 }
 
 - (void) finishSetup
 {
+    
+    NSData *imageData;
     for (int i = 0; i < 2; i++) 
     {
         UIImage *screenshot = [chart snapshot];
-        NSData *imageData = UIImagePNGRepresentation(screenshot);
-        UIImage *chartImage = [UIImage imageWithData:imageData];
-        UIImageView *imgView = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, chartImage.size.width, chartImage.size.height)] autorelease];
-        [imgView setImage:chartImage];
-       // [self.view addSubview:imgView];
-        
-        if (i==0) 
-        {
-            [imgView removeFromSuperview];
-        }
+        imageData = UIImagePNGRepresentation(screenshot);
     }
+    
+    NSString *fileName = [NSString stringWithFormat:@"%@.png", saved.filename];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, 
+                                                         NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString* path = [documentsDirectory stringByAppendingPathComponent: 
+                      [NSString stringWithString: fileName] ];
 
+    [imageData writeToFile:path atomically:YES];
     
-   // [chart removeFromSuperview];
-    
-    // [self createWebViewWithHTML:chartImage];
 }
-
 
 - (void)shareClick
 {
@@ -183,8 +188,9 @@ static bool emailPDF = YES;
     
     
     NSDateFormatter *dateFormat = [[[NSDateFormatter alloc] init] autorelease];
-    
-    [html appendString:@"<tr><td colspan='2' height='10'>&nbsp;<img src='tmp.png'></td></tr>"];
+    NSString *pngName = [NSString stringWithFormat:@"%@.png", saved.filename];
+    pngName = [pngName stringByReplacingOccurrencesOfString:@"/" withString:@""];  
+    [html appendString:[NSString stringWithFormat:@"<tr><td colspan='2' height='10'>&nbsp;<center><img src='%@'></center></td></tr>",pngName, pngName]];
     
     NSArray* allLinedStrings = [[rawDataArray objectAtIndex:0] componentsSeparatedByCharactersInSet:
                                 [NSCharacterSet newlineCharacterSet]];
@@ -297,6 +303,9 @@ static bool emailPDF = YES;
     
     //pass the string to the webview
     [printContentWebView loadHTMLString:[html description] baseURL:baseURL];
+    
+    
+    [self.view sendSubviewToBack:loadView];
     
     
 }
@@ -568,7 +577,8 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 {
 #pragma mark - Setup Graph
 /*--------------------------- Setup Graph to print ---------------------------*/
-
+    chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, 400, 300)];
+/*
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         //Create the chart
         chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
@@ -576,7 +586,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
         //Create the chart
         chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
     }
-    
+ */   
     // Set a different theme on the chart
     SChartMidnightTheme *midnight = [[SChartMidnightTheme alloc] init];
     [chart setTheme:midnight];
@@ -595,14 +605,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
     
     chart.datasource = datasource;
     
-    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init]; 
-    [dateFormat setDateFormat:@"dd-MMM-yyyy"];
-    NSDate *date = [dateFormat dateFromString:@"27-Jun-1969"];
-    NSDate *date1 = [dateFormat dateFromString:@"30-Jun-1969"];
-    
-    
-    SChartDateRange *xRange = [[SChartDateRange alloc] initWithDateMinimum:date andDateMaximum:date1];
-    NSLog(@"dateRange:  %@ - %@", date1, date);
+    SChartDateRange *xRange = [[SChartDateRange alloc] init];
     // Create a date time axis to use as the x axis.    
     //SChartDateTimeAxis *xAxis = [[SChartDateTimeAxis alloc] initWithRange:xRange];
     
@@ -640,7 +643,6 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
     chart.yAxis = yAxis;
     [yAxis release];
     
-    
     //Set the chart title
     chart.title = @"Results";
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -649,7 +651,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
         chart.titleLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:17.0f];
     }
     chart.titleLabel.textColor = [UIColor whiteColor];
-  //  [self.view addSubview:chart];
+   // [self.view addSubview:chart];
     
     
     //dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -657,26 +659,13 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
    // });
     
     [self.view insertSubview:printContentWebView aboveSubview:chart];
-    
-    // If you have a trial version, you need to enter your licence key here:
-    //    chart.licenseKey = @"";
-    
-    
-    // Image
-   // UIImage *screenshot = [chart snapshot];
-   // NSData *imageData = UIImagePNGRepresentation(screenshot);
-  //  UIImage *chartImage = [UIImage imageWithData:imageData];
-    
-    
-   // UIImageView *imgView = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, chartImage.size.width, chartImage.size.height)] autorelease];
-   // [imgView setImage:chartImage];
-   // [self.view addSubview:imgView];
-    
-    //[picker addAttachmentData:imageData mimeType:@"image/png" fileName:@"screenshot"]; 
-    
-    
-   // [chart removeFromSuperview];
-    
+
+
+    NSLog(@"after que");
+
+    //dispatch_async(dispatch_get_main_queue(), ^(void) {
+       
+   // });
     
 
 }

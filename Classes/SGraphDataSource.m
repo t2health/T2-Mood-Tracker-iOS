@@ -72,7 +72,8 @@ int seriesCount;
         if (self.dataDict == nil) 
         {
             self.dataDict = [NSMutableDictionary dictionaryWithDictionary:[self getChartDictionary]];
-            NSLog(@"dataDict: %@", dataDict);        }
+          //  NSLog(@"dataDict: %@", dataDict);        
+        }
         
         // Make backup copy of data
         if (self.dataDictCopy == nil) 
@@ -224,6 +225,7 @@ int seriesCount;
 
 - (void)fillScalesDictionary {
 	if (self.scalesDictionary == nil) {
+        NSLog(@"groupname: %@", self.groupName);
 		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 		NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"group.title like %@",self.groupName];
 		NSArray *predicateArray = [NSArray arrayWithObjects:groupPredicate, nil];
@@ -257,6 +259,9 @@ int seriesCount;
 		
 		[fetchRequest release];
 	}
+    
+   // NSLog(@"scalesDictionary: %@", scalesDictionary);
+
     
 }
 
@@ -617,7 +622,7 @@ int seriesCount;
     [arrayByDate release];
     
     
-    NSLog(@"chartDictionary:%@",chartDictionary);
+  //  NSLog(@"chartDictionary:%@",chartDictionary);
     
     return chartDictionary;
 }

@@ -20,7 +20,7 @@
 #import "DateMath.h"
 #import "AddNoteViewController.h"
 #import "MailData.h"
-#import "SLegendTableViewController.h"
+#import "SubLegendTableViewController.h"
 #import "NotesTableViewController.h"
 #import "OptionsTableViewController.h"
 
@@ -36,7 +36,7 @@
 @synthesize groupName;
 @synthesize scalesDictionary;
 @synthesize scalesArray, symbolsDictionary;
-@synthesize _tableView, optionView, legendSwitch, symbolSwitch, gradientSwitch, legendView, sLegendTableViewController, _legendTableView, notesTableViewController, _notesTableView;
+@synthesize _tableView, optionView, legendSwitch, symbolSwitch, gradientSwitch, legendView, subLegendTableViewController, _legendTableView, notesTableViewController, _notesTableView;
 @synthesize optionsTableViewController, _optionsTableView, doneButton, rangePicker, pickerArray;
 
 CGRect menu_ShownFrame;
@@ -60,6 +60,10 @@ bool isPortrait;
     _notesTableView.backgroundView = nil;
     _tableView.backgroundView = nil;
     
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:groupName forKey:@"subGraphSelected"];
+    [defaults synchronize];
+    NSLog(@"groupName: %@", groupName);
     //loadingLabel.text = @"Generating Chart";
     
     // Init view state
@@ -589,10 +593,10 @@ bool isPortrait;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *defaultsKey = @"";
     BOOL val;
-    for (Group *aGroup in groupsArray) 
+    for (Scale *aScale in scalesArray) 
     {
         
-        defaultsKey = [NSString stringWithFormat:@"SWITCH_STATE_%@",aGroup.title];
+        defaultsKey = [NSString stringWithFormat:@"SWITCH_STATE_%@",aScale.minLabel];
         
         if (![defaults objectForKey:defaultsKey]) 
         {
@@ -1334,7 +1338,7 @@ bool isPortrait;
     [chart redrawChartAndGL: YES]; 
     
     [self resetLegend];
-    [sLegendTableViewController refresh];
+    [subLegendTableViewController refresh];
     [containerView sendSubviewToBack:loadingView];
     
 }

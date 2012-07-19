@@ -11,19 +11,22 @@
 #import <MessageUI/MFMailComposeViewController.h>
 #import "SafeFetchedResultsController.h"
 
+
 @class MailData;
 @interface SavedResultsController : UIViewController <SafeFetchedResultsControllerDelegate, MFMailComposeViewControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, UIActionSheetDelegate>
 {
     
     SafeFetchedResultsController *fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;
-	
+    IBOutlet UIView *savingScreen;
+
 	IBOutlet UITableView *resultsTableView;
 
 }
 
 @property (nonatomic, retain) SafeFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) IBOutlet UIView *savingScreen;
 
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;

@@ -50,6 +50,7 @@
     // Initial CheckPin 
   //  [self chkPin];
 
+
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	

@@ -18,7 +18,7 @@
 #import <dispatch/dispatch.h>
 
 @class ViewNotesViewController;
-@class SLegendTableViewController;
+@class SubLegendTableViewController;
 @class NotesTableViewController;
 @class OptionsTableViewController;
 
@@ -54,7 +54,7 @@
     IBOutlet UIButton *legendButton;
     
     IBOutlet ViewNotesViewController *notesTable;
-    IBOutlet SLegendTableViewController *sLegendTableViewController;
+    IBOutlet SubLegendTableViewController *subLegendTableViewController;
     IBOutlet NotesTableViewController *notesTableViewController;
     IBOutlet OptionsTableViewController *optionsTableViewController;
     
@@ -97,7 +97,7 @@
 @property (nonatomic, retain) IBOutlet UILabel *loadingLabel;
 @property (nonatomic, retain) NSString *groupName;
 @property (nonatomic, retain) IBOutlet ViewNotesViewController *notesTable;
-@property (nonatomic, retain) IBOutlet SLegendTableViewController *sLegendTableViewController;
+@property (nonatomic, retain) IBOutlet SubLegendTableViewController *subLegendTableViewController;
 @property (nonatomic, retain) IBOutlet NotesTableViewController *notesTableViewController;
 @property (nonatomic, retain) IBOutlet OptionsTableViewController *optionsTableViewController;
 

@@ -622,7 +622,7 @@ bool symbolOn;
 	[fetchRequest release];
     [arrayByDate release];
     
-     NSLog(@"chartDictionary:%@",chartDictionary);
+    // NSLog(@"chartDictionary:%@",chartDictionary);
     
 	return chartDictionary;
 }
@@ -728,7 +728,7 @@ bool symbolOn;
     
     if (!mySwitch) // is Off
     {
-         NSLog(@"clearcolor");
+      //   NSLog(@"clearcolor");
         lineSeries.style.pointStyle.color = [UIColor clearColor];
         lineSeries.style.lineColor = [UIColor clearColor];
         lineSeries.style.areaColor = [UIColor clearColor];
@@ -736,7 +736,7 @@ bool symbolOn;
     }
     else 
     {
-        NSLog(@"normcolor: %@, %@", grpName,color);
+     //   NSLog(@"normcolor: %@, %@", grpName,color);
         lineSeries.style.lineColor = color;
         lineSeries.style.pointStyle.color = color;
         lineSeries.style.areaColor = color;

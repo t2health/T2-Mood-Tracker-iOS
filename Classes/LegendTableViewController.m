@@ -35,8 +35,9 @@
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
 	self.managedObjectContext = appDelegate.managedObjectContext;
     [self fillGroupsDictionary];
-    
-    NSLog(@"groupsDictionary: %@", groupsDictionary);
+    NSLog(@"HELLO group!!!!");
+
+  //  NSLog(@"groupsDictionary: %@", groupsDictionary);
 }
 
 

@@ -32,7 +32,7 @@
     ShinobiChart            *chart;
     ChartPrintDataSource         *datasource;    
     dispatch_queue_t backgroundQueue;
-
+    IBOutlet UIView *loadView;
     Saved *saved;
     IBOutlet UIWebView *printContentWebView;
     NSString *pdfPath;
@@ -42,6 +42,7 @@
 @property (nonatomic, retain) Saved *saved;
 @property (nonatomic, retain) UIWebView *printContentWebView;
 @property (nonatomic, retain) NSString *pdfPath;
+@property (nonatomic, retain) IBOutlet UIView *loadView;
 
 - (void)sendMail:(MailData *)mailData;
 - (void)displayComposerSheetWithMailData:(MailData *)data;

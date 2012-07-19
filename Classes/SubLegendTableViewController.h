@@ -1,17 +1,19 @@
 //
-//  LegendTableViewController.h
+//  SubLegendTableViewController.h
 //  VAS002
 //
-//  Created by Melvin Manzano on 6/8/12.
+//  Created by Melvin Manzano on 7/17/12.
 //  Copyright (c) 2012 GDIT. All rights reserved.
 //
+
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 #import "SafeFetchedResultsController.h"
 
 @class Group;
+@class Scale;
 
-@interface SLegendTableViewController : UITableViewController <SafeFetchedResultsControllerDelegate>
+@interface SubLegendTableViewController : UITableViewController <SafeFetchedResultsControllerDelegate>
 {
     SafeFetchedResultsController *fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;
@@ -21,7 +23,7 @@
     NSMutableDictionary *scalesDictionary;
     NSArray *scalesArray;
     NSString *groupName;
-
+    
 }
 
 @property (nonatomic, retain) NSMutableDictionary *groupsDictionary;
@@ -35,7 +37,6 @@
 
 - (void)fillGroupsDictionary;
 - (void)fillScalesDictionary;
-- (void)setGroupName:(NSString *)grpName;
 
 - (void)refresh;
 - (UIImage *)imageNamed:(UIImage *)name withColor:(UIColor *)color;

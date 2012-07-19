@@ -347,6 +347,7 @@ bool isPortrait;
         else 
         {
             startHeight = 205;
+            menuHeight = 205;
         }
         
         [self showButtons:1];

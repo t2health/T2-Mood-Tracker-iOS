@@ -9,15 +9,17 @@
 #import <Foundation/Foundation.h>
 #import <ShinobiCharts/ShinobiChart.h>
 
-@class Saved;
 
+@class Saved;
 @interface ChartPrintDataSource : NSObject <SChartDatasource>
 {
     Saved *saved;
     NSDictionary *dataDict;
+    NSArray *groupsArray;
 }
 @property (nonatomic, retain) Saved *saved;
 @property (nonatomic, retain) NSDictionary *dataDict;
+@property (nonatomic, retain) NSArray *groupsArray;
 @property (nonatomic, retain) NSMutableArray *seriesData, *seriesDates;
 
 

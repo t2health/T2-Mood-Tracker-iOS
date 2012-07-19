@@ -39,13 +39,14 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	// Override point for customization after application launch.
 	NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler); 
-	
+	   
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Defaults" ofType:@"plist"]]];
 	
 	[FlurryAPI startSession:@"61LDTFTR6XGJZA437D5W"];
 	
-    
+
 	if (![self doesDatabaseHaveData]) {
+        NSLog(@"dsfd");
 		[self fillDefaultGroups];
 		DAL *dal = [[[DAL alloc] init] autorelease];
 		dal.managedObjectContext = self.managedObjectContext;
@@ -53,8 +54,8 @@
 		dal.persistentStoreCoordinator = self.persistentStoreCoordinator;
 		[dal loadXMLByFile:@"data.xml"];
 	}
-	
-    
+	NSLog(@"5555");
+
 	RootViewController *rootViewController = (RootViewController *)[navigationController topViewController];
 	rootViewController.managedObjectContext = self.managedObjectContext;
 	
@@ -63,7 +64,7 @@
   //  [self.window makeKeyAndVisible];
 
     // Add the tabbar controller's view to the window and display.
-    
+
     [self.window addSubview:tabBarController.view];
      [self.window makeKeyAndVisible];
 	
@@ -120,23 +121,23 @@ void uncaughtExceptionHandler(NSException *exception) {
 
 - (BOOL)doesDatabaseHaveData {
 	BOOL hasData = NO;
-	
+	NSLog(@"pop");
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
 	[fetchRequest setEntity:entity];
-	
+	NSLog(@"pop1");
 	NSError *error = nil;
 	NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
 	if (error) {
 		[Error showErrorByAppendingString:@"Unable to load Category data." withError:error];
 	}
-	
+	NSLog(@"pop2");
 	if (fetchedObjects != nil) {
 		if ([fetchedObjects count] > 0) {
 			hasData = YES;			
 		}
 	}
-	
+	NSLog(@"pop3");
 	[fetchRequest release];
 	
 	return hasData;

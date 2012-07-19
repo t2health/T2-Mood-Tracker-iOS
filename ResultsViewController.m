@@ -855,6 +855,7 @@ int pickerShow;
 
 - (void)saveResults
 {
+    [self.view bringSubviewToFront:savingScreen];
     [self fetchFilteredResults];
 }
 
@@ -866,30 +867,22 @@ int pickerShow;
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Result" inManagedObjectContext:self.managedObjectContext];
     [fetchRequest setEntity:entity];
     
+    
+    
     NSString *rawFromDate = [textfieldArray objectAtIndex:0];
     NSString *rawToDate = [textfieldArray objectAtIndex:1];
     
-    NSArray *fromDateArray = [rawFromDate componentsSeparatedByString:@"/"];
-    NSArray *toDateArray = [rawToDate componentsSeparatedByString:@"/"];
     
-    int fromDay = [[fromDateArray objectAtIndex:1] intValue];
-    int fromMonth = [[fromDateArray objectAtIndex:0] intValue];
-    int fromYear = [[fromDateArray objectAtIndex:2] intValue];
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"MM/dd/yyyy"];
+    NSDate *myFromDate = [df dateFromString: rawFromDate];
+    NSDate *myToDate = [df dateFromString: rawToDate];
+
+    NSLog(@"from: %@ - to: %@", myFromDate, myToDate);
+
     
-    int toDay = [[toDateArray objectAtIndex:1] intValue];
-    int toMonth = [[toDateArray objectAtIndex:0] intValue];
-    int toYear = [[toDateArray objectAtIndex:2] intValue];   
-    fromYear += 2000;
-    toYear += 2000;
     
-    /*
-     NSString *tempString = [NSString stringWithFormat:@"(day >= %i) AND (month >= %i) AND (year >= %i) AND (day <= %i) AND (month <= %i) AND (year <= %i)", fromDay, fromMonth, fromYear, toDay, toMonth, toYear];
-     
-     NSLog(@"tempString: %@", tempString);
-     */
-    //  NSLog(@"groupDict: %@", groupsDictionary); 
-    //  NSLog(@"switchDictionary: %@", switchDictionary); 
-    NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(day >= %i) AND (month >= %i) AND (year >= %i) AND (day <= %i) AND (month <= %i) AND (year <= %i)", fromDay, fromMonth, fromYear, toDay, toMonth, toYear];
+    NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(timestamp >= %@) AND (timestamp <= %@)", myFromDate, myToDate];
     
     NSString *categoryString = @"";
     int counter = 0;
@@ -957,21 +950,16 @@ int pickerShow;
     NSString *rawFromDate = [textfieldArray objectAtIndex:0];
     NSString *rawToDate = [textfieldArray objectAtIndex:1];
     
-    NSArray *fromDateArray = [rawFromDate componentsSeparatedByString:@"/"];
-    NSArray *toDateArray = [rawToDate componentsSeparatedByString:@"/"];
     
-    int fromDay = [[fromDateArray objectAtIndex:1] intValue];
-    int fromMonth = [[fromDateArray objectAtIndex:0] intValue];
-    int fromYear = [[fromDateArray objectAtIndex:2] intValue];
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"MM/dd/yyyy"];
+    NSDate *myFromDate = [df dateFromString: rawFromDate];
+    NSDate *myToDate = [df dateFromString: rawToDate];
     
-    int toDay = [[toDateArray objectAtIndex:1] intValue];
-    int toMonth = [[toDateArray objectAtIndex:0] intValue];
-    int toYear = [[toDateArray objectAtIndex:2] intValue];   
-    fromYear += 2000;
-    toYear += 2000;
+    NSLog(@"from: %@ - to: %@", myFromDate, myToDate);
+
     
-    NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(noteDay >= %i) AND (noteMonth >= %i) AND (noteYear >= %i) AND (noteDay <= %i) AND (noteMonth <= %i) AND (noteYear <= %i)", fromDay, fromMonth, fromYear, toDay, toMonth, toYear];
-    
+    NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(timestamp >= %@) AND (timestamp <= %@)", myFromDate, myToDate];
     
     NSArray *finalPredicateArray = [NSArray arrayWithObjects:datePredicate, nil];
     NSPredicate *finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
@@ -1018,7 +1006,7 @@ int pickerShow;
             
         }	
     }
-    NSLog(@"csv: %@", csv);
+  //  NSLog(@"csv: %@", csv);
     
     
     
@@ -1062,7 +1050,7 @@ int pickerShow;
     //   NSLog(@"finalPath: %@", finalPath);
     [csv writeToFile:finalPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
     
-    
+    [self.view sendSubviewToBack:savingScreen];
     if (whichExport == 1) 
     {
         // Email Attachment
@@ -1115,7 +1103,7 @@ int pickerShow;
         // NSLog(@"Save CSV");
         whichExport = 0;
         savingScreen.hidden = NO;
-        [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
+        [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
         
     } 
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
@@ -1124,7 +1112,7 @@ int pickerShow;
         //  NSLog(@"Email CSV");
         whichExport = 1;
         savingScreen.hidden = NO;
-        [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
+        [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
         
         //[self emailResults];
     }

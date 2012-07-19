@@ -1,19 +1,19 @@
 //
-//  LegendTableViewController.m
+//  SubLegendTableViewController.m
 //  VAS002
 //
-//  Created by Melvin Manzano on 6/8/12.
+//  Created by Melvin Manzano on 7/17/12.
 //  Copyright (c) 2012 GDIT. All rights reserved.
 //
 
-#import "SLegendTableViewController.h"
+#import "SubLegendTableViewController.h"
 #import "Group.h"
 #import "Scale.h"
 #import "Error.h"
 #import "VAS002AppDelegate.h"
 #import "SGraphViewController.h"
 
-@implementation SLegendTableViewController
+@implementation SubLegendTableViewController
 
 @synthesize groupsArray, groupsDictionary, scalesArray, scalesDictionary;
 @synthesize fetchedResultsController;
@@ -32,25 +32,23 @@
 {
     [super viewDidLoad];
     
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    self.groupName = [defaults objectForKey:@"subGraphSelected"];    
+
     UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
 	self.managedObjectContext = appDelegate.managedObjectContext;
     [self fillGroupsDictionary];
-   // [self fillScalesDictionary];
- NSLog(@"pigs");
+    // [self fillScalesDictionary];
+
 }
 
 - (void)refresh
 {
-    [self fillScalesDictionary];
+    [self fillGroupsDictionary];
     [self.tableView reloadData];
     
     // Resize Legend Window
-}
-
-- (void)setGroupName:(NSString *)grpName
-{
-    self.groupName = grpName;
 }
 
 
@@ -60,6 +58,8 @@
     
 	NSArray *groupArray = [[self fetchedResultsController] fetchedObjects];
 	
+    NSLog(@"groupArray:%@", groupArray);
+    /*
 	self.groupsDictionary = nil;
 	self.groupsDictionary = [NSMutableDictionary dictionary];
     
@@ -95,6 +95,8 @@
     }
     self.groupsArray = [NSArray arrayWithArray:grpArray];
     // NSLog(@"groupsArray: %@", groupsArray);
+     
+     */
 }
 
 #pragma mark Fetched results controller
@@ -109,7 +111,7 @@
 	
 	// Create and configure a fetch request with the Group entity.
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Scale" inManagedObjectContext:self.managedObjectContext];
 	[fetchRequest setEntity:entity];
 	
 	// Create the sort descriptors array.
@@ -122,7 +124,7 @@
 	
 	//Create predicate
     
-	NSString *showGraphPredicateString = [NSString stringWithFormat:@"rateable = YES"];
+	NSString *showGraphPredicateString = [NSString stringWithFormat:@"group.title like %@",self.groupName];
 	NSPredicate *showGraphPredicate = [NSPredicate predicateWithFormat:showGraphPredicateString];
 	
     [NSFetchedResultsController deleteCacheWithName:nil]; 
@@ -130,7 +132,7 @@
 	
 	// Create and initialize the fetch results controller.
 	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
-									 self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
+									 self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Scales"];
 	self.fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
@@ -206,7 +208,6 @@
 #pragma mark fill scales
 
 - (void)fillScalesDictionary {
-    NSLog(@"blah");
 	if (self.scalesDictionary == nil) {
 		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 		NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"group.title like %@",self.groupName];
@@ -242,6 +243,7 @@
 		[fetchRequest release];
 	}
     
+    NSLog(@"POOP");
 }
 
 
@@ -273,7 +275,7 @@
     
     NSInteger row = [indexPath indexAtPosition:1];
     
-	Scale *scale = [self.scalesArray objectAtIndex:row];
+	Scale *scale = [self.groupsArray objectAtIndex:row];
     
     // Fetch saved user symbols/colors
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -291,7 +293,7 @@
     NSData *data = [colorDictionary objectForKey:scale.minLabel];
     
     UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-
+    
     
     // Configure the cell...
 	cell.textLabel.text = scale.minLabel;

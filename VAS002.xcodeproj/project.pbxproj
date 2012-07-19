@@ -14,6 +14,7 @@
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		FB2D7BD6152B549300DB9FC8 /* RootResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2D7BD4152B549300DB9FC8 /* RootResultsController.m */; };
 		FB2D7BD7152B549300DB9FC8 /* RootResultsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FB2D7BD5152B549300DB9FC8 /* RootResultsController.xib */; };
+		FB496CCA15B8A6D5001B16A4 /* VAS002.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FB496CC815B8A6D5001B16A4 /* VAS002.xcdatamodeld */; };
 		FB5AA7C0158656AE00014B78 /* HRBrightnessCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5AA7B5158656AE00014B78 /* HRBrightnessCursor.m */; };
 		FB5AA7C1158656AE00014B78 /* HRCgUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5AA7B7158656AE00014B78 /* HRCgUtil.m */; };
 		FB5AA7C2158656AE00014B78 /* HRColorCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5AA7B9158656AE00014B78 /* HRColorCursor.m */; };
@@ -99,7 +100,12 @@
 		FBFDA46315AF28F100C20E18 /* switchBlueBg.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA46015AF28F100C20E18 /* switchBlueBg.png */; };
 		FBFDA46415AF28F100C20E18 /* switchOffPlain.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA46115AF28F100C20E18 /* switchOffPlain.png */; };
 		FBFDA46515AF28F100C20E18 /* switchThumb.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA46215AF28F100C20E18 /* switchThumb.png */; };
-		FBFDA46715B0A41C00C20E18 /* mt-horizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA46615B0A41C00C20E18 /* mt-horizontal.png */; };
+		FBFDA47215B4B55F00C20E18 /* icon-mt-114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA47115B4B55D00C20E18 /* icon-mt-114x114.png */; };
+		FBFDA47415B5B77500C20E18 /* mt-horizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA47315B5B77500C20E18 /* mt-horizontal.png */; };
+		FBFDA47615B5B9D300C20E18 /* mt-square-2.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA47515B5B9D300C20E18 /* mt-square-2.png */; };
+		FBFDA47815B5BCAF00C20E18 /* about_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA47715B5BCAF00C20E18 /* about_logo.png */; };
+		FBFDA47A15B5BD7400C20E18 /* about_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FBFDA47915B5BD7400C20E18 /* about_logo@2x.png */; };
+		FBFDA47D15B5DD0C00C20E18 /* SubLegendTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFDA47C15B5DD0800C20E18 /* SubLegendTableViewController.m */; };
 		FE0A118D130DA1230013D958 /* EditScaleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0A118B130DA1230013D958 /* EditScaleViewController.m */; };
 		FE0A118E130DA1230013D958 /* EditScaleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE0A118C130DA1230013D958 /* EditScaleViewController.xib */; };
 		FE0A148E130EEE990013D958 /* iTunesArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = FE0A148D130EEE990013D958 /* iTunesArtwork.png */; };
@@ -147,7 +153,6 @@
 		FE6F3C8112C1050200357BEF /* AddNoteViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE6F3C7E12C1050200357BEF /* AddNoteViewController.xib */; };
 		FE6F3C8212C1050200357BEF /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE6F3C7F12C1050200357BEF /* MainWindow.xib */; };
 		FE6F3C8312C1050200357BEF /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE6F3C8012C1050200357BEF /* RootViewController.xib */; };
-		FE6F3C8612C1053A00357BEF /* VAS002.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FE6F3C8412C1053A00357BEF /* VAS002.xcdatamodeld */; };
 		FE6F3C8812C1054900357BEF /* data.xml in Resources */ = {isa = PBXBuildFile; fileRef = FE6F3C8712C1054900357BEF /* data.xml */; };
 		FE6F3C9B12C1058C00357BEF /* DAL.m in Sources */ = {isa = PBXBuildFile; fileRef = FE6F3C9012C1058C00357BEF /* DAL.m */; };
 		FE6F3C9C12C1058C00357BEF /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = FE6F3C9212C1058C00357BEF /* Group.m */; };
@@ -211,6 +216,7 @@
 		FB2D7BD3152B549300DB9FC8 /* RootResultsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootResultsController.h; sourceTree = "<group>"; };
 		FB2D7BD4152B549300DB9FC8 /* RootResultsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootResultsController.m; sourceTree = "<group>"; };
 		FB2D7BD5152B549300DB9FC8 /* RootResultsController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootResultsController.xib; sourceTree = "<group>"; };
+		FB496CC915B8A6D5001B16A4 /* VAS002.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = VAS002.xcdatamodel; sourceTree = "<group>"; };
 		FB5AA7B4158656AE00014B78 /* HRBrightnessCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HRBrightnessCursor.h; sourceTree = "<group>"; };
 		FB5AA7B5158656AE00014B78 /* HRBrightnessCursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HRBrightnessCursor.m; sourceTree = "<group>"; };
 		FB5AA7B6158656AE00014B78 /* HRCgUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HRCgUtil.h; sourceTree = "<group>"; };
@@ -307,8 +313,6 @@
 		FBF4B787157D031C00D6FAF5 /* Symbol_Square.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Symbol_Square.png; sourceTree = "<group>"; };
 		FBF4B788157D031C00D6FAF5 /* Symbol_Triangle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Symbol_Triangle.png; sourceTree = "<group>"; };
 		FBF4B7B0157E517900D6FAF5 /* ChartOptionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ChartOptionsViewController.xib; path = ../ChartOptionsViewController.xib; sourceTree = "<group>"; };
-		FBF7101B1592146F004728D9 /* SLegendTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLegendTableViewController.h; sourceTree = "<group>"; };
-		FBF7101C1592146F004728D9 /* SLegendTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLegendTableViewController.m; sourceTree = "<group>"; };
 		FBF710201592598C004728D9 /* NotesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotesTableViewController.h; sourceTree = "<group>"; };
 		FBF710211592598D004728D9 /* NotesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotesTableViewController.m; sourceTree = "<group>"; };
 		FBF7103115936B80004728D9 /* tab-legend.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tab-legend.png"; sourceTree = "<group>"; };
@@ -326,7 +330,14 @@
 		FBFDA46015AF28F100C20E18 /* switchBlueBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchBlueBg.png; sourceTree = "<group>"; };
 		FBFDA46115AF28F100C20E18 /* switchOffPlain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchOffPlain.png; sourceTree = "<group>"; };
 		FBFDA46215AF28F100C20E18 /* switchThumb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchThumb.png; sourceTree = "<group>"; };
-		FBFDA46615B0A41C00C20E18 /* mt-horizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mt-horizontal.png"; sourceTree = "<group>"; };
+		FBFDA47015B4943800C20E18 /* T2 Mood Tracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "T2 Mood Tracker.entitlements"; sourceTree = "<group>"; };
+		FBFDA47115B4B55D00C20E18 /* icon-mt-114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-mt-114x114.png"; sourceTree = "<group>"; };
+		FBFDA47315B5B77500C20E18 /* mt-horizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mt-horizontal.png"; sourceTree = "<group>"; };
+		FBFDA47515B5B9D300C20E18 /* mt-square-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mt-square-2.png"; sourceTree = "<group>"; };
+		FBFDA47715B5BCAF00C20E18 /* about_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = about_logo.png; sourceTree = "<group>"; };
+		FBFDA47915B5BD7400C20E18 /* about_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "about_logo@2x.png"; sourceTree = "<group>"; };
+		FBFDA47B15B5DD0500C20E18 /* SubLegendTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubLegendTableViewController.h; sourceTree = "<group>"; };
+		FBFDA47C15B5DD0800C20E18 /* SubLegendTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubLegendTableViewController.m; sourceTree = "<group>"; };
 		FE0A118A130DA1230013D958 /* EditScaleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditScaleViewController.h; sourceTree = "<group>"; };
 		FE0A118B130DA1230013D958 /* EditScaleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditScaleViewController.m; sourceTree = "<group>"; };
 		FE0A118C130DA1230013D958 /* EditScaleViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EditScaleViewController.xib; sourceTree = "<group>"; };
@@ -388,7 +399,6 @@
 		FE6F3C7E12C1050200357BEF /* AddNoteViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AddNoteViewController.xib; path = ../XIB/AddNoteViewController.xib; sourceTree = "<group>"; };
 		FE6F3C7F12C1050200357BEF /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = MainWindow.xib; path = ../XIB/MainWindow.xib; sourceTree = "<group>"; };
 		FE6F3C8012C1050200357BEF /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = RootViewController.xib; path = ../XIB/RootViewController.xib; sourceTree = "<group>"; };
-		FE6F3C8512C1053A00357BEF /* VAS.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = VAS.xcdatamodel; sourceTree = "<group>"; };
 		FE6F3C8712C1054900357BEF /* data.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = data.xml; path = ../Resources/data.xml; sourceTree = "<group>"; };
 		FE6F3C8F12C1058C00357BEF /* DAL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAL.h; sourceTree = "<group>"; };
 		FE6F3C9012C1058C00357BEF /* DAL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAL.m; sourceTree = "<group>"; };
@@ -508,6 +518,8 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				FBFDA47115B4B55D00C20E18 /* icon-mt-114x114.png */,
+				FBFDA47015B4943800C20E18 /* T2 Mood Tracker.entitlements */,
 				FBD06A53159BC32400FD28A9 /* QuickLook.framework */,
 				FE8F1130133CF8FB000022D0 /* iconx2.png */,
 				FE8F112C133CF8A9000022D0 /* icon.png */,
@@ -534,8 +546,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				FB496CC815B8A6D5001B16A4 /* VAS002.xcdatamodeld */,
 				FEA96A041314226000A05EFA /* html */,
-				FE6F3C8412C1053A00357BEF /* VAS002.xcdatamodeld */,
 				FE6F393E12BFE6E100357BEF /* Images */,
 				8D1107310486CEB800E47090 /* VAS002-Info.plist */,
 				FE37CE7B12F099A6009CA441 /* Defaults.plist */,
@@ -897,12 +909,12 @@
 				FB9654701551812000F80E27 /* GraphViewController_landscape.xib */,
 				FBDF3A1B158271C500E74F12 /* LegendTableViewController.h */,
 				FBDF3A1C158271C600E74F12 /* LegendTableViewController.m */,
-				FBF7101B1592146F004728D9 /* SLegendTableViewController.h */,
-				FBF7101C1592146F004728D9 /* SLegendTableViewController.m */,
 				FBF710201592598C004728D9 /* NotesTableViewController.h */,
 				FBF710211592598D004728D9 /* NotesTableViewController.m */,
 				FBFDA44115AB2C6F00C20E18 /* OptionsTableViewController.h */,
 				FBFDA44215AB2C6F00C20E18 /* OptionsTableViewController.m */,
+				FBFDA47B15B5DD0500C20E18 /* SubLegendTableViewController.h */,
+				FBFDA47C15B5DD0800C20E18 /* SubLegendTableViewController.m */,
 			);
 			name = Chart;
 			sourceTree = "<group>";
@@ -1044,7 +1056,10 @@
 		FE6F394C12BFE6E100357BEF /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				FBFDA46615B0A41C00C20E18 /* mt-horizontal.png */,
+				FBFDA47915B5BD7400C20E18 /* about_logo@2x.png */,
+				FBFDA47715B5BCAF00C20E18 /* about_logo.png */,
+				FBFDA47515B5B9D300C20E18 /* mt-square-2.png */,
+				FBFDA47315B5B77500C20E18 /* mt-horizontal.png */,
 				FE6F394D12BFE6E100357BEF /* add_blue.png */,
 				FE6F394E12BFE6E100357BEF /* add_blueL.png */,
 				FECD10B812DB800E00A410B0 /* check.png */,
@@ -1331,7 +1346,11 @@
 				FBFDA46315AF28F100C20E18 /* switchBlueBg.png in Resources */,
 				FBFDA46415AF28F100C20E18 /* switchOffPlain.png in Resources */,
 				FBFDA46515AF28F100C20E18 /* switchThumb.png in Resources */,
-				FBFDA46715B0A41C00C20E18 /* mt-horizontal.png in Resources */,
+				FBFDA47215B4B55F00C20E18 /* icon-mt-114x114.png in Resources */,
+				FBFDA47415B5B77500C20E18 /* mt-horizontal.png in Resources */,
+				FBFDA47615B5B9D300C20E18 /* mt-square-2.png in Resources */,
+				FBFDA47815B5BCAF00C20E18 /* about_logo.png in Resources */,
+				FBFDA47A15B5BD7400C20E18 /* about_logo@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1347,7 +1366,6 @@
 				1D3623260D0F684500981E51 /* VAS002AppDelegate.m in Sources */,
 				FE6F3C7C12C104CB00357BEF /* AddNoteViewController.m in Sources */,
 				FE6F3C7D12C104CB00357BEF /* RootViewController.m in Sources */,
-				FE6F3C8612C1053A00357BEF /* VAS002.xcdatamodeld in Sources */,
 				FE6F3C9B12C1058C00357BEF /* DAL.m in Sources */,
 				FE6F3C9C12C1058C00357BEF /* Group.m in Sources */,
 				FE6F3C9E12C1058C00357BEF /* Result.m in Sources */,
@@ -1407,6 +1425,8 @@
 				FBD06A5C159CC26900FD28A9 /* ChartPrintDataSource.m in Sources */,
 				FBFDA44315AB2C6F00C20E18 /* OptionsTableViewController.m in Sources */,
 				FBFDA45F15AF275600C20E18 /* UICustomSwitch.m in Sources */,
+				FBFDA47D15B5DD0C00C20E18 /* SubLegendTableViewController.m in Sources */,
+				FB496CCA15B8A6D5001B16A4 /* VAS002.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1456,7 +1476,6 @@
 			buildSettings = {
 				ADDITIONAL_SDKS = "/Library/SDKs/CorePlotSDK/${PLATFORM_NAME}.sdk/";
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1624,14 +1643,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		FE6F3C8412C1053A00357BEF /* VAS002.xcdatamodeld */ = {
+		FB496CC815B8A6D5001B16A4 /* VAS002.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				FE6F3C8512C1053A00357BEF /* VAS.xcdatamodel */,
+				FB496CC915B8A6D5001B16A4 /* VAS002.xcdatamodel */,
 			);
-			currentVersion = FE6F3C8512C1053A00357BEF /* VAS.xcdatamodel */;
+			currentVersion = FB496CC915B8A6D5001B16A4 /* VAS002.xcdatamodel */;
 			name = VAS002.xcdatamodeld;
-			path = Resources/VAS001.xcdatamodeld;
+			path = Resources/VAS002.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
