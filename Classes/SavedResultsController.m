@@ -17,7 +17,7 @@
 
 @implementation SavedResultsController
 
-@synthesize managedObjectContext, savingScreen;
+@synthesize managedObjectContext;
 @synthesize fetchedResultsController;
 
 id viewToDelete;
@@ -235,15 +235,16 @@ id viewToDelete;
     return cell;	
 }
 
+
+
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {	
 	// Configure the cell to show the note
 	Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	NSDateFormatter *dateFormat = [[[NSDateFormatter alloc] init] autorelease];
 	[dateFormat setDateStyle:NSDateFormatterMediumStyle];
 	[dateFormat setTimeStyle:NSDateFormatterShortStyle];
-    NSLog(@"table-indexPath: %@", indexPath);
-	NSString *dateString = [NSString stringWithFormat:@"%@", saved.filename];
-	cell.textLabel.text = saved.title;
+	NSString *dateString = [NSString stringWithFormat:@"%@", saved.title];
+	cell.textLabel.text = saved.filename;
 	cell.textLabel.textColor = [UIColor lightGrayColor];
 	cell.textLabel.font = [UIFont systemFontOfSize:14];
 	
@@ -301,7 +302,6 @@ id viewToDelete;
 	ViewSavedController *vsc = [[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil];
 	Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	vsc.saved = saved;
-    NSLog(@"saved: %@", saved);
 	[self.navigationController pushViewController:vsc animated:YES];
 	[vsc release];
     

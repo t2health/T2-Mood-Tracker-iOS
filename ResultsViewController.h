@@ -10,13 +10,13 @@
 #import <MessageUI/MessageUI.h>
 #import <MessageUI/MFMailComposeViewController.h>
 #import "SafeFetchedResultsController.h"
-#import <CorePlot/CorePlot.h>
+#import "PDFService.h"
 
 
 @class MailData;
 @class Group;
 
-@interface ResultsViewController : UIViewController <MFMailComposeViewControllerDelegate, UITableViewDelegate, UITextFieldDelegate, UIActionSheetDelegate>
+@interface ResultsViewController : UIViewController <MFMailComposeViewControllerDelegate, UITableViewDelegate, UITextFieldDelegate, UIActionSheetDelegate, PDFServiceDelegate>
 {
     NSManagedObjectContext *managedObjectContext;
     UITextField *fromField;
@@ -36,7 +36,6 @@
     IBOutlet UIView *savingScreen;
     IBOutlet UIView *datePickView;
     IBOutlet UIDatePicker *datePicker;
-    
     UIBarButtonItem *doneButton;	// this button appears only when the date picker is open
 	
 	NSArray *dataArray;
@@ -96,6 +95,7 @@
 - (void)slideDownDidStop;
 
 - (void)resignPicker;
+- (void)createPDF;
 
 - (void)deviceOrientationChanged:(NSNotification *)notification;
 

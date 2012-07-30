@@ -56,9 +56,9 @@
 
 - (void)fillGroupsDictionary {
     
-	NSArray *groupArray = [[self fetchedResultsController] fetchedObjects];
+    NSLog(@"groupName:%@", self.groupName);
+	//www.gooNSArray *groupArray = [[self fetchedResultsController] fetchedObjects];
 	
-    NSLog(@"groupArray:%@", groupArray);
     /*
 	self.groupsDictionary = nil;
 	self.groupsDictionary = [NSMutableDictionary dictionary];

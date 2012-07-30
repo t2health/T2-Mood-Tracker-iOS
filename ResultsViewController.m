@@ -21,6 +21,8 @@
 #import "Constants.h"
 
 #import "SavedResultsController.h"
+#import "ViewSavedController.h"
+
 
 #define kTextFieldWidth	260.0
 
@@ -54,6 +56,8 @@ int whichExport;
 CGRect picker_ShownFrame;
 CGRect picker_HiddenFrame;	
 int pickerShow;
+
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -311,17 +315,6 @@ int pickerShow;
 	return color;
 }
 
--(CPColor *)CPColorForIndex:(NSInteger)index {
-	NSArray *colorsArray = [NSArray arrayWithObjects:[CPColor blueColor], [CPColor greenColor], [CPColor orangeColor], [CPColor redColor], [CPColor purpleColor], [CPColor grayColor], [CPColor brownColor],	[CPColor cyanColor],[CPColor magentaColor],  nil];
-	
-	CPColor *color = nil;
-	
-	if (index >=0 && index < [colorsArray count]) {
-		color = [colorsArray objectAtIndex:index];
-		[[color retain] autorelease];
-	}
-	return color;
-}
 
 - (void)fillColors {
 	if (self.ledgendColorsDictionary == nil) {
@@ -849,7 +842,7 @@ int pickerShow;
                                    delegate:self 
                                    cancelButtonTitle:@"Cancel" 
                                    destructiveButtonTitle:nil 
-                                   otherButtonTitles:@"Save Results(CSV)", @"Email Results (CSV)", nil] autorelease];
+                                   otherButtonTitles:@"Export CSV", @"Export PDF", nil] autorelease];
     [actionSheet showFromTabBar:self.tabBarController.tabBar];  
 }
 
@@ -935,10 +928,18 @@ int pickerShow;
     
     
     NSArray *noteArray = [NSArray arrayWithArray:[self fetchNotes]];
-    // NSLog(@"objects: %@", objects);
+
+    if (whichExport == 0) 
+    {
+        //PDF
+        
+    }
+    else 
+    {
+        // CSV
+        [self convertArrayToCSV:objects:noteArray];
+    }
     
-    //  NSLog(@"noteArray: %@", noteArray);
-    [self convertArrayToCSV:objects:noteArray];
 }
 
 - (NSArray *)fetchNotes
@@ -977,7 +978,44 @@ int pickerShow;
     return objects;
     
 }
+#pragma mark -
+#pragma mark delegate method
 
+
+- (void)service:(PDFService *)service
+didFailedCreatingPDFFile:(NSString *)filePath
+        errorNo:(HPDF_STATUS)errorNo
+       detailNo:(HPDF_STATUS)detailNo
+{
+    NSString *message = [NSString stringWithFormat:@"Couldn't create a PDF file at %@\n errorNo:0x%04x detalNo:0x%04x",
+                         filePath,
+                         errorNo,
+                         detailNo];
+    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"PDF creation error"
+                                                     message:message
+                                                    delegate:nil
+                                           cancelButtonTitle:@"OK"
+                                           otherButtonTitles:nil] autorelease];
+    [alert show];
+}
+
+- (void) createPDF
+{
+
+    NSArray *arrayPaths = 
+    NSSearchPathForDirectoriesInDomains(
+                                        NSDocumentDirectory,
+                                        NSUserDomainMask,
+                                        YES);
+    NSString *path = [arrayPaths objectAtIndex:0];
+    path = [path stringByAppendingPathComponent:@"test.pdf"];
+    NSLog(@"path: %@", path);
+    PDFService *service = [PDFService instance];
+    service.delegate = self;
+    [service createPDFFile:path];
+    service.delegate = nil;
+    
+}
 
 - (void)convertArrayToCSV:(NSArray *)valueArray:(NSArray *)withNotes;
 {
@@ -990,7 +1028,7 @@ int pickerShow;
     
     for (Result *aResult in data) {
         //NSLog(@"resulttest: %@,%@,%@/%@,%@",aResult.timestamp, aResult.group.title, aResult.scale.minLabel, aResult.scale.maxLabel, aResult.value);
-        NSString * combinedLine = [NSString stringWithFormat:@"%@,%@,%@/%@,%@",aResult.timestamp, aResult.group.title, aResult.scale.minLabel, aResult.scale.maxLabel, aResult.value];
+        NSString * combinedLine = [NSString stringWithFormat:@"%@,%@,%@/%@,%@,%@",aResult.timestamp, aResult.group.title, aResult.scale.minLabel, aResult.scale.maxLabel, aResult.value, aResult.group.positiveDescription];
         [csv appendFormat:@"%@\n", combinedLine];
         
     }
@@ -1040,46 +1078,58 @@ int pickerShow;
     
     NSString *fileName = [NSString stringWithFormat:@"/%i%i%i_%i%i%i_%i.csv", fromDay, fromMonth, fromYear, toDay, toMonth, toYear, r];  
     NSString *rawFileName = [NSString stringWithFormat:@"%i%i%i_%i%i%i_%i.csv", fromDay, fromMonth, fromYear, toDay, toMonth, toYear, r];
-    NSString *titleText = [NSString stringWithFormat:@"%@ - %@", fromDate, toDate];
+    
+    NSString *reportType = @"";
+    if (whichExport == 0) 
+    {
+        reportType = @"CSV";
+    }
+    else 
+    {
+        reportType = @"PDF";
+    }
+    NSString *titleText = [NSString stringWithFormat:@" (%@) %@ - %@",reportType, fromDate, toDate];
     NSDate *today = [NSDate date];
     curFileName = rawFileName;
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
     NSString *documentsDir = [paths objectAtIndex:0];
     NSString *finalPath = [NSString stringWithFormat:@"%@%@",documentsDir, fileName];
-    //   NSLog(@"finalPath: %@", finalPath);
     [csv writeToFile:finalPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
     
     [self.view sendSubviewToBack:savingScreen];
-    if (whichExport == 1) 
+    
+    // Save file info in Core Data
+    NSManagedObject *savedResult = nil;
+    
+    savedResult = [NSEntityDescription insertNewObjectForEntityForName:@"SavedResults" inManagedObjectContext:self.managedObjectContext];
+    
+    [savedResult setValue:titleText forKey: @"title"];
+    [savedResult setValue:fileName forKey: @"filename"];
+    [savedResult setValue:today forKey: @"timestamp"];
+
+    
+    
+    NSError *error = nil;
+    if ([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error]) {
+        [Error showErrorByAppendingString:@"Unable to save result" withError:error];
+    } 	
+    
+    // Send to SavedResults View
+    savingScreen.hidden = YES;
+    ViewSavedController *viewSavedController = [[[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil] autorelease];
+	viewSavedController.finalPath = fileName;
+    viewSavedController.fileName = titleText;
+    if (whichExport == 0) 
     {
-        // Email Attachment
-        [self emailResults];
-        
+        viewSavedController.fileType = @"CSV";
     }
-    else
+    else 
     {
-        // Save file info in Core Data
-        NSManagedObject *savedResult = nil;
-        
-        savedResult = [NSEntityDescription insertNewObjectForEntityForName:@"SavedResults" inManagedObjectContext:self.managedObjectContext];
-        
-        [savedResult setValue:titleText forKey: @"title"];
-        [savedResult setValue:fileName forKey: @"filename"];
-        [savedResult setValue:today forKey: @"timestamp"];
-        
-        
-        NSError *error = nil;
-        if ([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error]) {
-            [Error showErrorByAppendingString:@"Unable to save result" withError:error];
-        } 	
-        
-        
-        // Send to SavedResults View
-        savingScreen.hidden = YES;
-        SavedResultsController *savedResultsController = [[[SavedResultsController alloc] initWithNibName:@"SavedResultsController" bundle:nil] autorelease];	
-        [self.navigationController pushViewController:savedResultsController animated:YES];   
+        viewSavedController.fileType = @"PDF";
     }
+    [self.navigationController pushViewController:viewSavedController animated:YES];   
+   
 }
 
 
@@ -1112,7 +1162,17 @@ int pickerShow;
         //  NSLog(@"Email CSV");
         whichExport = 1;
         savingScreen.hidden = NO;
-        [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
+       // [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
+        [self createPDF];
+        //[self emailResults];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2) 
+    {
+        // Export CSV
+        //  NSLog(@"Email CSV");
+        whichExport = 1;
+        savingScreen.hidden = NO;
+      //  [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
         
         //[self emailResults];
     }

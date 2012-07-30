@@ -18,7 +18,6 @@
 #import "GraphMenuViewController.h"
 #import "PasswordViewController.h"
 
-
 @implementation VAS002AppDelegate
 
 @synthesize managedObjectModel;

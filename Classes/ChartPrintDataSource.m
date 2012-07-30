@@ -25,7 +25,7 @@ int seriesCount;
 
         self.dataDict = [NSMutableDictionary dictionaryWithDictionary:[self getChartDictionary]];
         NSLog(@"dataDict: %@", dataDict);
-        NSLog(@"groupsArray: %@", groupsArray);
+       // NSLog(@"groupsArray: %@", groupsArray);
         
         seriesData = [[NSMutableArray alloc] init];
         seriesDates = [[NSMutableArray alloc] init];
@@ -147,10 +147,10 @@ int seriesCount;
             value = [[list objectAtIndex:3] intValue];
             scale = [list objectAtIndex:2];
             nn = [list objectAtIndex:1];
-            positiveDesc = 1;
+            positiveDesc = [[list objectAtIndex:4] intValue];
             //  NSLog(@"positive: %@ - %@", nn,positiveDesc);
             
-            NSLog(@"row: %@, %@, %@, %i", timeStamp, nn, scale, value);
+           // NSLog(@"row: %@, %@, %@, %i", timeStamp, nn, scale, value);
             
             // Check if Group exists
             if (![groupNames containsObject:nn]) 
@@ -356,7 +356,7 @@ int seriesCount;
 - (int)sChart:(ShinobiChart *)chart numberOfDataPointsForSeriesAtIndex:(int)seriesIndex {
     //In our example, all series have the same number of points
     int numPoints = 0;  
-    NSLog(@"numberdatapoints");
+    //NSLog(@"numberdatapoints");
     
     // Limit the points to 500/group
     numPoints = [self getSeriesDataCount:seriesIndex];
@@ -426,7 +426,7 @@ int seriesCount;
 {
     NSString *grpName = [groupsArray objectAtIndex:seriesIndex];
     NSDictionary *tempGrpDict = [NSDictionary dictionaryWithDictionary:[dataDict objectForKey:grpName]];
-    NSLog(@"forseriesatindex");
+   // NSLog(@"forseriesatindex");
 
     // NSLog(@"grp: %@  - seriesInex: %i", grpName, seriesIndex);
     

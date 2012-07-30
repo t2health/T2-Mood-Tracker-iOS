@@ -57,6 +57,8 @@ bool isPortrait;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+  //  NSLog(@"groupName: %@", groupName);
+    /*
     _notesTableView.backgroundView = nil;
     _tableView.backgroundView = nil;
     
@@ -106,12 +108,17 @@ bool isPortrait;
 	self.managedObjectContext = appDelegate.managedObjectContext;
     
     // Setup Data
+    NSLog(@"1");
     [self fillScalesDictionary];
+    NSLog(@"2");
 	[self fillColors];
+    NSLog(@"3");
 	[self createSwitches];
+    NSLog(@"4");
     [self fillSymbols];
+    NSLog(@"5");
     [self fillOptions];
-    
+    NSLog(@"6");
     
     // Orientation
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
@@ -143,12 +150,12 @@ bool isPortrait;
     self.title = [NSString stringWithFormat:@"%@",self.groupName];
     
     [self initSetup];
-    
+    */
 }
 
 -(void) viewWillAppear:(BOOL)animated {
-    [_tableView reloadData];    
-    [_legendTableView reloadData];
+  //  [_tableView reloadData];    
+   // [_legendTableView reloadData];
 }
 
 -(void) viewWillDisappear:(BOOL)animated {

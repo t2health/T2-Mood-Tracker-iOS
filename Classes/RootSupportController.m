@@ -13,7 +13,6 @@
 #import "AboutViewController.h"
 #import "HelpViewController.h"
 #import "ViewNotesViewController.h"
-#import "GraphResultsViewController.h"
 #import "ResultsViewController.h"
 #import "TipViewController.h"
 #import "Group.h"
@@ -348,7 +347,7 @@
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
 	NSDateComponents *parts;
-	[dateComponents setYear:2011];
+	[dateComponents setYear:2012];
 	
 	for (NSInteger i=1; i<=4; i++) {
 		[dateComponents setMonth:i];
@@ -460,7 +459,7 @@
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
 	
-	[dateComponents setYear:2011];
+	[dateComponents setYear:2012];
 	NSInteger noteDice;
 	
 	for (i=1; i<=4; i++) {

@@ -32,17 +32,24 @@
     ShinobiChart            *chart;
     ChartPrintDataSource         *datasource;    
     dispatch_queue_t backgroundQueue;
-    IBOutlet UIView *loadView;
     Saved *saved;
     IBOutlet UIWebView *printContentWebView;
     NSString *pdfPath;
+    IBOutlet UIActivityIndicatorView *activityInd;
+    NSString *finalPath;
+    NSString *fileName;
+    NSString *fileType;
 
 }
 
 @property (nonatomic, retain) Saved *saved;
 @property (nonatomic, retain) UIWebView *printContentWebView;
 @property (nonatomic, retain) NSString *pdfPath;
-@property (nonatomic, retain) IBOutlet UIView *loadView;
+@property (nonatomic, retain) IBOutlet UIActivityIndicatorView *activityInd;
+@property (nonatomic, retain) NSString *finalPath;
+@property (nonatomic, retain) NSString *fileName;
+@property (nonatomic, retain) NSString *fileType;
+
 
 - (void)sendMail:(MailData *)mailData;
 - (void)displayComposerSheetWithMailData:(MailData *)data;

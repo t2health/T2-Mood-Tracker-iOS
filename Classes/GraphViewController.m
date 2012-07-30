@@ -1848,12 +1848,12 @@ numberOfRowsInComponent:(NSInteger)component
     
     Group *group = [self.groupsArray objectAtIndex:row];
     NSString *groupName = group.title;
-    
+     NSLog(@"before pop");
     SGraphViewController *sGraphViewController = [[SGraphViewController alloc] initWithNibName:@"SGraphViewController" bundle:nil];
     sGraphViewController.groupName = groupName;
     [self.navigationController pushViewController:sGraphViewController animated:YES];
     [sGraphViewController release];
-    
+   
     // [self optionButtonClicked];
     
 }

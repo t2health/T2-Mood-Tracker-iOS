@@ -14,7 +14,6 @@
 #import "HelpViewController.h"
 #import "SettingsViewController.h"
 #import "ViewNotesViewController.h"
-#import "GraphResultsViewController.h"
 #import "ResultsViewController.h"
 #import "TipViewController.h"
 #import "Group.h"
