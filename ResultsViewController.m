@@ -22,7 +22,7 @@
 
 #import "SavedResultsController.h"
 #import "ViewSavedController.h"
-
+#import "WebViewController.h"
 
 #define kTextFieldWidth	260.0
 
@@ -932,6 +932,7 @@ int pickerShow;
     if (whichExport == 0) 
     {
         //PDF
+        [self convertArrayToPDF:objects:noteArray];
         
     }
     else 
@@ -1014,7 +1015,120 @@ didFailedCreatingPDFFile:(NSString *)filePath
     service.delegate = self;
     [service createPDFFile:path];
     service.delegate = nil;
+    [self showPDF];
+}
+
+- (void)convertArrayToPDF:(NSArray *)valueArray:(NSArray *)withNotes;
+{
     
+    NSArray * data = [NSArray arrayWithArray:valueArray];
+    NSArray * notes = [NSArray arrayWithArray:withNotes];
+    
+    NSMutableString * csv = [NSMutableString string];
+    
+    for (Result *aResult in data) {
+        //NSLog(@"resulttest: %@,%@,%@/%@,%@",aResult.timestamp, aResult.group.title, aResult.scale.minLabel, aResult.scale.maxLabel, aResult.value);
+        NSString * combinedLine = [NSString stringWithFormat:@"%@,%@,%@/%@,%@,%@",aResult.timestamp, aResult.group.title, aResult.scale.minLabel, aResult.scale.maxLabel, aResult.value, aResult.group.positiveDescription];
+        [csv appendFormat:@"%@\n", combinedLine];
+        
+    }
+    [csv appendFormat:@"NOTES,-,-,-\n"];
+    // Fetch Notes and add CSV
+    if (noteSwitch.on) 
+    {
+        for (Note *aNote in notes) 
+        {
+            NSString * combinedLine = [NSString stringWithFormat:@"NOTES,%@,\"%@\",",aNote.timestamp, aNote.note];
+            
+            [csv appendFormat:@"%@\n", combinedLine];
+            
+        }	
+    }
+    //  NSLog(@"csv: %@", csv);
+    
+    
+    
+    // Save file to disk
+    //UIApplication *app = [UIApplication sharedApplication];
+	//VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];	 
+    
+    NSString *rawFromDate = [textfieldArray objectAtIndex:0];
+    NSString *rawToDate = [textfieldArray objectAtIndex:1];
+    NSArray *fromDateArray = [rawFromDate componentsSeparatedByString:@"/"];
+    NSArray *toDateArray = [rawToDate componentsSeparatedByString:@"/"];
+    
+    int fromDay = [[fromDateArray objectAtIndex:1] intValue];
+    int fromMonth = [[fromDateArray objectAtIndex:0] intValue];
+    int fromYear = [[fromDateArray objectAtIndex:2] intValue];
+    
+    int toDay = [[toDateArray objectAtIndex:1] intValue];
+    int toMonth = [[toDateArray objectAtIndex:0] intValue];
+    int toYear = [[toDateArray objectAtIndex:2] intValue];  
+    
+    
+    int r = arc4random() % 1000;
+    
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init]; 
+    [dateFormat setDateFormat:@"MM/dd/yy"];
+    NSDate *fromTempDate = [dateFormat dateFromString:rawFromDate];
+    NSDate *toTempDate = [dateFormat dateFromString:rawToDate];
+    [dateFormat setDateFormat:@"MMMM dd, yyyy"];
+    NSString *fromDate = [dateFormat stringFromDate:fromTempDate];
+    NSString *toDate = [dateFormat stringFromDate:toTempDate];
+    
+    NSString *fileName = [NSString stringWithFormat:@"/%i%i%i_%i%i%i_%i.csv", fromDay, fromMonth, fromYear, toDay, toMonth, toYear, r];  
+    NSString *rawFileName = [NSString stringWithFormat:@"%i%i%i_%i%i%i_%i.csv", fromDay, fromMonth, fromYear, toDay, toMonth, toYear, r];
+    
+    NSString *reportType = @"";
+    if (whichExport == 0) 
+    {
+        reportType = @"CSV";
+    }
+    else 
+    {
+        reportType = @"PDF";
+    }
+    NSString *titleText = [NSString stringWithFormat:@" (%@) %@ - %@",reportType, fromDate, toDate];
+    NSDate *today = [NSDate date];
+    curFileName = rawFileName;
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
+    NSString *documentsDir = [paths objectAtIndex:0];
+    NSString *finalPath = [NSString stringWithFormat:@"%@%@",documentsDir, fileName];
+    [csv writeToFile:finalPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    
+    [self.view sendSubviewToBack:savingScreen];
+    
+    // Save file info in Core Data
+    NSManagedObject *savedResult = nil;
+    
+    savedResult = [NSEntityDescription insertNewObjectForEntityForName:@"SavedResults" inManagedObjectContext:self.managedObjectContext];
+    
+    [savedResult setValue:titleText forKey: @"title"];
+    [savedResult setValue:fileName forKey: @"filename"];
+    [savedResult setValue:today forKey: @"timestamp"];
+    
+    
+    
+    NSError *error = nil;
+    if ([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error]) {
+        [Error showErrorByAppendingString:@"Unable to save result" withError:error];
+    } 	
+    
+    // Send to SavedResults View
+    savingScreen.hidden = YES;
+    ViewSavedController *viewSavedController = [[[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil] autorelease];
+	viewSavedController.finalPath = fileName;
+    viewSavedController.fileName = titleText;
+    if (whichExport == 0) 
+    {
+        viewSavedController.fileType = @"CSV";
+    }
+    else 
+    {
+        viewSavedController.fileType = @"PDF";
+    }
+    [self.navigationController pushViewController:viewSavedController animated:YES];   
 }
 
 - (void)convertArrayToCSV:(NSArray *)valueArray:(NSArray *)withNotes;
@@ -1120,13 +1234,17 @@ didFailedCreatingPDFFile:(NSString *)filePath
     ViewSavedController *viewSavedController = [[[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil] autorelease];
 	viewSavedController.finalPath = fileName;
     viewSavedController.fileName = titleText;
-    if (whichExport == 0) 
-    {
-        viewSavedController.fileType = @"CSV";
-    }
-    else 
-    {
-        viewSavedController.fileType = @"PDF";
+    switch (whichExport) {
+        case 0:
+            // PDF
+            viewSavedController.fileType = @"PDF";
+            break;
+        case 1:
+            // CSV
+            viewSavedController.fileType = @"CSV";
+            break;
+        default:
+            break;
     }
     [self.navigationController pushViewController:viewSavedController animated:YES];   
    
@@ -1149,8 +1267,8 @@ didFailedCreatingPDFFile:(NSString *)filePath
     
     if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
     {
-        // Save
-        // NSLog(@"Save CSV");
+        // Export CSV
+        // NSLog(@"Export CSV");
         whichExport = 0;
         savingScreen.hidden = NO;
         [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
@@ -1158,14 +1276,14 @@ didFailedCreatingPDFFile:(NSString *)filePath
     } 
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
     {
-        // Export CSV
-        //  NSLog(@"Email CSV");
+        // Export PDF
+        //  NSLog(@"Export PDF");
         whichExport = 1;
         savingScreen.hidden = NO;
-       // [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
-        [self createPDF];
+        [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(saveResults) userInfo:nil repeats:NO];
         //[self emailResults];
     }
+    /*
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2) 
     {
         // Export CSV
@@ -1176,7 +1294,6 @@ didFailedCreatingPDFFile:(NSString *)filePath
         
         //[self emailResults];
     }
-    /*
      else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2) 
      {
      // Export PNG
@@ -1250,5 +1367,12 @@ didFailedCreatingPDFFile:(NSString *)filePath
     [self resignPicker];
 }
 
+- (void) showPDF
+{
+    NSString *nibName = @"WebViewController";
+    WebViewController *controller = [[WebViewController alloc] initWithNibName:nibName bundle:nil];
+    [self.navigationController pushViewController:controller animated:YES];
+    [controller release];
+}
 #pragma mark Fetched results controller
 @end

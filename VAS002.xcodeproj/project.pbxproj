@@ -11,6 +11,11 @@
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		1F5DE7ED15C8BCDC00F5FD5B /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F5DE7EB15C8BCDC00F5FD5B /* WebViewController.m */; };
+		1F5DE7EE15C8BCDC00F5FD5B /* WebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F5DE7EC15C8BCDC00F5FD5B /* WebViewController.xib */; };
+		1F5DE7F315C8BDE700F5FD5B /* Template_iPAD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F5DE7F115C8BDE700F5FD5B /* Template_iPAD.xib */; };
+		1F5DE7F515C8BE5800F5FD5B /* WebViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F5DE7F415C8BE5800F5FD5B /* WebViewController_iPad.xib */; };
+		1F5DE80015C8E64E00F5FD5B /* ShinobiCharts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5DE7FF15C8E64E00F5FD5B /* ShinobiCharts.framework */; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		FB2D7BD6152B549300DB9FC8 /* RootResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2D7BD4152B549300DB9FC8 /* RootResultsController.m */; };
 		FB2D7BD7152B549300DB9FC8 /* RootResultsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FB2D7BD5152B549300DB9FC8 /* RootResultsController.xib */; };
@@ -33,7 +38,6 @@
 		FB8EE94B153E2792009BEE0E /* tab-support-inactive.png in Resources */ = {isa = PBXBuildFile; fileRef = FB8EE94A153E2792009BEE0E /* tab-support-inactive.png */; };
 		FB96546515508D4300F80E27 /* DatePickerController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB96546315508D4200F80E27 /* DatePickerController.m */; };
 		FB96546615508D4300F80E27 /* DatePickerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FB96546415508D4200F80E27 /* DatePickerController.xib */; };
-		FB96546C15517E1B00F80E27 /* ShinobiCharts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB96546B15517E1A00F80E27 /* ShinobiCharts.framework */; };
 		FB96546F15517FD600F80E27 /* GraphDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FB96546E15517FD500F80E27 /* GraphDataSource.m */; };
 		FB9654711551812000F80E27 /* GraphViewController_landscape.xib in Resources */ = {isa = PBXBuildFile; fileRef = FB9654701551812000F80E27 /* GraphViewController_landscape.xib */; };
 		FB965473155182CA00F80E27 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB965472155182C900F80E27 /* OpenGLES.framework */; };
@@ -325,6 +329,12 @@
 		1D3623250D0F684500981E51 /* VAS002AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VAS002AppDelegate.m; sourceTree = "<group>"; };
 		1D6058910D05DD3D006BFB54 /* T2 Mood Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "T2 Mood Tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		1F5DE7EA15C8BCDC00F5FD5B /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
+		1F5DE7EB15C8BCDC00F5FD5B /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
+		1F5DE7EC15C8BCDC00F5FD5B /* WebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebViewController.xib; sourceTree = "<group>"; };
+		1F5DE7F115C8BDE700F5FD5B /* Template_iPAD.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Template_iPAD.xib; sourceTree = "<group>"; };
+		1F5DE7F415C8BE5800F5FD5B /* WebViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebViewController_iPad.xib; sourceTree = "<group>"; };
+		1F5DE7FF15C8E64E00F5FD5B /* ShinobiCharts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShinobiCharts.framework; sourceTree = "<group>"; };
 		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		28A0AAE50D9B0CCF005BE974 /* VAS002_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VAS002_Prefix.pch; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -361,7 +371,6 @@
 		FB96546215508D4200F80E27 /* DatePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatePickerController.h; sourceTree = "<group>"; };
 		FB96546315508D4200F80E27 /* DatePickerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DatePickerController.m; sourceTree = "<group>"; };
 		FB96546415508D4200F80E27 /* DatePickerController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DatePickerController.xib; sourceTree = "<group>"; };
-		FB96546B15517E1A00F80E27 /* ShinobiCharts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShinobiCharts.framework; path = ../../../../Downloads/ShinobiCharts/ShinobiCharts.framework; sourceTree = "<group>"; };
 		FB96546D15517FD400F80E27 /* GraphDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphDataSource.h; sourceTree = "<group>"; };
 		FB96546E15517FD500F80E27 /* GraphDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GraphDataSource.m; sourceTree = "<group>"; };
 		FB9654701551812000F80E27 /* GraphViewController_landscape.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GraphViewController_landscape.xib; path = ../GraphViewController_landscape.xib; sourceTree = "<group>"; };
@@ -699,13 +708,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F5DE80015C8E64E00F5FD5B /* ShinobiCharts.framework in Frameworks */,
 				FBE9A68C15C34600004BDAD1 /* libFlurry.a in Frameworks */,
 				FBE9A60315C2FBE4004BDAD1 /* libz.dylib in Frameworks */,
 				FBE9A60115C2FBDC004BDAD1 /* libharu.a in Frameworks */,
 				FBE9A60215C2FBDC004BDAD1 /* libpng.a in Frameworks */,
 				FBD06A54159BC32500FD28A9 /* QuickLook.framework in Frameworks */,
 				FB965473155182CA00F80E27 /* OpenGLES.framework in Frameworks */,
-				FB96546C15517E1B00F80E27 /* ShinobiCharts.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */,
@@ -757,13 +766,23 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		1F5DE7E915C8BC9C00F5FD5B /* WebView */ = {
+			isa = PBXGroup;
+			children = (
+				1F5DE7EA15C8BCDC00F5FD5B /* WebViewController.h */,
+				1F5DE7EB15C8BCDC00F5FD5B /* WebViewController.m */,
+				1F5DE7EC15C8BCDC00F5FD5B /* WebViewController.xib */,
+				1F5DE7F415C8BE5800F5FD5B /* WebViewController_iPad.xib */,
+				1F5DE7F115C8BDE700F5FD5B /* Template_iPAD.xib */,
+			);
+			name = WebView;
+			sourceTree = "<group>";
+		};
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				FBE9A0C415C1FEA7004BDAD1 /* libz.dylib */,
 				FBFDA47115B4B55D00C20E18 /* icon-mt-114x114.png */,
 				FBFDA47015B4943800C20E18 /* T2 Mood Tracker.entitlements */,
-				FBD06A53159BC32400FD28A9 /* QuickLook.framework */,
 				FE8F1130133CF8FB000022D0 /* iconx2.png */,
 				FE8F112C133CF8A9000022D0 /* icon.png */,
 				080E96DDFE201D6D7F000001 /* Classes */,
@@ -801,10 +820,12 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FBE9A0C415C1FEA7004BDAD1 /* libz.dylib */,
 				FEE9B2CD12CA608D000AD5EF /* libCorePlot.a */,
 				FE7F645712CBE3B8001AB494 /* libFlurry.a */,
+				1F5DE7FF15C8E64E00F5FD5B /* ShinobiCharts.framework */,
+				FBD06A53159BC32400FD28A9 /* QuickLook.framework */,
 				FB965472155182C900F80E27 /* OpenGLES.framework */,
-				FB96546B15517E1A00F80E27 /* ShinobiCharts.framework */,
 				FE6F3CC812C109FF00357BEF /* CoreData.framework */,
 				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
@@ -1026,6 +1047,7 @@
 		FBDF39F1157FC49F00E74F12 /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				1F5DE7E915C8BC9C00F5FD5B /* WebView */,
 				FBF0954F152BA7BC00B00AA6 /* RootSupportController.h */,
 				FBF09550152BA7BC00B00AA6 /* RootSupportController.m */,
 				FBF09551152BA7BC00B00AA6 /* RootSupportController.xib */,
@@ -1812,6 +1834,9 @@
 				FBFDA47615B5B9D300C20E18 /* mt-square-2.png in Resources */,
 				FBFDA47815B5BCAF00C20E18 /* about_logo.png in Resources */,
 				FBFDA47A15B5BD7400C20E18 /* about_logo@2x.png in Resources */,
+				1F5DE7EE15C8BCDC00F5FD5B /* WebViewController.xib in Resources */,
+				1F5DE7F315C8BDE700F5FD5B /* Template_iPAD.xib in Resources */,
+				1F5DE7F515C8BE5800F5FD5B /* WebViewController_iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1886,6 +1911,7 @@
 				FBFDA47D15B5DD0C00C20E18 /* SubLegendTableViewController.m in Sources */,
 				FB496CCA15B8A6D5001B16A4 /* VAS002.xcdatamodeld in Sources */,
 				FBE9A69015C34683004BDAD1 /* PDFService.m in Sources */,
+				1F5DE7ED15C8BCDC00F5FD5B /* WebViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1998,6 +2024,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
+					"\"$(SRCROOT)/../ShinobiCharts\"",
+					"\"$(SRCROOT)\"",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2031,6 +2059,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
+					"\"$(SRCROOT)/../ShinobiCharts\"",
+					"\"$(SRCROOT)\"",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2289,6 +2319,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
+					"\"$(SRCROOT)/../ShinobiCharts\"",
+					"\"$(SRCROOT)\"",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

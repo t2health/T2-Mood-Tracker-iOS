@@ -84,6 +84,7 @@
 
 - (void)saveResults;
 - (void)convertArrayToCSV:(NSArray *)valueArray:(NSArray *)withNotes;
+- (void)convertArrayToPDF:(NSArray *)valueArray:(NSArray *)withNotes;
 - (void)fetchFilteredResults;
 - (NSArray *)fetchNotes;
 
@@ -96,6 +97,7 @@
 
 - (void)resignPicker;
 - (void)createPDF;
+- (void) showPDF;
 
 - (void)deviceOrientationChanged:(NSNotification *)notification;
 

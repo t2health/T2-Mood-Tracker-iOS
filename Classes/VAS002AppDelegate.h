@@ -44,9 +44,6 @@
 
 - (void)addNote;
 
-
-
-
 void uncaughtExceptionHandler(NSException *exception);
 
 #define SQL_FILE_BASE @"VAS002"

@@ -230,7 +230,9 @@ void uncaughtExceptionHandler(NSException *exception) {
     if (managedObjectModel != nil) {
         return managedObjectModel;
     }
-    managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];    
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:SQL_FILE_BASE withExtension:@"momd"];
+    managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    //managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];    
     return managedObjectModel;
 }
 
