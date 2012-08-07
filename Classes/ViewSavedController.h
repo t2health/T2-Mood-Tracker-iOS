@@ -14,6 +14,7 @@
 #import "ShinobiCharts/ShinobiChart+Screenshot.h"
 #import "ChartPrintDataSource.h"
 #import <dispatch/dispatch.h>
+#import "PDFService.h"
 
 
 #define kBorderInset            20.0
@@ -27,7 +28,7 @@
 @class Saved;
 @class MailData;
 
-@interface ViewSavedController : UIViewController <UIWebViewDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, SChartDelegate>
+@interface ViewSavedController : UIViewController <UIWebViewDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, SChartDelegate, PDFServiceDelegate>
 {
     ShinobiChart            *chart;
     ChartPrintDataSource         *datasource;    
@@ -58,6 +59,7 @@
 - (void)emailResults;
 - (void) finishSetup;
 - (void) getScreenShot;
+- (void) createPDFDocument;
 - (void) createWebViewWithHTML;
 - (NSMutableDictionary *) parseNotes:(NSString *)fileContents;
 - (void) shareClick;

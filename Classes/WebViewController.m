@@ -14,9 +14,11 @@
 
 @implementation WebViewController
 @synthesize webView;
+@synthesize filePath;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    [super viewDidLoad];
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
@@ -26,7 +28,7 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
     [self loadPDFFile];
@@ -34,6 +36,7 @@
 
 - (void)viewDidUnload
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    [super viewDidLoad];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -41,18 +44,25 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
+//    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation 
+{
+    [self.webView reload];
 }
 
 - (void)loadPDFFile
     {
+        NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    [super viewDidLoad];
         NSArray *arrayPaths = 
         NSSearchPathForDirectoriesInDomains(
                                             NSDocumentDirectory,
                                             NSUserDomainMask,
                                             YES);
         NSString *path = [arrayPaths objectAtIndex:0];
-        path = [path stringByAppendingPathComponent:@"test.pdf"];
+        path = [path stringByAppendingPathComponent:self.filePath];
         NSURL *url = [NSURL fileURLWithPath:path];
 #if TARGET_IPHONE_SIMULATOR
         

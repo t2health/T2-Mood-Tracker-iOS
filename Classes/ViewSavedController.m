@@ -38,6 +38,7 @@ int rowCount;
 
 - (void)didReceiveMemoryWarning
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     NSLog(@"low on memory!!");
@@ -45,10 +46,13 @@ int rowCount;
 }
 
 #pragma mark - View lifecycle
-
 - (void)viewDidLoad
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     [super viewDidLoad];
+    NSLog(@"fileName: %@",self.fileName);
+    NSLog(@"finalPath: %@",self.finalPath);
+    NSLog(@"fileType: %@",self.fileType);
    // [self.view bringSubviewToFront:loadView];
     // Do any additional setup after loading the view from its nib.
     activityInd.hidden = NO;
@@ -56,14 +60,15 @@ int rowCount;
     NSString *tempTitle = @"";
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if (saved) 
+    if (self.saved) 
     {
         [defaults setObject:self.saved.filename forKey:@"savedName"];
-        tempTitle = saved.title;
+        tempTitle = self.saved.title;
     }
     else 
     {
-        [defaults setObject:finalPath forKey:@"savedName"];
+        NSLog(@"finalPath %@", self.finalPath);
+        [defaults setObject:self.finalPath forKey:@"savedName"];
          tempTitle = self.fileName;
     }
     
@@ -72,7 +77,7 @@ int rowCount;
     components = [afterOpenBracket componentsSeparatedByString:@")"];
     NSString *numberString = [components objectAtIndex:0];    
     NSLog(@"numberString: %@", numberString);
-    if (saved) 
+    if (self.saved) 
     {
 
         viewTitle = numberString;
@@ -118,6 +123,7 @@ int rowCount;
 
 - (void) finishSetup
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
     NSData *imageData;
     for (int i = 0; i < 2; i++) 
@@ -127,9 +133,9 @@ int rowCount;
     }
     
     NSString *reportName = @"";
-    if (saved) 
+    if (self.saved) 
     {
-        reportName = saved.filename;
+        reportName = self.saved.filename;
     }
     else 
     {
@@ -145,13 +151,15 @@ int rowCount;
 
     [imageData writeToFile:path atomically:YES];
     NSLog(@"path: %@", path);
-    [self createWebViewWithHTML];
+    [self createPDFDocument];
+//    [self createWebViewWithHTML];
     
 }
 
 
 - (void)shareClick
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
     if (isPDF) 
     {
@@ -192,6 +200,7 @@ int rowCount;
 
 - (NSMutableDictionary *) parseNotes:(NSString *)fileContents
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     NSMutableDictionary *notesDictionary = [[NSMutableDictionary alloc] init];
     // first, separate by new line
     NSArray* allLinedStrings = [fileContents componentsSeparatedByCharactersInSet:
@@ -222,17 +231,26 @@ int rowCount;
     return notesDictionary;
 }
 
+- (void) createPDFDocument 
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    PDFService *service = [PDFService instance];
+    service.delegate = self;
+    [service createPDFFile];    
+}
+
 - (void) createWebViewWithHTML
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *reportName = @"";
     NSString *reportTitle = @"";
 
-    if (saved) 
+    if (self.saved) 
     {
-        reportName = saved.filename;
-        reportTitle = saved.title;
+        reportName = self.saved.filename;
+        reportTitle = self.saved.title;
     }
     else 
     {
@@ -435,6 +453,7 @@ int rowCount;
 
 
 - (NSString *) htmlFromUIColor:(UIColor *)_color {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     if (CGColorGetNumberOfComponents(_color.CGColor) < 4) {
         const CGFloat *components = CGColorGetComponents(_color.CGColor);
         _color = [UIColor colorWithRed:components[0] green:components[0] blue:components[0] alpha:components[1]];
@@ -450,6 +469,7 @@ int rowCount;
 /****************************************************************************/
 - (void)drawPageNumber:(NSInteger)pageNum
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 	NSString* pageString = [NSString stringWithFormat:@"Page %d", pageNum];
 	UIFont* theFont = [UIFont systemFontOfSize:12];
 	CGSize maxSize = CGSizeMake(612, 72);
@@ -470,6 +490,7 @@ int rowCount;
 #pragma mark Show filter view for Email Results
 - (void)emailResults
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     activityInd.hidden = YES;
 
 // Fetch filtered data
@@ -495,6 +516,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 #pragma mark Mail Delegate Methods
 
 -(void)sendMail:(MailData *)data {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 	Class mailClass = (NSClassFromString(@"MFMailComposeViewController"));
 	if (mailClass != nil) {
 		if ([mailClass canSendMail]) {
@@ -513,6 +535,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 // Dismisses the email composition interface when users tap Cancel or Send. Proceeds to update the message field with the result of the operation.
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error 
 {	
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 
 	[self dismissModalViewControllerAnimated:YES];
     [self.navigationController setNavigationBarHidden:NO animated:NO];
@@ -521,6 +544,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 // Displays an email composition interface inside the application. Populates all the Mail fields. 
 -(void)displayComposerSheetWithMailData:(MailData *)data
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 	MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
 	picker.mailComposeDelegate = self;
 	
@@ -547,9 +571,9 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
     }
     else 
     {
-        NSString *Path = [documentsDir stringByAppendingString:saved.filename];
+        NSString *Path = [documentsDir stringByAppendingString:self.saved.filename];
         NSData *myData = [NSData dataWithContentsOfFile:Path];
-        [picker addAttachmentData:myData mimeType:@"text/plain" fileName:saved.filename];
+        [picker addAttachmentData:myData mimeType:@"text/plain" fileName:self.saved.filename];
 
     }
     
@@ -565,6 +589,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 
 // Launches the Mail application on the device.
 -(void)launchMailAppOnDeviceWithMailData:(MailData *)data {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 	NSString *body = @"&body=";
 	if (data.mailBody != nil) {
 		body = [NSString stringWithFormat:@"%@%@",body,data.mailBody];
@@ -600,6 +625,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 #pragma mark ActionSheet
 -(void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
     {
         //    NSLog(@"Ummm.");
@@ -608,6 +634,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
     NSLog(@"button press: %i", buttonIndex);
     
@@ -637,8 +664,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 #pragma mark PDF
 - (void)makePDF
 {
-    
-    NSLog(@"webviewload");
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
     
     
@@ -701,6 +727,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 
 - (void) drawPDF:(UIImage *)reportImage;
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     /*
     CGSize pageSize = CGSizeMake(612, 792);
     CGRect imageBoundsRect = CGRectMake(50, 50, 512, 692);
@@ -721,7 +748,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 {
 #pragma mark - Setup Graph
 /*--------------------------- Setup Graph to print ---------------------------*/
-    chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, 400, 300)];
+    chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, 10*72, 7.5*72)]; // 11 x 8 inches with 72dpi
 /*
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         //Create the chart
@@ -732,6 +759,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
     }
  */   
     // Set a different theme on the chart
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     SChartMidnightTheme *midnight = [[SChartMidnightTheme alloc] init];
     [chart setTheme:midnight];
     [midnight release];
@@ -825,11 +853,13 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     // Return YES for supported orientations
     return YES;
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 	UIDevice *device = [UIDevice currentDevice];
 	if (device.orientation == UIDeviceOrientationPortrait || device.orientation == UIDeviceOrientationPortraitUpsideDown) 
     {
@@ -845,5 +875,37 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
     
 }
 
+#pragma mark -
+#pragma mark PDFService delegate method
+
+
+- (void)service:(PDFService *)service
+didFailedCreatingPDFFile:(NSString *)filePath
+        errorNo:(HPDF_STATUS)errorNo
+       detailNo:(HPDF_STATUS)detailNo
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    NSString *message = [NSString stringWithFormat:@"Couldn't create a PDF file at %@\n errorNo:0x%04x detalNo:0x%04x",
+                         filePath,
+                         errorNo,
+                         detailNo];
+    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"PDF creation error"
+                                                     message:message
+                                                    delegate:nil
+                                           cancelButtonTitle:@"OK"
+                                           otherButtonTitles:nil] autorelease];
+    [alert show];
+}
+
+- (void)service:(PDFService *)service 
+didFinishCreatingPDFFile:(NSString *)filePath 
+       detailNo:(HPDF_STATUS)detailNo
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    NSLog(@"finished creating PDF");
+    
+    
+    
+}
 
 @end

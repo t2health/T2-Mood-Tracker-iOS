@@ -997,8 +997,9 @@ bool isPortrait;
                 chartHeight = 211;
                 menuStart = 211;
                 menuHeight = 205;
-            }        
-            [chart removeFromSuperview];
+            }
+            chart.alpha = 0.0f;
+//            [chart removeFromSuperview];
             
             
             CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
@@ -1017,9 +1018,10 @@ bool isPortrait;
             
             menuView.hidden = NO;
             [menuView setAlpha:1.0];
-            [containerView addSubview:chart];
-            [containerView bringSubviewToFront:legendView];
-            [containerView bringSubviewToFront:menuView];
+            chart.alpha = 1.0f;
+//            [containerView addSubview:chart];
+//            [containerView bringSubviewToFront:legendView];
+//            [containerView bringSubviewToFront:menuView];
             
             [self slideDownDidStop];
             [self resetLegend];
@@ -1047,8 +1049,8 @@ bool isPortrait;
                 menuStart = 0;
                 menuHeight = 320;
             } 
-            
-            [chart removeFromSuperview];
+            chart.alpha = 0.0f;
+//            [chart removeFromSuperview];
 
             NSLog(@"OrientationCHANGE: LANDSCAPE");
             CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
@@ -1065,10 +1067,10 @@ bool isPortrait;
                                          menuViewSize.width, menuHeight);
             self.menuView.frame = menuRect;
             
-            
-            [containerView addSubview:chart];
-            [containerView bringSubviewToFront:legendView];
-            [containerView bringSubviewToFront:menuView];
+            chart.alpha = 1.0f;
+//            [containerView addSubview:chart];
+//            [containerView bringSubviewToFront:legendView];
+//            [containerView bringSubviewToFront:menuView];
             menuView.hidden = YES;
             menuShowing = NO;
             

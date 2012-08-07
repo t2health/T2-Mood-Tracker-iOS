@@ -12,6 +12,11 @@
 #import "SafeFetchedResultsController.h"
 #import "PDFService.h"
 
+typedef enum {
+    enExportTypeCSV = 0,
+    enExportTypePDF
+}enExportType;
+ 
 
 @class MailData;
 @class Group;

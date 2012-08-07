@@ -9,7 +9,9 @@
 
 #import <Foundation/Foundation.h>
 #import "hpdf.h"
+#import "Saved.h"
 
+#define dpi(inches) (inches*72.0f)
 
 @class PDFService;
 
@@ -23,6 +25,11 @@
 didFailedCreatingPDFFile:(NSString *)filePath
         errorNo:(HPDF_STATUS)errorNo
        detailNo:(HPDF_STATUS)detailNo;
+
+- (void)service:(PDFService *)service
+didFinishCreatingPDFFile:(NSString *)filePath
+       detailNo:(HPDF_STATUS)detailNo;
+
 @end
 
 
@@ -35,7 +42,8 @@ didFailedCreatingPDFFile:(NSString *)filePath
 }
 
 + (PDFService *)instance;
-- (void)createPDFFile:(NSString *)filePath;
+- (void)createPDFFile;
+- (NSMutableDictionary *) parseNotes:(NSString *)fileContents;
 
 @property (nonatomic, assign) id<PDFServiceDelegate> delegate;
 

@@ -10,11 +10,10 @@
 
 @interface WebViewController : UIViewController <UIWebViewDelegate> {
     IBOutlet UIWebView *webView;
-    
-    //NSString *url;
+    NSString *filePath;
     //NSString *baseUrl;
 }
 @property (nonatomic, retain) IBOutlet UIWebView *webView;
-
+@property (nonatomic, retain) NSString *filePath;
 - (void)loadPDFFile;
 @end

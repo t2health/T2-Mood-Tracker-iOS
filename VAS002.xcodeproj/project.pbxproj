@@ -16,6 +16,7 @@
 		1F5DE7F315C8BDE700F5FD5B /* Template_iPAD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F5DE7F115C8BDE700F5FD5B /* Template_iPAD.xib */; };
 		1F5DE7F515C8BE5800F5FD5B /* WebViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F5DE7F415C8BE5800F5FD5B /* WebViewController_iPad.xib */; };
 		1F5DE80015C8E64E00F5FD5B /* ShinobiCharts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5DE7FF15C8E64E00F5FD5B /* ShinobiCharts.framework */; };
+		1FA03B3A15CC384600DF7EE8 /* chart.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FA03B3915CC384600DF7EE8 /* chart.png */; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		FB2D7BD6152B549300DB9FC8 /* RootResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2D7BD4152B549300DB9FC8 /* RootResultsController.m */; };
 		FB2D7BD7152B549300DB9FC8 /* RootResultsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FB2D7BD5152B549300DB9FC8 /* RootResultsController.xib */; };
@@ -335,6 +336,7 @@
 		1F5DE7F115C8BDE700F5FD5B /* Template_iPAD.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Template_iPAD.xib; sourceTree = "<group>"; };
 		1F5DE7F415C8BE5800F5FD5B /* WebViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebViewController_iPad.xib; sourceTree = "<group>"; };
 		1F5DE7FF15C8E64E00F5FD5B /* ShinobiCharts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShinobiCharts.framework; sourceTree = "<group>"; };
+		1FA03B3915CC384600DF7EE8 /* chart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chart.png; sourceTree = "<group>"; };
 		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		28A0AAE50D9B0CCF005BE974 /* VAS002_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VAS002_Prefix.pch; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -781,6 +783,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				1FA03B3915CC384600DF7EE8 /* chart.png */,
 				FBFDA47115B4B55D00C20E18 /* icon-mt-114x114.png */,
 				FBFDA47015B4943800C20E18 /* T2 Mood Tracker.entitlements */,
 				FE8F1130133CF8FB000022D0 /* iconx2.png */,
@@ -1837,6 +1840,7 @@
 				1F5DE7EE15C8BCDC00F5FD5B /* WebViewController.xib in Resources */,
 				1F5DE7F315C8BDE700F5FD5B /* Template_iPAD.xib in Resources */,
 				1F5DE7F515C8BE5800F5FD5B /* WebViewController_iPad.xib in Resources */,
+				1FA03B3A15CC384600DF7EE8 /* chart.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2023,7 +2027,6 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
 					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
@@ -2058,7 +2061,6 @@
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
 					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
@@ -2318,7 +2320,6 @@
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
 					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
