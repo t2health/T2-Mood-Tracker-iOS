@@ -10,6 +10,8 @@
 #import <Foundation/Foundation.h>
 #import "hpdf.h"
 #import "Saved.h"
+#import <CoreData/CoreData.h>
+
 
 #define dpi(inches) (inches*72.0f)
 
@@ -39,12 +41,14 @@ didFinishCreatingPDFFile:(NSString *)filePath
 
 @interface PDFService : NSObject {
     id <PDFServiceDelegate> delegate;
+    NSManagedObjectContext *managedObjectContext;
 }
 
 + (PDFService *)instance;
 - (void)createPDFFile;
 - (NSMutableDictionary *) parseNotes:(NSString *)fileContents;
 
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, assign) id<PDFServiceDelegate> delegate;
 
 @end

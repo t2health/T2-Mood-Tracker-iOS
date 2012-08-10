@@ -198,6 +198,7 @@
 		FBF4B79B157D031C00D6FAF5 /* Symbol_Square.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF4B787157D031C00D6FAF5 /* Symbol_Square.png */; };
 		FBF4B79C157D031C00D6FAF5 /* Symbol_Triangle.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF4B788157D031C00D6FAF5 /* Symbol_Triangle.png */; };
 		FBF4B7B1157E517900D6FAF5 /* ChartOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBF4B7B0157E517900D6FAF5 /* ChartOptionsViewController.xib */; };
+		FBF6CD4615D56AED00B51908 /* PDFDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF6CD4515D56AED00B51908 /* PDFDataSource.m */; };
 		FBF710221592598D004728D9 /* NotesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF710211592598D004728D9 /* NotesTableViewController.m */; };
 		FBF7103215936B80004728D9 /* tab-legend.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF7103115936B80004728D9 /* tab-legend.png */; };
 		FBF7103415936BC1004728D9 /* tab-legend@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF7103315936BC1004728D9 /* tab-legend@2x.png */; };
@@ -552,6 +553,8 @@
 		FBF4B787157D031C00D6FAF5 /* Symbol_Square.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Symbol_Square.png; sourceTree = "<group>"; };
 		FBF4B788157D031C00D6FAF5 /* Symbol_Triangle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Symbol_Triangle.png; sourceTree = "<group>"; };
 		FBF4B7B0157E517900D6FAF5 /* ChartOptionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ChartOptionsViewController.xib; path = ../ChartOptionsViewController.xib; sourceTree = "<group>"; };
+		FBF6CD4415D56AED00B51908 /* PDFDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDFDataSource.h; sourceTree = "<group>"; };
+		FBF6CD4515D56AED00B51908 /* PDFDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDFDataSource.m; sourceTree = "<group>"; };
 		FBF710201592598C004728D9 /* NotesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotesTableViewController.h; sourceTree = "<group>"; };
 		FBF710211592598D004728D9 /* NotesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotesTableViewController.m; sourceTree = "<group>"; };
 		FBF7103115936B80004728D9 /* tab-legend.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tab-legend.png"; sourceTree = "<group>"; };
@@ -1008,6 +1011,8 @@
 				FBD06A40159B7FE900FD28A9 /* PDFImageConverter.m */,
 				FBD06A5A159CC26900FD28A9 /* ChartPrintDataSource.h */,
 				FBD06A5B159CC26900FD28A9 /* ChartPrintDataSource.m */,
+				FBF6CD4415D56AED00B51908 /* PDFDataSource.h */,
+				FBF6CD4515D56AED00B51908 /* PDFDataSource.m */,
 			);
 			name = ViewDetails;
 			sourceTree = "<group>";
@@ -1916,6 +1921,7 @@
 				FB496CCA15B8A6D5001B16A4 /* VAS002.xcdatamodeld in Sources */,
 				FBE9A69015C34683004BDAD1 /* PDFService.m in Sources */,
 				1F5DE7ED15C8BCDC00F5FD5B /* WebViewController.m in Sources */,
+				FBF6CD4615D56AED00B51908 /* PDFDataSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

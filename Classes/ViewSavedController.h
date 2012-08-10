@@ -40,6 +40,8 @@
     NSString *finalPath;
     NSString *fileName;
     NSString *fileType;
+    NSDictionary *groupsScalesDictionary;
+
 
 }
 
@@ -50,6 +52,7 @@
 @property (nonatomic, retain) NSString *finalPath;
 @property (nonatomic, retain) NSString *fileName;
 @property (nonatomic, retain) NSString *fileType;
+@property (nonatomic, retain) NSDictionary *groupsScalesDictionary;
 
 
 - (void)sendMail:(MailData *)mailData;
@@ -67,5 +70,6 @@
 - (void) drawPDF:(UIImage *)reportImage;
 
 - (void)drawPageNumber:(NSInteger)pageNum;
+
 
 @end

@@ -104,6 +104,8 @@ typedef enum {
 - (void)createPDF;
 - (void) showPDF;
 
+- (NSArray *)fetchScales:(NSString *)groupTitle;
+
 - (void)deviceOrientationChanged:(NSNotification *)notification;
 
 

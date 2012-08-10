@@ -277,7 +277,7 @@ id viewToDelete;
 		NSManagedObjectContext *context = [fetchedResultsController managedObjectContext];
 		[context deleteObject:[fetchedResultsController objectAtIndexPath:indexPath]];
         Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
-        NSLog(@"Edit-indexPath: %@", indexPath);
+       // NSLog(@"Edit-indexPath: %@", indexPath);
 
       //  NSLog(@"clicked: %@", saved.filename);
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 

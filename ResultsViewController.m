@@ -885,6 +885,8 @@ int pickerShow;
 
 - (void)fetchFilteredResults
 {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     // Get raw data
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -896,12 +898,17 @@ int pickerShow;
     
     NSString *rawFromDate = [textfieldArray objectAtIndex:0];
     NSString *rawToDate = [textfieldArray objectAtIndex:1];
+
     
     
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"MM/dd/yyyy"];
     NSDate *myFromDate = [df dateFromString: rawFromDate];
     NSDate *myToDate = [df dateFromString: rawToDate];
+
+    
+    [defaults setObject:myFromDate forKey:@"PDF_FromDate"];
+    [defaults setObject:myToDate forKey:@"PDF_ToDate"];
 
     NSLog(@"from: %@ - to: %@", myFromDate, myToDate);
 
@@ -1011,6 +1018,40 @@ int pickerShow;
     
 }
 
+- (NSArray *)fetchScales:(NSString *)groupTitle
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Scale" inManagedObjectContext:self.managedObjectContext];
+    [fetchRequest setEntity:entity];
+    
+    NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"(group.title= %@)", groupTitle];
+    
+    NSArray *finalPredicateArray = [NSArray arrayWithObjects:groupPredicate, nil];
+    NSPredicate *finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
+    [fetchRequest setPredicate:finalPredicate];
+    
+    
+    NSError *error = nil;
+    NSArray *objects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error) {
+        [Error showErrorByAppendingString:@"Unable to get data" withError:error];
+    }
+    NSMutableArray *scaleArray = [[NSMutableArray alloc] init];
+    
+    for (Scale *aScale in objects) 
+    {
+        NSString *scaleLabel = [NSString stringWithFormat:@"%@/%@",aScale.minLabel, aScale.maxLabel];
+        [scaleArray addObject:scaleLabel];
+    }	
+    
+    
+    
+    [fetchRequest release];
+    return scaleArray;
+    
+}
+
 #pragma mark -
 #pragma mark PDFService delegate method
 
@@ -1051,6 +1092,7 @@ didFinishCreatingPDFFile:(NSString *)filePath
 
 - (void)convertArrayToPDF:(NSArray *)valueArray:(NSArray *)withNotes;
 {
+    /*
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     NSString *rawFromDate = [textfieldArray objectAtIndex:0];
     NSString *rawToDate = [textfieldArray objectAtIndex:1];
@@ -1081,6 +1123,7 @@ didFinishCreatingPDFFile:(NSString *)filePath
     service.delegate = self;
     NSLog(@"Will Create PDF to %@", fileName);
     [service createPDFFile:fileName withDataArray:valueArray withNotesArray:withNotes];
+     */
     //Delegate notified when complete or error
 }
 
@@ -1188,6 +1231,26 @@ didFinishCreatingPDFFile:(NSString *)filePath
     ViewSavedController *viewSavedController = [[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil];
 	viewSavedController.finalPath = [NSString stringWithFormat:@"%@", fileName];
     viewSavedController.fileName = titleText;
+    NSMutableDictionary *tempDictionary = [[NSMutableDictionary alloc] init];
+    
+    for (NSString *groupTitle in self.groupsDictionary) 
+    {
+		Group *currentGroup = [self.groupsDictionary objectForKey:groupTitle];
+		UISwitch *currentSwitch = [switchDictionary objectForKey:groupTitle];
+        NSString *tString = currentGroup.title;
+        
+        NSArray *scaleArray = [self fetchScales:tString];
+        
+        if (currentSwitch.on) 
+        {
+            // Add to tempDict
+            [tempDictionary setObject:scaleArray forKey:tString];
+        }
+    }
+    NSDictionary *groupScalesDictionary = [NSDictionary dictionaryWithDictionary:tempDictionary];
+
+    viewSavedController.groupsScalesDictionary = groupScalesDictionary;
+    
     switch (whichExport) {
         case enExportTypePDF:
             // PDF
@@ -1202,6 +1265,8 @@ didFinishCreatingPDFFile:(NSString *)filePath
     }
     [self.navigationController pushViewController:viewSavedController animated:YES];   
     [viewSavedController release];
+    [tempDictionary release];
+
    
 }
 

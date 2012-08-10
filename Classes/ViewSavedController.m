@@ -28,7 +28,7 @@
 @implementation ViewSavedController
 
 @synthesize saved, activityInd;
-@synthesize printContentWebView, pdfPath, finalPath, fileName, fileType;
+@synthesize printContentWebView, pdfPath, finalPath, fileName, fileType, groupsScalesDictionary;
 
 int imageName = 0;
 double webViewHeight = 0.0;
@@ -108,8 +108,12 @@ int rowCount;
     
     if ([viewTitle isEqualToString:@"PDF"]) 
     {
-        isPDF = YES;
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
+        [defaults setObject:groupsScalesDictionary forKey:@"PDF_GroupScaleDictionary"];    
+        
+        isPDF = YES;
+       // NSLog(@"has groupsScalesDictionary: %@", groupsScalesDictionary);
         [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(getScreenShot) userInfo:nil repeats:NO];
     }   
     else 
@@ -120,6 +124,7 @@ int rowCount;
     }
 
 }
+
 
 - (void) finishSetup
 {
@@ -234,6 +239,12 @@ int rowCount;
 - (void) createPDFDocument 
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    
+
+    
+    
+    
+    
     PDFService *service = [PDFService instance];
     service.delegate = self;
     [service createPDFFile];    
@@ -901,9 +912,16 @@ didFailedCreatingPDFFile:(NSString *)filePath
 didFinishCreatingPDFFile:(NSString *)filePath 
        detailNo:(HPDF_STATUS)detailNo
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    NSLog(@"finished creating PDF");
+  //  NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
+    
+    // Show PDF in WebView
+    NSString *path = [filePath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
+    NSLog(@"finished creating PDF: %@", path);
+    NSURL *targetURL = [NSURL fileURLWithPath:path];
+
+    NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
+    [printContentWebView loadRequest:request];
     
     
 }

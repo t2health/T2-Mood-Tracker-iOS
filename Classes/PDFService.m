@@ -8,11 +8,14 @@
 //
 
 #import "PDFService.h"
+#import "PDFDataSource.h"
 
 #import "Group.h"
 #import "Result.h"
 #import "Note.h"
 #import "Scale.h"
+#import "Result.h"
+
 
 
 static PDFService *_instance;
@@ -40,12 +43,12 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
 
 
 @implementation PDFService
-
+@synthesize managedObjectContext;
 @synthesize delegate;
 
 - (id) init
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    //NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
    self = [super init];
     if (self != nil) {
         //init code
@@ -55,13 +58,13 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
 
 - (void) dealloc
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+   // NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     [super dealloc];
 }
 
 + (PDFService *)instance
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+   // NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     if (!_instance) {
         _instance = [[PDFService alloc] init];
     }
@@ -71,18 +74,26 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
 
 - (void)createPDFFile
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+   // NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     // Creates a test PDF file to the specified path.
     // TODO: use UIImage to create non-optimized PNG rather than build target setting
     
+    PDFDataSource *myDataSource = [[PDFDataSource alloc] init];
+    NSDictionary *myObjects = [NSDictionary dictionaryWithDictionary:[myDataSource getChartDictionary]];
+    NSLog(@"myObjects: %@", myObjects);
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+   // NSLog(@"groupScaleDictionaryService: %@", [defaults objectForKey:@"PDF_GroupScaleDictionary"]);
+    
+    NSDictionary *groupScaleDictionary = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"PDF_GroupScaleDictionary"]];
+    
     NSString *reportName = @"";
     NSString *reportTitle = @"";
 
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
     NSString *documentsDir = [paths objectAtIndex:0];
     NSString *filePath = [NSString stringWithFormat:@"%@%@",documentsDir, [defaults objectForKey:@"savedName"]];
-    NSLog(@"filePath is %@", filePath);
+   // NSLog(@"filePath is %@", filePath);
     
 //    reportName = saved.filename;
 //    reportTitle = saved.title;
@@ -92,8 +103,6 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
     NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
     [dateFormat setDateFormat:@"MMM d, yyyy h:mm:ss a"];
     const char *pathCString = NULL;
-    const int rows = 200;
-    const int maxLinesPerPage = 67;
     
     // read everything from text
     NSString* fileContents = [NSString stringWithContentsOfFile:filePath 
@@ -141,107 +150,142 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
     NSLog(@"Path for chart image is %@", path);
     pathCString = [path cStringUsingEncoding:NSASCIIStringEncoding];
     
+    // Header with date
+    /*
     HPDF_Image image = HPDF_LoadPngImageFromFile(pdf, pathCString);
     NSDate *currentTimestamp;
         
     page = HPDF_AddPage(pdf);
-    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_LANDSCAPE);
+    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_PORTRAIT);
     HPDF_Page_BeginText(page);
     HPDF_Page_SetFontAndSize(page, fontEn, 27.0);
-    HPDF_Page_TextRect(page, dpi(0.25), dpi(8.0), dpi(10.5), dpi(2.0), [[NSString stringWithFormat: @"T2 Mood Tracker Report\nGenerated On: %@",[dateFormat stringFromDate: [NSDate date]]] UTF8String], HPDF_TALIGN_CENTER, nil);
+    HPDF_Page_TextRect(page, dpi(0.25), dpi(8.0), dpi(8.0), dpi(2.0), [[NSString stringWithFormat: @"T2 Mood Tracker Report\nGenerated On: %@",[dateFormat stringFromDate: [NSDate date]]] UTF8String], HPDF_TALIGN_CENTER, nil);
     HPDF_Page_EndText(page);
     HPDF_Page_SetLineWidth(page, 1.0);
     HPDF_Page_SetRGBStroke(page, 0.0, 0, 0);
-    HPDF_Page_Rectangle(page, dpi(0.25), dpi(0.25), dpi(10.5), dpi(8.0));
+    HPDF_Page_Rectangle(page, dpi(0.25), dpi(0.25), dpi(8.0), dpi(8.0));
     HPDF_Page_Stroke(page);
-    HPDF_Page_DrawImage(page, image, dpi(0.5), dpi(0.5), dpi(10.0), dpi(7.5));
-    page = HPDF_AddPage(pdf);
-    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_LANDSCAPE);
+*/
     
+    /*
     NSDate *currentDate = [[NSDate alloc] init];
     NSString *currentCategory = @"";
     int lineNumber = 0;
     CGFloat linePos = 0.0f;
-    /*
-    for (Result *aResult in data) {
-        if (lineNumber % maxLinesPerPage == 0 || (![currentDate isEqual:aResult.timestamp] && lineNumber > maxLinesPerPage - 2) ) {
-            lineNumber = 0;
-            pageNumber++;
-            page = HPDF_AddPage(pdf);
-            HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_PORTRAIT);
-            HPDF_Page_BeginText(page);
-            HPDF_Page_SetFontAndSize(page, fontEn, 11.0);
-            HPDF_Page_TextRect(page, dpi(1.0), dpi(0.25), dpi(7.5), dpi(0.5), [[NSString stringWithFormat:@"Page %d", pageNumber] UTF8String], HPDF_TALIGN_CENTER, nil);
-            HPDF_Page_EndText(page);
-            HPDF_Page_SetLineWidth(page, 1.0);
-            HPDF_Page_SetRGBStroke(page, 0.0, 0, 0);
-            HPDF_Page_Rectangle(page, dpi(0.25), dpi(0.25), dpi(8.0), dpi(10.5));
-            HPDF_Page_Stroke(page);
-        }
-        HPDF_Page_BeginText(page);
-        HPDF_Page_SetFontAndSize(page, fontEn, 12.0);
-        if (![currentDate isEqual:aResult.timestamp]) {
-            linePos = 10.5f - (0.15f * (CGFloat)lineNumber);
-            HPDF_Page_TextRect(page, dpi(0.50), dpi(linePos), dpi(7.5), dpi(0.5), [[NSString stringWithFormat:@"%@",[dateFormat stringFromDate: aResult.timestamp]] UTF8String], HPDF_TALIGN_LEFT, nil);
-            currentDate = aResult.timestamp;
-            lineNumber++;
-        }
-        if (![currentCategory isEqual:aResult.group.title]) {
-            linePos = 10.5f - (0.15f * (CGFloat)lineNumber);
-            HPDF_Page_EndText(page);
-            HPDF_Page_SetLineWidth(page, 3.0);
-//            HPDF_Page_SetRGBStroke(page, 0.0, 0, 0);
-            HPDF_Page_SetRGBFill(page, 1.0, 0.0, 0.0);
-            HPDF_Page_Rectangle(page, dpi(0.5), dpi(linePos)-dpi(0.175), dpi(0.25), dpi(0.10));
-//            HPDF_Page_Stroke(page);
-            HPDF_Page_Fill(page);
-            HPDF_Page_SetRGBFill(page, 0.0, 0.0, 0.0);
-            HPDF_Page_BeginText(page);
-            HPDF_Page_TextRect(page, dpi(.750), dpi(linePos), dpi(7.0), dpi(0.5), [aResult.group.title UTF8String], HPDF_TALIGN_LEFT, nil);
-            currentCategory = aResult.group.title;
-            lineNumber++;
-        }
-        linePos = 10.5f - (0.15f * (CGFloat)lineNumber);
-        HPDF_Page_TextRect(page, dpi(1.0), dpi(linePos), dpi(6.5), dpi(0.5), [[NSString stringWithFormat:@"%@/%@: %@", aResult.scale.minLabel, aResult.scale.maxLabel, aResult.value] UTF8String], HPDF_TALIGN_LEFT, nil);
-        HPDF_Page_EndText(page);
-        lineNumber++;
-    }
-   */
-/*
-    for (int i = 0; i < rows; i++) {
-        if(i % maxLinesPerPage == 0)
+    NSArray *grpArray = [groupScaleDictionary allKeys];
+    */
+    
+    // Summary Page
+    const int maxLinesPerPage = 3;
+
+    NSArray *categoryNameArray = [groupScaleDictionary allKeys];
+    
+    page = HPDF_AddPage(pdf);
+    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_PORTRAIT);
+    
+    for (int i = 0; i < categoryNameArray.count; i++) 
+    {
+        if (i == 3) 
         {
-            if (pageNumber != 0) {
-                HPDF_Page_EndText(page);
-            }
             pageNumber++;
-//            lblInfo.text = [NSString stringWithFormat:@"Creating Page %d", pageNumber];
-            page = HPDF_AddPage(pdf);
-            HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_PORTRAIT);
+            
+            // End Page after 3rd Category
             HPDF_Page_BeginText(page);
             HPDF_Page_SetFontAndSize(page, fontEn, 11.0);
             HPDF_Page_TextRect(page, dpi(1.0), dpi(0.25), dpi(7.5), dpi(0.5), [[NSString stringWithFormat:@"Page %d", pageNumber] UTF8String], HPDF_TALIGN_CENTER, nil);
             HPDF_Page_EndText(page);
-            HPDF_Page_SetLineWidth(page, 1.0);
-            HPDF_Page_SetRGBStroke(page, 0.0, 0, 0);
-            HPDF_Page_Rectangle(page, dpi(0.25), dpi(0.25), dpi(8.0), dpi(10.5));
-            HPDF_Page_Stroke(page);
-            HPDF_Page_DrawImage(page, image, dpi(0.5), dpi(5.5), dpi(7.5), dpi(5.0));
-            HPDF_Page_BeginText(page);
-            HPDF_Page_SetFontAndSize(page, fontEn, 10.0);
+            // Start New Page
+            page = HPDF_AddPage(pdf);
+            HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_PORTRAIT);
         }
-        NSString *lineText = [NSString stringWithFormat:@"Data Line %d", i];
-        const char *line = [lineText UTF8String];
-        HPDF_Page_TextOut(page, dpi(1.0), dpi(5.25)-(dpi(0.125) * (i%maxLinesPerPage)), line);
         
+        HPDF_Page_BeginText(page);
+        HPDF_Page_SetFontAndSize(page, fontEn, 27.0);
+        HPDF_Page_TextRect(page, dpi(0.25), dpi(10.25)-(dpi(3.0) * (i%maxLinesPerPage)), dpi(8.0), dpi(1.0), [[NSString stringWithFormat: @"Category: %@",[categoryNameArray objectAtIndex:i]] UTF8String], HPDF_TALIGN_LEFT, nil);
+        HPDF_Page_EndText(page);
+        
+       ////////////////////////////------------------- GRAPH SUMMARY
+        // Pull Data
+        NSDictionary *groupDict = [myObjects objectForKey:[categoryNameArray objectAtIndex:i]];
+        NSArray *dateArray = [groupDict objectForKey:@"date"];
+        NSArray *dataArray = [groupDict objectForKey:@"data"];
+        
+        // Set Bounderies
+        float chart_width = dpi(8.0);
+        float chart_height = dpi(2.0);
+        float chart_startY = dpi(7.75)-(dpi(3.0) * (i%maxLinesPerPage));
+        float chart_startX = dpi(0.25);
+        float chart_endX = chart_startX + chart_width;
+        float chart_endY = chart_startY + chart_height;
+        float xIncrement = chart_width / dataArray.count;
+        float yIncrement = chart_height/100;
+        
+        
+        // Draw Border
+        HPDF_Page_SetLineWidth(page, 1.0);
+        HPDF_Page_SetRGBStroke(page, 0.0, 0, 0);
+        HPDF_Page_Rectangle(page, chart_startX, chart_startY, chart_width, chart_height);
+        HPDF_Page_Stroke(page);
+       // NSLog(@"width: %f, height: %f, x: %f-%f, y: %f-%f", chart_width, chart_height, chart_startX, chart_endX, chart_startY, chart_endY);
+        
+        
+        // Draw Points/Lines
+        int stepX = chart_startX;
+        HPDF_Page_SetRGBStroke(page, 1.0, 0, 0);
+        for (int a=0; a < dataArray.count; a++) 
+        {
+            int value = [[dataArray objectAtIndex:a] intValue];
+            
+            if (a == 0) 
+            {
+                HPDF_Page_Circle(page, stepX, chart_startY + value, .1);
+
+            }
+            else 
+            {
+                HPDF_Page_LineTo(page, stepX, chart_startY + value);
+            }
+            stepX += xIncrement;
+        }
+        HPDF_Page_Stroke(page);
+        
+
+        // Draw Regression/Trend Line
+        stepX = chart_startX;
+        
+        HPDF_Page_SetRGBStroke(page, 0.0, 0, 1.0);
+        for (int a=0; a < dataArray.count; a++) 
+        {
+            if (a == 0) 
+            {
+                HPDF_Page_Circle(page, stepX, chart_startY + 50, .1);
+                
+            }
+            else 
+            {
+                HPDF_Page_LineTo(page, stepX, chart_startY + 50);
+            }
+            stepX += xIncrement;
+        }
+        HPDF_Page_Stroke(page);
     }
-    HPDF_Page_EndText(page);
     
-    // comment out this line intentionally causes an error here to test error handling
-    //    path = [[NSBundle mainBundle] pathForResource:@"no_such_file_hogehoge"
-    //                                           ofType:@"png"];
-*/  
+
     
+    ////////////////////////////------------------- GRAPH CATEGORY SCALES
+    
+    int indentCounter = 0;
+    int scaleCounter = 0;
+    const int rows = 10;
+    
+    // Scale Details
+    
+    
+    
+    
+    
+    
+    // Save PDF
     path = [filePath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
     pathCString = [path cStringUsingEncoding:1];
     NSLog(@"Saving PDF to %@", path);
