@@ -17,22 +17,25 @@
 	IBOutlet UIButton *deleteGroup;
 	IBOutlet UIButton *manageScalesButton;
 	IBOutlet UISwitch *isPositveSwitch;
+    IBOutlet UILabel *positiveLabel;
     
-    IBOutlet UITableView *scalesTableView;	
 	
 	Group *group;
 }
 
 @property (nonatomic, retain)NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain)Group *group;
-@property (nonatomic, retain) IBOutlet UITableView *scalesTableView;
 @property (nonatomic, retain) SafeFetchedResultsController *fetchedResultsController;
+@property (nonatomic, retain) IBOutlet UILabel *positiveLabel;
+
 
 - (IBAction)deleteGroupPressed:(id)sender;
 - (IBAction)manageScalesPressed:(id)sender;
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (IBAction)saveAction:(id)sender;
 - (void)addGroup;
+- (void)addLegendInfo;
+
 - (void)saveEdit;
 - (NSNumber *)getNextMenuIndex;
 - (IBAction)switchFlipped:(id)sender;

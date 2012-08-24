@@ -58,12 +58,10 @@ int seriesCount;
         // Setup Data
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         self.groupName = [defaults objectForKey:@"subGraphSelected"];
-        
         [self fillScalesDictionary];
         [self fillColors];
         [self fillSymbols];
         [self createSwitches];
-        
         seriesData = [[NSMutableArray alloc] init];
         seriesDates = [[NSMutableArray alloc] init];
         
@@ -119,7 +117,7 @@ int seriesCount;
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
     NSDate *myDate = [df dateFromString: str];
-    
+    [df release];
     
     
     return myDate;
@@ -225,7 +223,7 @@ int seriesCount;
 
 - (void)fillScalesDictionary {
 	if (self.scalesDictionary == nil) {
-        NSLog(@"groupname: %@", self.groupName);
+      //  NSLog(@"groupname: (%@)", self.groupName);
 		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 		NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"group.title like %@",self.groupName];
 		NSArray *predicateArray = [NSArray arrayWithObjects:groupPredicate, nil];
@@ -249,7 +247,15 @@ int seriesCount;
 			
 			NSMutableArray *sclArray = [NSMutableArray array];
 			for (NSString *minLabel in sortedKeys) {
-				[sclArray addObject:[self.scalesDictionary objectForKey:minLabel]];
+                if ([minLabel isEqualToString:@""]) 
+                {
+                    
+                }
+                else 
+                {
+                    [sclArray addObject:[self.scalesDictionary objectForKey:minLabel]];
+                    
+                }
 			}
 			self.scalesArray = [NSArray arrayWithArray:sclArray];
 		}
@@ -361,47 +367,55 @@ int seriesCount;
     
     defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
     NSString *theRange = [defaults objectForKey:defaultsKey];
+    NSDate *theFromDate = [[NSDate alloc] init];
     
-    
-    NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:[[NSDate alloc] init]];
+    NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:theFromDate];
     
     // Today's Date
     [components setHour:-[components hour]];
     [components setMinute:-[components minute]];
     [components setSecond:-[components second]];
-    NSDate *today = [cal dateByAddingComponents:components toDate:[[NSDate alloc] init] options:0];
+    NSDate *today;
     NSDate *fromDate;
-    BOOL isAll = NO;
     
     
-    components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+    components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
     [components setDay:([components day] + 1)]; 
     today = [cal dateFromComponents:components];
     
     
     if ([theRange isEqualToString:@"30 days"]) 
     {
-        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
         [components setMonth:([components month] - 1)]; 
         fromDate = [cal dateFromComponents:components];
     }
     else if ([theRange isEqualToString:@"90 days"]) 
     {
-        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
         [components setMonth:([components month] - 3)]; 
+        fromDate = [cal dateFromComponents:components];
+    }
+    else if ([theRange isEqualToString:@"180 days"]) 
+    {
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
+        [components setMonth:([components month] - 6)]; 
         fromDate = [cal dateFromComponents:components];
     }
     else if ([theRange isEqualToString:@"1 year"]) 
     {
-        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
         [components setYear:([components year] - 1)]; 
         fromDate = [cal dateFromComponents:components];
     }
     else // All and anything else
     {
-        isAll = YES;
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
+        [components setMonth:([components month] - 1)]; 
+        fromDate = [cal dateFromComponents:components];
     }
-
+    [theFromDate release];
+    
     NSMutableArray *arrayByDate = [[NSMutableArray alloc] init];
     [arrayByDate addObject:@"0"];
 	
@@ -410,12 +424,12 @@ int seriesCount;
 	[fetchRequest setEntity:entity];
 	
 	// Create the sort descriptors array.
-	NSSortDescriptor *yearDescriptor = [[NSSortDescriptor alloc] initWithKey:@"year" ascending:YES];
-	NSSortDescriptor *monthDescriptor = [[NSSortDescriptor alloc] initWithKey:@"month" ascending:YES];
-	NSSortDescriptor *dayDescriptor = [[NSSortDescriptor alloc] initWithKey:@"day" ascending:YES];
-	NSSortDescriptor *scaleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"scale" ascending:YES];
+	NSSortDescriptor *yearDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"year" ascending:YES] autorelease];
+	NSSortDescriptor *monthDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"month" ascending:YES] autorelease];
+	NSSortDescriptor *dayDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"day" ascending:YES] autorelease];
+	NSSortDescriptor *scaleDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"scale" ascending:YES] autorelease];
 	
-	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:yearDescriptor, monthDescriptor,dayDescriptor, scaleDescriptor, nil];
+	NSArray *sortDescriptors = [[[NSArray alloc] initWithObjects:yearDescriptor, monthDescriptor,dayDescriptor, scaleDescriptor, nil] autorelease];
 	[fetchRequest setSortDescriptors:sortDescriptors];
 	
 	NSString *scalePredicateString = @"";
@@ -438,17 +452,11 @@ int seriesCount;
         scalePredicate = [NSPredicate predicateWithFormat:scalePredicateString, scaleMinLabel];
 
         
-        if (isAll) 
-        {
-            finalPredicateArray = [NSArray arrayWithObjects:groupPredicate, scalePredicate, nil];
-            
-        }
-        else 
-        {
-            timePredicateString = [NSString stringWithFormat:@"(timestamp >= %%@) && (timestamp <= %%@)"];
-            timePredicate = [NSPredicate predicateWithFormat:timePredicateString, fromDate, today];
-            finalPredicateArray = [NSArray arrayWithObjects:groupPredicate,timePredicate, scalePredicate, nil];
-        }
+
+        timePredicateString = [NSString stringWithFormat:@"(timestamp >= %%@) && (timestamp <= %%@)"];
+        timePredicate = [NSPredicate predicateWithFormat:timePredicateString, fromDate, today];
+        finalPredicateArray = [NSArray arrayWithObjects:groupPredicate,timePredicate, scalePredicate, nil];
+        
 			
         finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
         
@@ -464,30 +472,34 @@ int seriesCount;
         } 
         else 
         {
-            NSMutableArray *tempTotalArray = [[NSMutableArray alloc] init];
-            NSMutableArray *tempCountArray = [[NSMutableArray alloc] init];
+            NSMutableArray *tempTotalArray = [[[NSMutableArray alloc] init] autorelease];
+            NSMutableArray *tempCountArray = [[[NSMutableArray alloc] init] autorelease];
             
             if (results.count > 0) 
             { 
                 int value = 0;
-                int day = 0;
-                int month = 0;
-                int year = 0; 
+                //int day = 0;
+                //int month = 0;
+               // int year = 0; 
                 NSString *nn = @"";
-                NSString *monthStr = @"";
-                NSString *dayStr = @"";
-                
+               // NSString *monthStr = @"";
+               // NSString *dayStr = @"";
+                NSString *timeStamp = @"";
+
                 // Set up temp arrays for averaging
-                for (GroupResult *groupResult in results) 
+                for (Result *groupResult in results) 
                 {
+                    timeStamp = [NSString stringWithFormat:@"%@",groupResult.timestamp];
+
                     value = [groupResult.value intValue];
-                    day = [groupResult.day intValue] - 1;
-                    month = [groupResult.month intValue];
-                    year = [groupResult.year intValue]; 
+                  //  day = [groupResult.day intValue] - 1;
+                   // month = [groupResult.month intValue];
+                   // year = [groupResult.year intValue]; 
                     nn = scaleMinLabel;
                     
                     //  NSLog(@"name: %@ value:%i day:%i month:%i year:%i", nn, value, day, month, year);
                     // Yah yah, dateformatter would have been better....
+                    /*
                     if (month == 1) {monthStr = @"Jan";}
                     if (month == 2) {monthStr = @"Feb";}
                     if (month == 3) {monthStr = @"Mar";}
@@ -512,13 +524,23 @@ int seriesCount;
                     
                     // Convert Date 
                     NSString *dateString = [NSString stringWithFormat:@"%@-%@-%i", dayStr, monthStr, year];
+                    */
                     
                     
-                    [tempTotalArray addObject:[NSString stringWithFormat:@"%@",dateString]];
+                    // Format DateTime
+                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
+                    NSDate *date  = [dateFormatter dateFromString:timeStamp];
+                    
+                    // Convert Date 
+                    [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
+                    NSString *newDate = [dateFormatter stringFromDate:date];
+                    [dateFormatter release];
+                    [tempTotalArray addObject:[NSString stringWithFormat:@"%@",newDate]];
                     [tempTotalArray addObject:[NSString stringWithFormat:@"%i",value]];
                     [tempTotalArray addObject:[NSString stringWithFormat:@"%@",nn]];
                     
-                    [tempCountArray addObject:[NSString stringWithFormat:@"%@",dateString]];
+                    [tempCountArray addObject:[NSString stringWithFormat:@"%@",newDate]];
                     [tempCountArray addObject:[NSString stringWithFormat:@"%i",value]];
                     [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
                     
@@ -572,23 +594,23 @@ int seriesCount;
     //NSLog(@"arrayByDate: %@", arrayByDate);
 
     NSArray *objects = [self.scalesDictionary allKeys];
-    NSMutableDictionary *chartDictionary = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *chartDictionary = [[[NSMutableDictionary alloc] init] autorelease];
     
     
     for (NSString *groupTitle in objects)
     {
-        NSMutableArray *rawValuesArray = [[NSMutableArray alloc] init];
-        NSMutableArray *dataArray = [[NSMutableArray alloc] init];
-        NSMutableArray *dateArray = [[NSMutableArray alloc] init];
-        NSMutableDictionary *valueDict = [[NSMutableDictionary alloc] init];
+        NSMutableArray *rawValuesArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableArray *dataArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableArray *dateArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableDictionary *valueDict = [[[NSMutableDictionary alloc] init] autorelease];
         int averageValue = 0;
-        NSString *tempDate = @"";
+      //  NSString *tempDate = @"";
         
         for (int i = 1; i < [arrayByDate count]; i+=4) 
         {
             // Average
             averageValue = [[arrayByDate objectAtIndex:i + 1] intValue] / [[arrayByDate objectAtIndex:i + 2] intValue];
-            tempDate = [arrayByDate objectAtIndex:i];
+           // tempDate = [arrayByDate objectAtIndex:i];
             [rawValuesArray addObject:[arrayByDate objectAtIndex:i + 3]];
             [rawValuesArray addObject:[arrayByDate objectAtIndex:i]];
             [rawValuesArray addObject:[NSString stringWithFormat:@"%i", averageValue]];
@@ -608,21 +630,28 @@ int seriesCount;
         
         [valueDict setObject:dataArray forKey:@"data"];
         [valueDict setObject:dateArray forKey:@"date"];
-        [chartDictionary setObject:valueDict forKey:groupTitle];
+        if ([groupTitle isEqualToString:@""]) 
+        {
+            
+        }
+        else 
+        {
+            [chartDictionary setObject:valueDict forKey:groupTitle];
+
+        }
         
     }    
     
     
-	[yearDescriptor release];
-	[monthDescriptor release];
-	[dayDescriptor release];
+	//[yearDescriptor release];
+	//[monthDescriptor release];
+	//[dayDescriptor release];
 	//[groupTitleDescriptor release];
-	[sortDescriptors release];
+	//[sortDescriptors release];
 	[fetchRequest release];
     [arrayByDate release];
     
-    
-  //  NSLog(@"chartDictionary:%@",chartDictionary);
+    //NSLog(@"chartDictionary:%@",chartDictionary);
     
     return chartDictionary;
 }
@@ -674,24 +703,8 @@ int seriesCount;
 {
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    
     NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]];
     NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]];
-    
-    NSDictionary *symbolDictionary = [tSymbolDict objectForKey:self.groupName];
-    NSDictionary *colorDictionary = [tColorDict objectForKey:self.groupName];
-    NSString *grpName = [[scalesArray objectAtIndex:index] minLabel];
-    
-    
-    // the image
-    UIImage *image = [self UIImageForIndex:[[symbolDictionary objectForKey:grpName] intValue]];
-    // the color
-    NSData *data = [colorDictionary objectForKey:grpName];
-    
-    UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    
-    
     
     // Our series are either of type SChartLineSeries or SChartStepLineSeries depending on stepLineMode.
     SChartLineSeries *lineSeries = stepLineMode? 
@@ -707,39 +720,54 @@ int seriesCount;
         symbolSize = [NSNumber numberWithInt:8];
     } 
     
-    if (symbolOn) 
-    {
-        lineSeries.style.pointStyle.texture = image;
-        lineSeries.style.pointStyle.radius = symbolSize;
-        lineSeries.style.pointStyle.showPoints = YES;
-        lineSeries.style.pointStyle.color = color;
-    }
-    else 
-    {
-        lineSeries.style.pointStyle.showPoints = NO;
-    }
-    lineSeries.style.lineColor = color;
+    NSDictionary *symbolDictionary = [tSymbolDict objectForKey:self.groupName];
+    NSDictionary *colorDictionary = [tColorDict objectForKey:self.groupName];
+    NSString *grpName = [[scalesArray objectAtIndex:index] minLabel];
+    
+    
+    NSData *data = [colorDictionary objectForKey:grpName];
+    UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    UIImage *image = [self UIImageForIndex:[[symbolDictionary objectForKey:grpName] intValue]];
+    
+
+    // Symbol
+    lineSeries.style.pointStyle.texture = image;
+    lineSeries.style.pointStyle.radius = symbolSize;
+    lineSeries.style.pointStyle.showPoints = symbolMode?YES:NO;
     [lineSeries setTitle:grpName];
-    
-    
-    lineSeries.style.areaColor = color;
-    
-    // lineSeries.style.lineColorBelowBaseline = [UIColor colorWithRed:227.f/255.f green:182.f/255.f blue:0.f alpha:1.f];
-    //  lineSeries.style.areaColorBelowBaseline = [UIColor colorWithRed:150.f/255.f green:120.f/255.f blue:0.f alpha:1.f];
-    
     lineSeries.baseline = [NSNumber numberWithInt:0];
     
-    if (gradientOn) 
+    // Gradient
+    lineSeries.style.showFill = gradientMode?YES:NO;
+    lineSeries.crosshairEnabled = NO;  
+    
+    // Series On/Off
+    NSString *myKey = [NSString stringWithFormat:@"SWITCH_STATE_%@",grpName];
+    NSNumber *mySwitch = [defaults objectForKey:myKey];
+    BOOL myBoolSwitch = [defaults boolForKey:myKey];
+    if (mySwitch == nil) 
     {
-        lineSeries.style.showFill = YES;
+        lineSeries.style.lineColor = color;
+        lineSeries.style.pointStyle.color = color;
+        lineSeries.style.areaColor = color;
+        
     }
     else 
     {
-        lineSeries.style.showFill = NO;
+        if (!myBoolSwitch) // is Off
+        {
+            lineSeries.style.pointStyle.color = [UIColor clearColor];
+            lineSeries.style.lineColor = [UIColor clearColor];
+            lineSeries.style.areaColor = [UIColor clearColor];
+            
+        }
+        else 
+        {
+            lineSeries.style.lineColor = color;
+            lineSeries.style.pointStyle.color = color;
+            lineSeries.style.areaColor = color;
+        }
     }
-    
-    
-    lineSeries.crosshairEnabled = NO;  
     
     
     return lineSeries;
@@ -760,7 +788,7 @@ int seriesCount;
     seriesData = [NSArray arrayWithArray:[tempGrpDict objectForKey:@"data"]]; 
     seriesDates = [NSArray arrayWithArray:[tempGrpDict objectForKey:@"date"]]; 
     
-    
+   // NSLog(@"tempGrpDict: %@", tempGrpDict);
     
     // Construct a data point to return
     SChartDataPoint *datapoint = [[[SChartDataPoint alloc] init] autorelease];

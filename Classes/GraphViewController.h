@@ -28,8 +28,7 @@
     
     ShinobiChart            *chart;
     GraphDataSource         *datasource;    
-    UISwitch                *stepSwitch;
-    UILabel                 *stepLabel;
+
     
     IBOutlet UIView *menuView;
     IBOutlet UIView *containerView;
@@ -50,7 +49,6 @@
     NSArray *pickerArray;
     IBOutlet UIButton *legendButton;
     
-    NSMutableArray *chartChangeArray;
     
     IBOutlet ViewNotesViewController *notesTable;
     IBOutlet LegendTableViewController *legendTableViewController;
@@ -76,6 +74,8 @@
     
     IBOutlet UIBarButtonItem *doneButton;	// this button appears only when the date picker is open
     IBOutlet UIPickerView *rangePicker;
+    IBOutlet UIView *pickerView;
+    IBOutlet UIView *pickerView_iPad;
 
 
     
@@ -83,6 +83,8 @@
 
 @property (nonatomic, retain) IBOutlet UIButton *legendButton;
 @property (nonatomic, retain) IBOutlet UIPickerView *rangePicker;
+@property (nonatomic, retain) IBOutlet UIView *pickerView;
+@property (nonatomic, retain) IBOutlet UIView *pickerView_iPad;
 
 @property (nonatomic, retain) IBOutlet UIView *menuView;
 @property (nonatomic, retain) IBOutlet UIView *containerView;
@@ -153,6 +155,9 @@
 
 - (void)resignLegend;
 - (void)showButtons:(int)howMany;
+
+- (void) loadingSymbol;
+- (void) loadingGradient;
 
 
 - (void)legendToggle;

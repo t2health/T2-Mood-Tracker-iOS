@@ -18,6 +18,7 @@
 #import "GroupResult.h"
 #import "DateMath.h"
 
+
 @implementation GraphDataSource
 
 @synthesize seriesData, seriesDates, dataDict;
@@ -39,6 +40,7 @@ bool symbolOn;
 
 - (id)init
 {
+    
     self = [super init];
     if (self) {
         // Initialize the calendar
@@ -56,7 +58,7 @@ bool symbolOn;
         [self fillGroupsDictionary];
         [self fillColors];
         [self fillSymbols];
-        [self createSwitches];
+       // [self createSwitches];
 
         
         seriesData = [[NSMutableArray alloc] init];
@@ -74,9 +76,9 @@ bool symbolOn;
         {
             self.dataDictCopy = [NSMutableDictionary dictionaryWithDictionary:dataDict];
         }
-        
         seriesCount = [[dataDictCopy allKeys] count];
-        
+        NSLog(@"seriesCount: %i", seriesCount);
+
         [self printData];
         
     }
@@ -89,6 +91,7 @@ bool symbolOn;
 
 - (void)toggleSeries;
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 
     [self createSwitches];
     
@@ -96,6 +99,8 @@ bool symbolOn;
 
 - (void)toggleGradient
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
     gradientMode = !gradientMode;
 }
 
@@ -117,7 +122,7 @@ bool symbolOn;
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
     NSDate *myDate = [df dateFromString: str];
-    
+    [df release];
     
     
     return myDate;
@@ -127,7 +132,10 @@ bool symbolOn;
 
 
 #pragma mark Groups
-- (void)fillGroupsDictionary {
+- (void)fillGroupsDictionary 
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
 	if (self.groupsDictionary == nil) {
 		NSMutableDictionary *groups = [NSMutableDictionary dictionary];
 		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -169,7 +177,10 @@ bool symbolOn;
 
 #pragma mark colors
 
--(UIColor *)UIColorForIndex:(NSInteger)index {
+-(UIColor *)UIColorForIndex:(NSInteger)index 
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
 	NSArray *colorsArray = [NSArray arrayWithObjects:[UIColor blueColor], [UIColor greenColor], [UIColor orangeColor], [UIColor redColor], [UIColor purpleColor], [UIColor grayColor], [UIColor brownColor], [UIColor cyanColor], [UIColor magentaColor], [UIColor lightGrayColor], nil];
 	
 	UIColor *color = nil;
@@ -201,7 +212,10 @@ bool symbolOn;
 	return color;
 }
 
-- (void)fillColors {
+- (void)fillColors 
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
 	if (self.ledgendColorsDictionary == nil) {
 		self.ledgendColorsDictionary = [NSMutableDictionary dictionary];
 		
@@ -218,7 +232,10 @@ bool symbolOn;
     // NSLog(@"colorDict: %@", ledgendColorsDictionary);
 }
 
--(UIImage *)UIImageForIndex:(NSInteger)index {
+-(UIImage *)UIImageForIndex:(NSInteger)index 
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
 	NSArray *imageArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"Symbol_Clover.png"], [UIImage imageNamed:@"Symbol_Club.png"], [UIImage imageNamed:@"Symbol_Cross.png"], [UIImage imageNamed:@"Symbol_Davidstar.png"], [UIImage imageNamed:@"Symbol_Diamondclassic.png"], [UIImage imageNamed:@"Symbol_Diamondring.png"], [UIImage imageNamed:@"Symbol_Doublehook.png"], [UIImage imageNamed:@"Symbol_Fivestar.png"], [UIImage imageNamed:@"Symbol_Heart.png"], [UIImage imageNamed:@"Symbol_Triangle.png"], [UIImage imageNamed:@"Symbol_Circle.png"], [UIImage imageNamed:@"Symbol_Hourglass.png"], [UIImage imageNamed:@"Symbol_Moon.png"], [UIImage imageNamed:@"Symbol_Skew.png"], [UIImage imageNamed:@"Symbol_Pentagon.png"], [UIImage imageNamed:@"Symbol_Spade.png"], nil];
 	
 	UIImage *image = nil;
@@ -252,6 +269,8 @@ bool symbolOn;
 
 - (void)fillSymbols
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
 	if (self.symbolsDictionary == nil) {
 		self.symbolsDictionary = [NSMutableDictionary dictionary];
 		
@@ -269,7 +288,10 @@ bool symbolOn;
     // NSLog(@"symbolsDictionary: %@", symbolsDictionary);
 }
 
--(void)createSwitches {
+-(void)createSwitches 
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
 	if (self.switchDictionary == nil) {
 		self.switchDictionary = [NSMutableDictionary dictionary];
 		
@@ -301,60 +323,71 @@ bool symbolOn;
 			
 			[self.switchDictionary setValue:aSwitch forKey:groupTitle];
           //  NSLog(@"groupTitle: %@ - aSwitch: %i",groupTitle,  aSwitch.on);
-
-			[aSwitch release];
+            [aSwitch release];
 		}
 	}
 }
 
 - (NSDictionary *)getChartDictionary
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
     // Get data range
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *defaultsKey;
     
     defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
     NSString *theRange = [defaults objectForKey:defaultsKey];
-    
-    
-    NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:[[NSDate alloc] init]];
+    NSDate *theFromDate = [[NSDate alloc] init];
+
+    NSLog(@"theRange: %@", theRange);
+    NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:theFromDate];
     
     // Today's Date
     [components setHour:-[components hour]];
     [components setMinute:-[components minute]];
     [components setSecond:-[components second]];
-    NSDate *today = [cal dateByAddingComponents:components toDate:[[NSDate alloc] init] options:0];
+    NSDate *today;
     NSDate *fromDate;
-    BOOL isAll = NO;
     
 
-        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
         [components setDay:([components day] + 1)]; 
         today = [cal dateFromComponents:components];
-    
+
     
     if ([theRange isEqualToString:@"30 days"]) 
     {
-        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
         [components setMonth:([components month] - 1)]; 
         fromDate = [cal dateFromComponents:components];
     }
     else if ([theRange isEqualToString:@"90 days"]) 
     {
-        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
         [components setMonth:([components month] - 3)]; 
+        fromDate = [cal dateFromComponents:components];
+    }
+    else if ([theRange isEqualToString:@"180 days"]) 
+    {
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
+        [components setMonth:([components month] - 6)]; 
         fromDate = [cal dateFromComponents:components];
     }
     else if ([theRange isEqualToString:@"1 year"]) 
     {
-        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[[NSDate alloc] init]];
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
         [components setYear:([components year] - 1)]; 
        fromDate = [cal dateFromComponents:components];
     }
     else // All and anything else
     {
-        isAll = YES;
+        components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
+        [components setMonth:([components month] - 1)]; 
+        fromDate = [cal dateFromComponents:components];    
     }
+    [theFromDate release];
+    
     //------------------DATE STUFF------------------------------------//
     // Beginning of current month
     /*
@@ -398,17 +431,11 @@ bool symbolOn;
         titlePredicate = [NSPredicate predicateWithFormat:groupPredicateString, groupTitle];
         visiblePredicate = [NSPredicate predicateWithFormat:@"group.visible == TRUE"];
         
-        if (isAll) 
-        {
-            finalPredicateArray = [NSArray arrayWithObjects:titlePredicate, visiblePredicate, nil];
 
-        }
-        else 
-        {
-            timePredicateString = [NSString stringWithFormat:@"(timestamp >= %%@) && (timestamp <= %%@)"];
-            timePredicate = [NSPredicate predicateWithFormat:timePredicateString, fromDate, today];
-            finalPredicateArray = [NSArray arrayWithObjects:titlePredicate,timePredicate, visiblePredicate, nil];
-        }
+        timePredicateString = [NSString stringWithFormat:@"(timestamp >= %%@) && (timestamp <= %%@)"];
+        timePredicate = [NSPredicate predicateWithFormat:timePredicateString, fromDate, today];
+        finalPredicateArray = [NSArray arrayWithObjects:titlePredicate,timePredicate, visiblePredicate, nil];
+        
         
         finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
         [fetchRequest setPredicate:finalPredicate];
@@ -422,16 +449,16 @@ bool symbolOn;
         } 
         else 
         {
-            NSMutableArray *tempTotalArray = [[NSMutableArray alloc] init];
-            NSMutableArray *tempCountArray = [[NSMutableArray alloc] init];
+            NSMutableArray *tempTotalArray = [[[NSMutableArray alloc] init] autorelease];
+            NSMutableArray *tempCountArray = [[[NSMutableArray alloc] init] autorelease];
             
             
             if (results.count > 0) 
             { 
                 int value = 0;
-                int day = 0;
-                int month = 0;
-                int year = 0; 
+               // int day = 0;
+               // int month = 0;
+               // int year = 0; 
                 NSString *timeStamp = @"";
                 NSString *lastTimeStamp = @"";
                 NSString *nn = @"";
@@ -448,9 +475,9 @@ bool symbolOn;
                 {
                     timeStamp = [NSString stringWithFormat:@"%@",groupResult.timestamp];
                     value = [groupResult.value intValue];
-                    day = [groupResult.day intValue] - 1;
-                    month = [groupResult.month intValue];
-                    year = [groupResult.year intValue]; 
+                    //day = [groupResult.day intValue] - 1;
+                   // month = [groupResult.month intValue];
+                   // year = [groupResult.year intValue]; 
                     nn = groupResult.group.title;
                     positiveDesc = groupResult.group.positiveDescription;
                   //  NSLog(@"positive: %@ - %@", nn,positiveDesc);
@@ -565,15 +592,15 @@ bool symbolOn;
     
     
     NSArray *objects = [self.groupsDictionary allKeys];
-    NSMutableDictionary *chartDictionary = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *chartDictionary = [[[NSMutableDictionary alloc] init] autorelease];
     
     
     for (NSString *groupTitle in objects)
     {
-        NSMutableArray *rawValuesArray = [[NSMutableArray alloc] init];
-        NSMutableArray *dataArray = [[NSMutableArray alloc] init];
-        NSMutableArray *dateArray = [[NSMutableArray alloc] init];
-        NSMutableDictionary *valueDict = [[NSMutableDictionary alloc] init];
+        NSMutableArray *rawValuesArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableArray *dataArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableArray *dateArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableDictionary *valueDict = [[[NSMutableDictionary alloc] init] autorelease];
         int averageValue = 0;
         NSString *tempDate = @"";
         
@@ -622,16 +649,21 @@ bool symbolOn;
 	[fetchRequest release];
     [arrayByDate release];
     
-    // NSLog(@"chartDictionary:%@",chartDictionary);
+     NSLog(@"chartDictionary:%@",chartDictionary);
     
 	return chartDictionary;
 }
 
 
-- (void) dealloc {
+- (void) dealloc 
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
 	[cal release];
     [scalesUpdateDict release];
     [symbolsDictionary release];
+    [groupsArray release];
+    [groupsDictionary release];
 	[super dealloc];
 }
 
@@ -641,6 +673,8 @@ bool symbolOn;
 
 - (int) getSeriesDataCount:(int) seriesIndex
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    NSLog(@"seriesIndex: %i", seriesIndex);
     int seriesDataCount = 1;
     NSString *grpName = [[groupsArray objectAtIndex:seriesIndex] title];
     
@@ -695,56 +729,47 @@ bool symbolOn;
     
     
     NSData *data = [tColorDict objectForKey:grpName];
-    
     UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    
     UIImage *image = [self UIImageForIndex:[[tSymbolDict objectForKey:grpName] intValue]];
     
     // Symbol
     lineSeries.style.pointStyle.texture = image;
     lineSeries.style.pointStyle.radius = symbolSize;
     lineSeries.style.pointStyle.showPoints = symbolMode?YES:NO;
-    
     [lineSeries setTitle:grpName];
-    
-    
-
-    
-    // lineSeries.style.lineColorBelowBaseline = [UIColor colorWithRed:227.f/255.f green:182.f/255.f blue:0.f alpha:1.f];
-    //  lineSeries.style.areaColorBelowBaseline = [UIColor colorWithRed:150.f/255.f green:120.f/255.f blue:0.f alpha:1.f];
-    
     lineSeries.baseline = [NSNumber numberWithInt:0];
     
     // Gradient
     lineSeries.style.showFill = gradientMode?YES:NO;
-
-
     lineSeries.crosshairEnabled = NO;  
-   // NSLog(@"switchDictionary: %@", switchDictionary);
 
     // Series On/Off
     NSString *myKey = [NSString stringWithFormat:@"SWITCH_STATE_%@",grpName];
-    BOOL mySwitch = [defaults boolForKey:myKey];
-    
-    if (!mySwitch) // is Off
+    NSNumber *mySwitch = [defaults objectForKey:myKey];
+    BOOL myBoolSwitch = [defaults boolForKey:myKey];
+    if (mySwitch == nil) 
     {
-      //   NSLog(@"clearcolor");
-        lineSeries.style.pointStyle.color = [UIColor clearColor];
-        lineSeries.style.lineColor = [UIColor clearColor];
-        lineSeries.style.areaColor = [UIColor clearColor];
-
-    }
-    else 
-    {
-     //   NSLog(@"normcolor: %@, %@", grpName,color);
         lineSeries.style.lineColor = color;
         lineSeries.style.pointStyle.color = color;
         lineSeries.style.areaColor = color;
 
     }
-	
-
-    
+    else 
+    {
+        if (!myBoolSwitch) // is Off
+        {
+            lineSeries.style.pointStyle.color = [UIColor clearColor];
+            lineSeries.style.lineColor = [UIColor clearColor];
+            lineSeries.style.areaColor = [UIColor clearColor];
+            
+        }
+        else 
+        {
+            lineSeries.style.lineColor = color;
+            lineSeries.style.pointStyle.color = color;
+            lineSeries.style.areaColor = color;
+        }
+    }
     
     return lineSeries;
 }
@@ -752,7 +777,7 @@ bool symbolOn;
 // Returns the number of series in the specified chart
 - (int)numberOfSeriesInSChart:(ShinobiChart *)chart 
 {
-    return seriesCount;
+    return seriesCount - 1;
 }
 
 // Returns the data point at the specified index for the given series/chart.

@@ -43,7 +43,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
-
+    
 }
 
 - (void)chkPin
@@ -78,36 +78,48 @@
 #pragma mark buttons
 -(IBAction)securityButtonClicked:(id)sender {
 	SecurityViewController *securityViewController = [[SecurityViewController alloc] initWithNibName:@"SecurityViewController" bundle:nil];
+    securityViewController.hidesBottomBarWhenPushed = YES;
+
 	[self.navigationController pushViewController:securityViewController animated:YES];
 	[securityViewController release];
 }
 
 - (IBAction)clearDataButtonClicked:(id)sender {
 	ClearDataViewController *clearDataViewController = [[ClearDataViewController alloc] initWithNibName:@"ClearDataViewController" bundle:nil];
+    clearDataViewController.hidesBottomBarWhenPushed = YES;
+
 	[self.navigationController pushViewController:clearDataViewController animated:YES];
 	[clearDataViewController release];
 }
 
 - (IBAction)improveApplicationButtonClicked:(id)sender {
 	ImproveApplicationViewController *improveApplicationViewController = [[ImproveApplicationViewController alloc] initWithNibName:@"ImproveApplicationViewController" bundle:nil];
+    improveApplicationViewController.hidesBottomBarWhenPushed = YES;
+
 	[self.navigationController pushViewController:improveApplicationViewController animated:YES];
 	[improveApplicationViewController release];
 }
 
 - (IBAction)reminderButtonClicked:(id)sender {
 	ReminderSettingsViewController *reminderSettingsViewController = [[ReminderSettingsViewController alloc] initWithNibName:@"ReminderSettingsViewController" bundle:nil];
+    reminderSettingsViewController.hidesBottomBarWhenPushed = YES;
+
 	[self.navigationController pushViewController:reminderSettingsViewController animated:YES];
 	[reminderSettingsViewController release];
 }
 
 - (IBAction)areasButtonClicked:(id)sender {
 	GroupsViewController *groupsViewController = [[GroupsViewController alloc] initWithNibName:@"GroupsViewController" bundle:nil];
+    groupsViewController.hidesBottomBarWhenPushed = YES;
+
 	[self.navigationController pushViewController:groupsViewController animated:YES];
 	[groupsViewController release];
 }
 
 - (IBAction)optionsButtonClicked:(id)sender {
 	ChartOptionsViewController *chartOptionsViewController = [[ChartOptionsViewController alloc] initWithNibName:@"ChartOptionsViewController" bundle:nil];
+    chartOptionsViewController.hidesBottomBarWhenPushed = YES;
+
 	[self.navigationController pushViewController:chartOptionsViewController animated:YES];
 	[chartOptionsViewController release];
 }
@@ -125,7 +137,7 @@
 	
 	switch (section) {
 		case 0: //Number of sections
-			numRows = 6;
+			numRows = 5;
 			break;
 		default:
 			numRows = 0;
@@ -171,19 +183,19 @@
 				case 0: //Areas Of Interest
 					cell.textLabel.text = @"Add/Edit Rating Categories";
 					break; 
-                case 1: //Custom Charting
-					cell.textLabel.text = @"Custom Charting";
-					break;
-				case 2: //Reminders
+              //  case 1: //Custom Charting
+				//	cell.textLabel.text = @"Custom Charting";
+					//break;
+				case 1: //Reminders
 					cell.textLabel.text = @"Reminders";
 					break;
-				case 3: //Security
+				case 2: //Security
 					cell.textLabel.text = @"Security";
 					break;
-				case 4: //Clear Data
+				case 3: //Clear Data
 					cell.textLabel.text = @"Clear Data";
 					break;
-				case 5: //Show Tips
+				case 4: //Show Tips
 					defaults = [NSUserDefaults standardUserDefaults];
 					BOOL storedVal;
 					
@@ -243,7 +255,7 @@
 {
     
     // create the parent view that will hold header Label
-	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
+	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -258,7 +270,7 @@
 	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
 	headerLabel.text = @"Settings";
 	[customView addSubview:headerLabel];
-    
+    [headerLabel release];
 	return customView;
 }
 
@@ -278,21 +290,18 @@
 				case 0: //Areas Of Interest
 					[self areasButtonClicked:nil];
 					break;
-                case 1: //Custom
-					[self optionsButtonClicked:nil];
-					break;
-				case 2: //Reminders
+				case 1: //Reminders
 					[self reminderButtonClicked:nil];
 					break;
-				case 3: //Security
+				case 2: //Security
 					[self securityButtonClicked:nil];
 					break;
-				case 4://Clear Data
+				case 3://Clear Data
 					[self clearDataButtonClicked:nil];
 					break;
-				case 5://There is a switch in this row, no actions needed
+				case 4://There is a switch in this row, no actions needed
 					break;
-				case 6:
+				case 5:
 					[self improveApplicationButtonClicked:nil];
 					break;
 				default:

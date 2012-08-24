@@ -21,39 +21,132 @@
 
 @synthesize group;
 @synthesize managedObjectContext;
-@synthesize scalesTableView;
-@synthesize fetchedResultsController;
+@synthesize fetchedResultsController, positiveLabel;
 
 #pragma mark -
 #pragma mark View lifecycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    scalesTableView.backgroundView = nil;
-
+    
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
 	self.managedObjectContext = appDelegate.managedObjectContext;
 	
+    UICustomSwitch *switchView = [[UICustomSwitch alloc] initWithFrame:CGRectZero];
+	switchView = [UICustomSwitch switchWithLeftText:@"YES" andRight:@"NO"];
+    
+    
 	if (self.group != nil) {
 		self.title = group.title;
 		groupTextField.text = self.group.title;
-		
+        NSLog(@"group: %@  switch: %i", group.title, [group.positiveDescription intValue]);
+        if ([group.positiveDescription intValue] == 0) 
+        {
+            isPositveSwitch.on = NO;
+        }
+        else 
+        {
+            isPositveSwitch.on = YES;
+        }
 		manageScalesButton.enabled = YES;
-		deleteGroup.enabled = YES;
+        manageScalesButton.hidden = NO;
+        positiveLabel.hidden = NO;
+        switchView.hidden = NO;
+        
+        // Delete Button
+        UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteGroupPressed:)];
+        self.navigationItem.rightBarButtonItem = deleteButton;
+        [deleteButton release];
+        
+        
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSMutableDictionary *colorDict = [defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"];
+       // NSMutableDictionary *symbolDict = [defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"];
+        
+        
+        id isObject = [colorDict objectForKey:groupTextField.text];
+        
+        if (isObject == nil) 
+        {
+            NSLog(@"color does not exist");
+            [self addLegendInfo];
+            
+        }
+        else 
+        {
+            NSLog(@"color exists");
+        }
+        
+        
+        
+        
+        
 	}
 	else {
 		self.title = @"New Category";
+        manageScalesButton.hidden = NO;
+        positiveLabel.hidden = NO;
+        switchView.hidden = NO;
+        
+        
 	}
 	
-	UICustomSwitch *switchView = [[UICustomSwitch alloc] initWithFrame:CGRectZero];
     
-	switchView = [UICustomSwitch switchWithLeftText:@"YES" andRight:@"NO"];
-	switchView.center = CGPointMake(160.0f, 60.0f);
-	switchView.on = YES;
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        // iPad
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            switchView.center = CGPointMake(250.0f, 70.0f);
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            switchView.center = CGPointMake(250.0f, 70.0f);
+        }
+    }
+    else 
+    {
+        // iPhone
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        {
+            switchView.center = CGPointMake(250.0f, 70.0f);
+        }
+        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
+        {
+            switchView.center = CGPointMake(250.0f, 70.0f);
+        }
+        
+    }
+    
+    
+    if ([group.positiveDescription intValue] == 1) 
+    {
+        switchView.on = YES;
+    }
+    else 
+    {
+        switchView.on = NO;
+    }
 	[self.view addSubview:switchView];
     
+    
+    
+    
+    // NOTIFICATIONS----------------------------------------------//
+    // Listen for Actions from Option UITableViewController
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(switchFlipped:) name:@"toggleSwitch" object: nil];
+    // NOTIFICATIONS----------------------------------------------//
+    
 	[FlurryUtility report:EVENT_GROUP_ACTIVITY];
+}
+
+- (void)viewDidUnload
+{
+	self.fetchedResultsController.delegate = nil;
 }
 
 - (void)saveEdit {
@@ -79,11 +172,13 @@
 }
 
 - (IBAction)manageScalesPressed:(id)sender {
+
     
 	ManageScalesViewController *manageScalesViewController = [[ManageScalesViewController alloc] initWithNibName:@"ManageScalesViewController" bundle:nil];
 	manageScalesViewController.group = self.group;
 	[self.navigationController pushViewController:manageScalesViewController animated:YES];
 	[manageScalesViewController release];
+    
 }
 
 #pragma mark Alert 
@@ -141,6 +236,8 @@
 		deleteGroup.enabled = YES;
 		if (self.group == nil) {
 			[self addGroup];
+           // [self.navigationController popViewControllerAnimated:YES];
+            
 		}
 		else {
 			[self saveEdit];
@@ -284,10 +381,12 @@
 		newGroup.positiveDescription = [NSNumber numberWithBool:isPositveSwitch.on];
 		
 		NSError *error = nil;
+        
+
 		if (![self.managedObjectContext save:&error]) {
 			[Error showErrorByAppendingString:@"Error saving new Category" withError:error];
 		}
-		
+        
 		Scale *newScale;
 		for (NSInteger i = 0; i<10; i++) {
 			newScale = [NSEntityDescription insertNewObjectForEntityForName:@"Scale" inManagedObjectContext:self.managedObjectContext];
@@ -303,16 +402,121 @@
 			if (![self.managedObjectContext save:&error]) {
 				[Error showErrorByAppendingString:@"Error saving Scale in Category" withError:error];
 			}
+
+
+            
 		}
 		
 		self.group = newGroup;
+        
 	}
+}
+
+- (void)addLegendInfo
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *colorDict = [NSMutableDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]];
+    NSMutableDictionary *symbolDict = [NSMutableDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"]];
+    
+    int randomColor = arc4random_uniform(9);
+    int randomSymbol = arc4random_uniform(15);
+    UIColor *newGroupColor = [self UIColorForIndex:randomColor];
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:newGroupColor];
+    
+    [colorDict setObject:data forKey:groupTextField.text];
+    [symbolDict setObject:[NSString stringWithFormat:@"%i",randomSymbol] forKey:groupTextField.text];
+    
+    
+    [defaults setValue:[NSDictionary dictionaryWithDictionary:colorDict] forKey:@"LEGEND_COLOR_DICTIONARY"];
+    [defaults setValue:[NSDictionary dictionaryWithDictionary:symbolDict] forKey:@"LEGEND_SYMBOL_DICTIONARY"];
+    
+    
+    NSLog(@"colorDict: %@", colorDict);
+    NSLog(@"symbolDict: %@", symbolDict);
+}
+
+#pragma mark symbols
+
+-(UIImage *)UIImageForIndex:(NSInteger)index {
+	NSArray *imageArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"Symbol_Circle.png"], [UIImage imageNamed:@"Symbol_Cross.png"], [UIImage imageNamed:@"Symbol_Diamondring.png"], [UIImage imageNamed:@"Symbol_Hourglass.png"], [UIImage imageNamed:@"Symbol_Pentagon.png"], [UIImage imageNamed:@"Symbol_Square.png"], [UIImage imageNamed:@"Symbol_Fivestar.png"], [UIImage imageNamed:@"Symbol_Triangle.png"], [UIImage imageNamed:@"Symbol_Spade.png"], [UIImage imageNamed:@"Symbol_Club.png"], [UIImage imageNamed:@"Symbol_Moon.png"], [UIImage imageNamed:@"Symbol_Diamondclassic.png"], [UIImage imageNamed:@"Symbol_Clover.png"], [UIImage imageNamed:@"Symbol_Skew.png"], [UIImage imageNamed:@"Symbol_Quadstar.png"], [UIImage imageNamed:@"Symbol_Octogon.png"], nil];
+	
+	UIImage *image = nil;
+	//NSLog(@"imageArray: %@", imageArray);
+    // Perm fix for color bug from v2.0; 5/17/2012 Mel Manzano
+	if (index >=0 && index < [imageArray count]) {
+		image = [imageArray objectAtIndex:index];
+		[[image retain] autorelease];
+	}
+    else // If index is > color array count, then start over.
+    {
+        // Split index into digits via array
+        NSString *stringNumber = [NSString stringWithFormat:@"%i", index];
+        NSMutableArray *digits = [NSMutableArray arrayWithCapacity:[stringNumber length]];
+        const char *cstring = [stringNumber cStringUsingEncoding:NSASCIIStringEncoding];
+        while (*cstring) {
+            if (isdigit(*cstring)) {
+                [digits addObject:[NSString stringWithFormat:@"%c", *cstring]];
+            }
+            cstring++;
+        }
+        
+        // Take last digit in array and use for color selection
+        int lastDigit = [digits count] - 1;
+        int overCount = [[digits objectAtIndex:lastDigit] intValue];
+        image = [imageArray objectAtIndex:overCount];
+    }
+    
+	return image;
+}
+
+
+#pragma mark colors
+
+-(UIColor *)UIColorForIndex:(NSInteger)index {
+	NSArray *colorsArray = [NSArray arrayWithObjects:[UIColor blueColor], [UIColor greenColor], [UIColor orangeColor], [UIColor redColor], [UIColor purpleColor], [UIColor grayColor], [UIColor brownColor], [UIColor cyanColor], [UIColor magentaColor], [UIColor lightGrayColor], nil];
+	
+	UIColor *color = nil;
+	
+    // Perm fix for color bug from v2.0; 5/17/2012 Mel Manzano
+	if (index >=0 && index < [colorsArray count]) {
+		color = [colorsArray objectAtIndex:index];
+		[[color retain] autorelease];
+	}
+    else // If index is > color array count, then start over.
+    {
+        // Split index into digits via array
+        NSString *stringNumber = [NSString stringWithFormat:@"%i", index];
+        NSMutableArray *digits = [NSMutableArray arrayWithCapacity:[stringNumber length]];
+        const char *cstring = [stringNumber cStringUsingEncoding:NSASCIIStringEncoding];
+        while (*cstring) {
+            if (isdigit(*cstring)) {
+                [digits addObject:[NSString stringWithFormat:@"%c", *cstring]];
+            }
+            cstring++;
+        }
+        
+        // Take Last digit in array and use for color selection
+        int lastDigit = [digits count] - 1;
+        int overCount = [[digits objectAtIndex:lastDigit] intValue];
+        color = [colorsArray objectAtIndex:overCount];
+    }
+    
+	return color;
 }
 
 - (IBAction)switchFlipped:(id)sender {
 	if (self.group != nil) {
+        if (isPositveSwitch.on) 
+        {
+            isPositveSwitch.on = NO;
+        }
+        else 
+        {
+            isPositveSwitch.on = YES;
+        }
 		self.group.positiveDescription = [NSNumber numberWithBool:isPositveSwitch.on];
-		
+        
+		NSLog(@"switched to: %i", isPositveSwitch.on);
 		NSError *error = nil;
 		if (![self.managedObjectContext save:&error]) {
 			[Error showErrorByAppendingString:@"Error saving Scale in Category" withError:error];
@@ -441,12 +645,16 @@
 }
 
 
+
 #pragma mark Memory management
 
 - (void)dealloc {
 	if (self.group != nil) {
 		[self.group release];		
 	}
+    
+	self.fetchedResultsController.delegate = nil;
+	[self.fetchedResultsController release];
     
 	[self.managedObjectContext release];
 	

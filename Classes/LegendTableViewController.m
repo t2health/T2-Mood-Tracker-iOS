@@ -118,12 +118,18 @@
 	[fetchRequest setSortDescriptors:sortDescriptors];
 	
 	//Create predicate
-    
-	NSString *showGraphPredicateString = [NSString stringWithFormat:@"rateable = YES"];
-	NSPredicate *showGraphPredicate = [NSPredicate predicateWithFormat:showGraphPredicateString];
+    NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"(showGraph == YES)"];
+    NSPredicate *visiblePredicate = [NSPredicate predicateWithFormat:@"(visible == YES)"];
+
+	//NSString *showGraphPredicateString = [NSString stringWithFormat:@"rateable = YES"];
+    NSArray *finalPredicateArray = [NSArray arrayWithObjects:groupPredicate,visiblePredicate, nil];
+
+    NSPredicate *finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
+
+	//NSPredicate *showGraphPredicate = [NSPredicate predicateWithFormat:finalPredicateArray];
 	
     [NSFetchedResultsController deleteCacheWithName:nil]; 
-	[fetchRequest setPredicate:showGraphPredicate];
+	[fetchRequest setPredicate:finalPredicate];
 	
 	// Create and initialize the fetch results controller.
 	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:

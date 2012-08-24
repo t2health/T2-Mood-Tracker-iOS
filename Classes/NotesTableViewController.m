@@ -28,7 +28,7 @@
 {
     [super viewDidLoad];
     notesTableView.backgroundView = nil;
-
+    
 	self.title = @"View Notes";
     
 	UIApplication *app = [UIApplication sharedApplication];
@@ -37,10 +37,10 @@
 	
 	UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNote:)];
 	self.navigationItem.rightBarButtonItem = plusButton;
-    
+    [plusButton release];
     // Orientation
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
-
+    
 	
 	[FlurryUtility report:EVENT_NOTES_ACTIVITY];	
 	
@@ -220,7 +220,7 @@
 	NSInteger month = numericSection - (year * 1000);
     
     // create the parent view that will hold header Label
-	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
+	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -238,7 +238,7 @@
     NSString *titleString = [NSString stringWithFormat:@"%@ %d", [monthSymbols objectAtIndex:month-1], year];
 	headerLabel.text = titleString;
 	[customView addSubview:headerLabel];
-    
+    [headerLabel release];
 	return customView;
 }
 
@@ -312,9 +312,9 @@
 }
 
 - (void)dealloc {	
-	self.fetchedResultsController.delegate = nil;
-	[self.fetchedResultsController release];
-	[self.managedObjectContext release];
+	fetchedResultsController.delegate = nil;
+	[fetchedResultsController release];
+	[managedObjectContext release];
 	
     [super dealloc];
 }

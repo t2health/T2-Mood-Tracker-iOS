@@ -38,12 +38,12 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	// Override point for customization after application launch.
 	NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler); 
-	   
+    
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Defaults" ofType:@"plist"]]];
 	
 	[FlurryAPI startSession:@"61LDTFTR6XGJZA437D5W"];
 	
-
+    
 	if (![self doesDatabaseHaveData]) {
         NSLog(@"dsfd");
 		[self fillDefaultGroups];
@@ -54,26 +54,31 @@
 		[dal loadXMLByFile:@"data.xml"];
 	}
 	NSLog(@"5555");
-
+    
 	RootViewController *rootViewController = (RootViewController *)[navigationController topViewController];
 	rootViewController.managedObjectContext = self.managedObjectContext;
 	
 	// Add the navigation controller's view to the window and display.
-  //  [self.window addSubview:navigationController.view];
-  //  [self.window makeKeyAndVisible];
-
+    //  [self.window addSubview:navigationController.view];
+    //  [self.window makeKeyAndVisible];
+    
     // Add the tabbar controller's view to the window and display.
-
+    
     [self.window addSubview:tabBarController.view];
-     [self.window makeKeyAndVisible];
+    [self.window makeKeyAndVisible];
 	
     application.applicationIconBadgeNumber = 0;
 	
 	[self setFirstLauchPreferences];
     
+    
     return YES;
 }
 
+- (void)myManagedObjectContextDidSaveNotificationHandler:(NSNotification *)notification
+{
+    [self.managedObjectContext performSelectorOnMainThread:@selector(mergeChangesFromContextDidSaveNotification:) withObject:notification waitUntilDone:NO];
+}
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
 	UIAlertView *immutableAlert = [[[UIAlertView alloc]initWithTitle:@"Reminder:" message:notification.alertBody delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
@@ -120,23 +125,19 @@ void uncaughtExceptionHandler(NSException *exception) {
 
 - (BOOL)doesDatabaseHaveData {
 	BOOL hasData = NO;
-	NSLog(@"pop");
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
 	[fetchRequest setEntity:entity];
-	NSLog(@"pop1");
 	NSError *error = nil;
 	NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
 	if (error) {
 		[Error showErrorByAppendingString:@"Unable to load Category data." withError:error];
 	}
-	NSLog(@"pop2");
 	if (fetchedObjects != nil) {
 		if ([fetchedObjects count] > 0) {
 			hasData = YES;			
 		}
 	}
-	NSLog(@"pop3");
 	[fetchRequest release];
 	
 	return hasData;
@@ -146,11 +147,16 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     NSError *error = nil;
 	NSManagedObjectContext *localManagedObjectContext = self.managedObjectContext;
+    // Register
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(myManagedObjectContextDidSaveNotificationHandler:) name:NSManagedObjectContextDidSaveNotification object:self.managedObjectContext];
     if (localManagedObjectContext != nil) {
         if ([localManagedObjectContext hasChanges] && ![localManagedObjectContext save:&error]) {
 			[Error showErrorByAppendingString:@"Unable to save changes." withError:error];
         } 
     }
+    // Unregister
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:self.managedObjectContext];
+    NSLog(@"saveContext");
 }    
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -212,7 +218,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     if (managedObjectContext == nil) {
 		NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
 		if (coordinator != nil) {
-			managedObjectContext = [[NSManagedObjectContext alloc] init];
+			managedObjectContext = [[[NSManagedObjectContext alloc] init] retain];
 			[managedObjectContext setPersistentStoreCoordinator: coordinator];
 			managedObjectContext.undoManager = nil;
 		}
@@ -256,7 +262,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 		NSLog(@"Error: %@",error);
 		[Error showErrorByAppendingString:@"Unable to find database file." withError:error];
     }    
-
+    
     return persistentStoreCoordinator;
 }
 
@@ -278,18 +284,6 @@ void uncaughtExceptionHandler(NSException *exception) {
 	NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
 	
 	return storeUrl;
-}
-
-#pragma mark Add Notes Methods
-- (void)addNote
-{
-
-    NSString *nibName = @"AddNoteViewController";
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-    {
-        // ipad
-        nibName = @"AddNoteViewController-iPad";
-    }
 }
 
 
@@ -376,7 +370,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     Group *results = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
 	results.section = @"Results";
-	results.title = @"Export Results";
+	results.title = @"Create Reports";
 	results.groupDescription = @"Lorem ipsum dolor sit amet";
 	results.visible = [NSNumber numberWithBool:YES];
 	results.rateable = [NSNumber numberWithBool:NO];
@@ -387,7 +381,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     Group *savedresults = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
 	savedresults.section = @"Results";
-	savedresults.title = @"Saved Results";
+	savedresults.title = @"Saved Reports";
 	savedresults.groupDescription = @"Lorem ipsum dolor sit amet";
 	savedresults.visible = [NSNumber numberWithBool:YES];
 	savedresults.rateable = [NSNumber numberWithBool:NO];
@@ -472,7 +466,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 	local.showGraph = [NSNumber numberWithBool:NO];
 	local.menuIndex = [NSNumber numberWithInt:6];
 	local.positiveDescription = [NSNumber numberWithBool:NO];
-
+    
 	
 #ifdef DEBUG
 	Group *data = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
@@ -516,13 +510,13 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (void)dealloc {
-	[self.managedObjectContext release],self.managedObjectContext = nil;
-    [self.managedObjectModel release], self.managedObjectModel = nil;
-    [self.persistentStoreCoordinator release], self.persistentStoreCoordinator = nil;
-	[self.persistentStore release], self.persistentStore = nil;
+	[managedObjectContext release],self.managedObjectContext = nil;
+    [managedObjectModel release], self.managedObjectModel = nil;
+    [persistentStoreCoordinator release], self.persistentStoreCoordinator = nil;
+	[persistentStore release], self.persistentStore = nil;
 	
-	[self.navigationController release],self.navigationController = nil;
-	[self.window release], self.window = nil;
+	[navigationController release],navigationController = nil;
+	[window release], self.window = nil;
 	
 	[super dealloc];
 }

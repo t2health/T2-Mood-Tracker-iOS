@@ -152,8 +152,8 @@
 }
 
 - (void)dealloc {
-	[self.note release];
-	[self.noteView release];
+	[note release];
+	[noteView release];
     
 	[super dealloc];
 }

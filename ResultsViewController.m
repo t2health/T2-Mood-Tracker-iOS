@@ -48,7 +48,7 @@ enExportType whichExport;
 @synthesize dataSourceArray;
 @synthesize ledgendColorsDictionary, filterViewItems;
 @synthesize textfieldArray, groupArray, savingScreen;
-@synthesize datePickView ,datePicker;
+@synthesize datePicker;
 @synthesize doneButton, dataArray, dateFormatter;
 @synthesize curFileName, noteSwitch;
 
@@ -93,12 +93,12 @@ int pickerShow;
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
     self.managedObjectContext = appDelegate.managedObjectContext;
     // NSLog(@"stop 2");
-    UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(generateReport:)];
+    UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(generateReport:)];
 	self.navigationItem.rightBarButtonItem = nextButton;
-    
+    [nextButton release];
     self.dataSourceArray = [NSArray arrayWithObjects:@"Start Date", @"End Date", @"Notes", nil];
     
-    self.title = NSLocalizedString(@"Export Results", @"");
+    self.title = NSLocalizedString(@"Create Reports", @"");
 	
 	// we aren't editing any fields yet, it will be in edit when the user touches an edit field
 	self.editing = NO;
@@ -157,6 +157,7 @@ int pickerShow;
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     [super viewWillAppear:animated];
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -201,8 +202,24 @@ int pickerShow;
 - (void)deviceOrientationChanged:(NSNotification *)notification 
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    [tableView reloadData];
-    [self resignPicker];
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    {
+        [tableView reloadData];
+        [self resignPicker];
+    }
+    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+    {
+        [tableView reloadData];
+        [self resignPicker];
+
+    }
+    else {
+        
+    }
+    
+    
+
 }
 
 #pragma mark Fill Groups
@@ -651,7 +668,7 @@ int pickerShow;
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
     // create the parent view that will hold header Label
-	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
+	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -678,7 +695,7 @@ int pickerShow;
     headerLabel.text = sectionName;
     
 	[customView addSubview:headerLabel];
-    
+    [headerLabel release];
 	return customView;
 }
 
@@ -782,7 +799,7 @@ int pickerShow;
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
         {
             //iPad
-            UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
+            UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
             if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
             {
                 startHeight = 329;
@@ -798,7 +815,7 @@ int pickerShow;
         else 
         {
             //iPhone
-            UIInterfaceOrientation interfaceOrientation = self.interfaceOrientation;
+            UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
             if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
             {
                 startHeight = 329;
@@ -865,15 +882,18 @@ int pickerShow;
 }
 
 #pragma mark Email/Save
--(void)generateReport:(id)sender {
+-(void)generateReport:(id)sender 
+{
+    
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     UIActionSheet *actionSheet = [[[UIActionSheet alloc]
                                    initWithTitle:@"" 
                                    delegate:self 
                                    cancelButtonTitle:@"Cancel" 
                                    destructiveButtonTitle:nil 
-                                   otherButtonTitles:@"Export CSV", @"Export PDF", nil] autorelease];
+                                   otherButtonTitles:@"Save as CSV", @"Save as PDF", nil] autorelease];
     [actionSheet showFromTabBar:self.tabBarController.tabBar];  
+     
 }
 
 - (void)saveResults
@@ -905,7 +925,7 @@ int pickerShow;
     [df setDateFormat:@"MM/dd/yyyy"];
     NSDate *myFromDate = [df dateFromString: rawFromDate];
     NSDate *myToDate = [df dateFromString: rawToDate];
-
+    [df release];
     
     [defaults setObject:myFromDate forKey:@"PDF_FromDate"];
     [defaults setObject:myToDate forKey:@"PDF_ToDate"];
@@ -995,7 +1015,7 @@ int pickerShow;
     [df setDateFormat:@"MM/dd/yyyy"];
     NSDate *myFromDate = [df dateFromString: rawFromDate];
     NSDate *myToDate = [df dateFromString: rawToDate];
-    
+    [df release];
     NSLog(@"from: %@ - to: %@", myFromDate, myToDate);
 
     
@@ -1037,7 +1057,7 @@ int pickerShow;
     if (error) {
         [Error showErrorByAppendingString:@"Unable to get data" withError:error];
     }
-    NSMutableArray *scaleArray = [[NSMutableArray alloc] init];
+    NSMutableArray *scaleArray = [[[NSMutableArray alloc] init] autorelease];
     
     for (Scale *aScale in objects) 
     {
@@ -1081,56 +1101,21 @@ didFinishCreatingPDFFile:(NSString *)filePath
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     NSLog(@"finished creating PDF");
     savingScreen.hidden = YES;
+    /*
     WebViewController *webViewController = [[WebViewController alloc] initWithNibName:@"WebViewController" bundle:nil];
     webViewController.filePath = filePath;
     [self.navigationController pushViewController:webViewController animated:YES];
     [WebViewController release];
-    
+    */
 }
 
 #pragma mark - Array Converters
 
-- (void)convertArrayToPDF:(NSArray *)valueArray:(NSArray *)withNotes;
-{
-    /*
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    NSString *rawFromDate = [textfieldArray objectAtIndex:0];
-    NSString *rawToDate = [textfieldArray objectAtIndex:1];
-    NSArray *fromDateArray = [rawFromDate componentsSeparatedByString:@"/"];
-    NSArray *toDateArray = [rawToDate componentsSeparatedByString:@"/"];
-    
-    int fromDay = [[fromDateArray objectAtIndex:1] intValue];
-    int fromMonth = [[fromDateArray objectAtIndex:0] intValue];
-    int fromYear = [[fromDateArray objectAtIndex:2] intValue];
-    
-    int toDay = [[toDateArray objectAtIndex:1] intValue];
-    int toMonth = [[toDateArray objectAtIndex:0] intValue];
-    int toYear = [[toDateArray objectAtIndex:2] intValue];  
-    
-    
-    int r = arc4random() % 1000;
-    
-    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init]; 
-    [dateFormat setDateFormat:@"MM/dd/yy"];
-    NSDate *fromTempDate = [dateFormat dateFromString:rawFromDate];
-    NSDate *toTempDate = [dateFormat dateFromString:rawToDate];
-    [dateFormat setDateFormat:@"MMMM dd, yyyy"];
-    NSString *fromDate = [dateFormat stringFromDate:fromTempDate];
-    NSString *toDate = [dateFormat stringFromDate:toTempDate];
-    
-    NSString *fileName = [NSString stringWithFormat:@"/%i%i%i_%i%i%i_%i.pdf", fromDay, fromMonth, fromYear, toDay, toMonth, toYear, r];  
-    PDFService *service = [PDFService instance];
-    service.delegate = self;
-    NSLog(@"Will Create PDF to %@", fileName);
-    [service createPDFFile:fileName withDataArray:valueArray withNotesArray:withNotes];
-     */
-    //Delegate notified when complete or error
-}
-
 - (void)convertArrayToCSV:(NSArray *)valueArray:(NSArray *)withNotes;
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
     // Create CSV
     NSArray * data = [NSArray arrayWithArray:valueArray];
     NSArray * notes = [NSArray arrayWithArray:withNotes];
@@ -1147,13 +1132,21 @@ didFinishCreatingPDFFile:(NSString *)filePath
     // Fetch Notes and add CSV
     if (noteSwitch.on) 
     {
+        //NSMutableArray *notesArray = [[NSMutableArray alloc] init];
         for (Note *aNote in notes) 
         {
-            NSString * combinedLine = [NSString stringWithFormat:@"NOTES,%@,\"%@\",",aNote.timestamp, aNote.note];
+            NSString * combinedLine = [NSString stringWithFormat:@"NOTES||%@||\"%@\"||",aNote.timestamp, aNote.note];
             
             [csv appendFormat:@"%@\n", combinedLine];
+          //  [notesArray addObject:[NSString stringWithFormat:@"%@|||%@",aNote.timestamp, aNote.note]];
             
         }	
+        [defaults setValue:@"YES" forKey:@"PDF_Notes_On"];
+     //   [defaults setValue:notesArray forKey:@"PDF_Notes"];
+    }
+    else 
+    {
+        [defaults setValue:@"NO" forKey:@"PDF_Notes_On"];
     }
   //  NSLog(@"csv: %@", csv);
     
@@ -1183,10 +1176,10 @@ didFinishCreatingPDFFile:(NSString *)filePath
     [dateFormat setDateFormat:@"MM/dd/yy"];
     NSDate *fromTempDate = [dateFormat dateFromString:rawFromDate];
     NSDate *toTempDate = [dateFormat dateFromString:rawToDate];
-    [dateFormat setDateFormat:@"MMMM dd, yyyy"];
+    [dateFormat setDateFormat:@"MM/dd/yy"];
     NSString *fromDate = [dateFormat stringFromDate:fromTempDate];
     NSString *toDate = [dateFormat stringFromDate:toTempDate];
-    
+    [dateFormat release];
     NSString *fileName = [NSString stringWithFormat:@"/%i%i%i_%i%i%i_%i.csv", fromDay, fromMonth, fromYear, toDay, toMonth, toYear, r];  
     NSString *rawFileName = [NSString stringWithFormat:@"%i%i%i_%i%i%i_%i.csv", fromDay, fromMonth, fromYear, toDay, toMonth, toYear, r];
     
@@ -1199,7 +1192,7 @@ didFinishCreatingPDFFile:(NSString *)filePath
     {
         reportType = @"PDF";
     }
-    NSString *titleText = [NSString stringWithFormat:@" (%@) %@ - %@",reportType, fromDate, toDate];
+    NSString *titleText = [NSString stringWithFormat:@"Moodtracker(%@) %@ - %@",reportType, fromDate, toDate];
     NSDate *today = [NSDate date];
     curFileName = rawFileName;
     
@@ -1226,48 +1219,70 @@ didFinishCreatingPDFFile:(NSString *)filePath
         [Error showErrorByAppendingString:@"Unable to save result" withError:error];
     } 	
     
-    // Send to SavedResults View
-    savingScreen.hidden = YES;
-    ViewSavedController *viewSavedController = [[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil];
-	viewSavedController.finalPath = [NSString stringWithFormat:@"%@", fileName];
-    viewSavedController.fileName = titleText;
-    NSMutableDictionary *tempDictionary = [[NSMutableDictionary alloc] init];
     
-    for (NSString *groupTitle in self.groupsDictionary) 
+    // Create PDF
+    /*
+    if (whichExport == enExportTypePDF) 
     {
-		Group *currentGroup = [self.groupsDictionary objectForKey:groupTitle];
-		UISwitch *currentSwitch = [switchDictionary objectForKey:groupTitle];
-        NSString *tString = currentGroup.title;
-        
-        NSArray *scaleArray = [self fetchScales:tString];
-        
-        if (currentSwitch.on) 
-        {
-            // Add to tempDict
-            [tempDictionary setObject:scaleArray forKey:tString];
-        }
+        PDFService *service = [PDFService instance];
+        service.delegate = self;
+        [service createPDFFile]; 
     }
-    NSDictionary *groupScalesDictionary = [NSDictionary dictionaryWithDictionary:tempDictionary];
-
-    viewSavedController.groupsScalesDictionary = groupScalesDictionary;
+     */
+    // Send to SavedResults View
     
+    savingScreen.hidden = YES;
+    
+   // [self.navigationController popViewControllerAnimated:YES];
+
     switch (whichExport) {
         case enExportTypePDF:
             // PDF
+
+            
+            // Send to SavedResults View
+            savingScreen.hidden = YES;
+            ViewSavedController *viewSavedController = [[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil];
+            viewSavedController.finalPath = [NSString stringWithFormat:@"%@", fileName];
+            viewSavedController.fileName = titleText;
+            NSMutableDictionary *tempDictionary = [[NSMutableDictionary alloc] init];
+            
+            
+            
+            for (NSString *groupTitle in self.groupsDictionary) 
+            {
+                Group *currentGroup = [self.groupsDictionary objectForKey:groupTitle];
+                UISwitch *currentSwitch = [switchDictionary objectForKey:groupTitle];
+                NSString *tString = currentGroup.title;
+                
+                NSArray *scaleArray = [self fetchScales:tString];
+                
+                if (currentSwitch.on) 
+                {
+                    // Add to tempDict
+                    [tempDictionary setObject:scaleArray forKey:tString];
+                }
+            }
+            NSDictionary *groupScalesDictionary = [NSDictionary dictionaryWithDictionary:tempDictionary];
+            
+            viewSavedController.groupsScalesDictionary = groupScalesDictionary;
             viewSavedController.fileType = @"PDF";
+            
+            viewSavedController.fileAction = @"create";
+            [self.navigationController pushViewController:viewSavedController animated:YES];   
+            [viewSavedController release];
+            [tempDictionary release];
+            
+            
             break;
         case enExportTypeCSV:
             // CSV
-            viewSavedController.fileType = @"CSV";
+            [defaults setValue:@"csvSaved" forKey:@"csvSaved"];
+            [self.navigationController popViewControllerAnimated:YES];
             break;
         default:
             break;
     }
-    [self.navigationController pushViewController:viewSavedController animated:YES];   
-    [viewSavedController release];
-    [tempDictionary release];
-
-   
 }
 
 
@@ -1383,8 +1398,9 @@ didFinishCreatingPDFFile:(NSString *)filePath
 	[self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     
-    UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(generateReport:)];
+    UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(generateReport:)];
 	self.navigationItem.rightBarButtonItem = nextButton;    
+    [nextButton release];
 }
 
 - (IBAction)doneAction:(id)sender

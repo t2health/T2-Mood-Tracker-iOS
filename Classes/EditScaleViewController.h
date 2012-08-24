@@ -16,7 +16,7 @@
     SafeFetchedResultsController *fetchedResultsController;
     NSMutableDictionary *switchDictionary;
 	NSMutableDictionary *groupsDictionary;
-	
+	NSString *groupName;
 	IBOutlet UITableView *tableView;
     
 	IBOutlet UITextField *leftTextField;
@@ -29,13 +29,14 @@
 @property (nonatomic, retain) NSMutableDictionary *switchDictionary;
 @property (nonatomic, retain) NSMutableDictionary *groupsDictionary;
 @property (nonatomic, retain) IBOutlet UITableView *tableView;
+@property (nonatomic, retain) NSString *groupName;
 
 @property (nonatomic, retain) IBOutlet UITextField *leftTextField;
 @property (nonatomic, retain) IBOutlet UITextField *rightTextField;
 @property (nonatomic, retain)Scale *scale;
 
 - (void)save:(id)sender;
-
+- (void)addLegendInfo;
 - (NSFetchedResultsController *)fetchedResultsController;
 
 @end

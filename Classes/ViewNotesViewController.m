@@ -22,21 +22,23 @@
 @synthesize managedObjectContext;
 @synthesize notesTableView;
 
+id viewToDelete;
+
 #pragma mark View lifecycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     notesTableView.backgroundView = nil;
-
+    
 	self.title = @"View Notes";
-
+    
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
 	self.managedObjectContext = appDeleate.managedObjectContext;
 	
 	UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNote:)];
 	self.navigationItem.rightBarButtonItem = plusButton;
-	
+	[plusButton release];
 	[FlurryUtility report:EVENT_NOTES_ACTIVITY];	
 	
 	NSError *error = nil;
@@ -104,6 +106,53 @@
     return YES;
 }
 
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+
+    // Delete Action Sheet
+    if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
+    {
+        id view = viewToDelete;
+        while (view && ![view isKindOfClass:[UITableViewCell class]]) {
+            view = [view superview];
+        }
+        UITableViewCell *cell = view;
+        NSIndexPath *indexPath = [notesTableView indexPathForCell:cell];
+        NSManagedObject *task = [fetchedResultsController objectAtIndexPath:indexPath];
+        
+        [self.managedObjectContext deleteObject:task];
+        
+        [self.managedObjectContext save:nil];
+        
+        
+        [notesTableView reloadData];
+    }
+
+
+}
+
+
+- (void)handleGesture:(UILongPressGestureRecognizer *)recognizer {
+    
+    if (recognizer.state == UIGestureRecognizerStateBegan) 
+    {    
+        
+        UIActionSheet *actionSheet = [[[UIActionSheet alloc]
+                                       initWithTitle:@"" 
+                                       delegate:self 
+                                       cancelButtonTitle:@"Cancel" 
+                                       destructiveButtonTitle:nil 
+                                       otherButtonTitles:@"Delete Note", nil] autorelease];
+        [actionSheet showFromTabBar:self.tabBarController.tabBar];  
+        
+        viewToDelete = recognizer.view;
+        
+    } 
+    else if (recognizer.state == UIGestureRecognizerStateEnded) 
+    {
+        
+    }
+}
+
 #pragma mark Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -149,6 +198,11 @@
 	cell.detailTextLabel.text = note.note;
     cell.detailTextLabel.textColor = [UIColor blackColor];
     cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:18];
+    
+    UILongPressGestureRecognizer* gestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
+    [cell addGestureRecognizer:gestureRecognizer];
+    
+    [gestureRecognizer release];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {	
@@ -175,7 +229,7 @@
 	NSString *titleString = [NSString stringWithFormat:@"%@ %d", [monthSymbols objectAtIndex:month-1], year];
 	
 	return titleString;	
-
+    
 }
 
 
@@ -217,13 +271,15 @@
     
 	// If you want to align the header text as centered
 	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
-
+    
     
     NSString *titleString = [NSString stringWithFormat:@"%@ %d", [monthSymbols objectAtIndex:month-1], year];
 	headerLabel.text = titleString;
 	[customView addSubview:headerLabel];
+    [headerLabel release];
     
-	return customView;
+	return [customView autorelease];
+    
 }
 
 // return list of section titles to display in section index view (e.g. "ABCD...Z#")
@@ -257,7 +313,7 @@
 		// Delete the managed object.
 		NSManagedObjectContext *context = [fetchedResultsController managedObjectContext];
 		[context deleteObject:[fetchedResultsController objectAtIndexPath:indexPath]];
-
+        
         NSLog(@"deleted");
         
 		NSError *error;
@@ -272,11 +328,11 @@
 	Note *note = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	vnvc.note = note;
     NSLog(@"note: %@", note);
-
+    
 	[self.navigationController pushViewController:vnvc animated:YES];
 	[vnvc release];
-        
-
+    
+    
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -299,8 +355,8 @@
 
 - (void)dealloc {	
 	self.fetchedResultsController.delegate = nil;
-	[self.fetchedResultsController release];
-	[self.managedObjectContext release];
+	[fetchedResultsController release];
+	[managedObjectContext release];
 	
     [super dealloc];
 }

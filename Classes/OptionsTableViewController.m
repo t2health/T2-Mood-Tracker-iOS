@@ -15,7 +15,6 @@
 
 @implementation OptionsTableViewController
 
-@synthesize fetchedResultsController;
 @synthesize managedObjectContext, whichGraph;
 @synthesize dataSourceArray, myNavController;
 @synthesize legendSwitch, symbolSwitch, gradientSwitch;
@@ -36,7 +35,7 @@
 	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
 	self.managedObjectContext = appDeleate.managedObjectContext;
     
-    self.dataSourceArray = [NSArray arrayWithObjects:@"Legend", @"Symbols", @"Gradient", @"Edit Colors/Symbols", @"Data Range", nil];
+    self.dataSourceArray = [NSArray arrayWithObjects: @"Symbols", @"Gradient", @"Edit Colors/Symbols", @"Data Range", nil];
     
     
 }
@@ -46,6 +45,14 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+}
+
+- (void) viewWillDisappear:(BOOL)animated
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:NO forKey:@"SWITCH_OPTION_STATE_SYMBOL"];
+    [defaults setBool:NO forKey:@"SWITCH_OPTION_STATE_GRADIENT"];
+
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -58,10 +65,10 @@
 
 - (void)legendToggle
 {
-
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSString *defaultsKey;
-
+    
     defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND"];
     BOOL val = legendSwitch.on;
     [defaults setBool:val forKey:defaultsKey];
@@ -87,8 +94,8 @@
     
     
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"toggleSymbol" object: nil];
-
+    [[NSNotificationCenter defaultCenter] postNotificationName:[NSString stringWithFormat:@"toggleSymbol_%@", whichGraph] object: nil];
+    
 }
 
 - (void)gradientToggle
@@ -104,8 +111,8 @@
     
     
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"toggleGradient" object: nil];
-
+    [[NSNotificationCenter defaultCenter] postNotificationName:[NSString stringWithFormat:@"toggleGradient_%@", whichGraph] object: nil];
+    
 }
 
 #pragma mark Table view data source
@@ -152,34 +159,11 @@
     // Create controls
     NSString *cellName = @"";
     
-    // Legend
+    // Symbol
     if (row == 0) 
     {
         cellName = [dataSourceArray objectAtIndex:row];
         
-        UISwitch *aSwitch = [[UISwitch alloc] init];
-        
-        // Fetch User Defaults for Legend
-        key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_LEGEND"];
-        if (![defaults boolForKey:key]) {
-            storedVal = NO;
-        }
-        else 
-        {
-            storedVal = [defaults boolForKey:key];	
-        }
-        aSwitch.on = storedVal;
-        aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
-        [aSwitch addTarget:self action:@selector(legendToggle) forControlEvents:UIControlEventValueChanged];
-        legendSwitch = aSwitch;
-        cell.accessoryView = aSwitch;
-        [aSwitch release];
-    }
-    // Symbol
-    else if (row == 1) 
-    {
-        cellName = [dataSourceArray objectAtIndex:row];
-
         UISwitch *aSwitch = [[UISwitch alloc] init];
         // Fetch User Defaults for Symbol
         key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_SYMBOL"];
@@ -190,48 +174,49 @@
             storedVal = [defaults boolForKey:key];				
         }
         NSLog(@"config: symbol: %i", storedVal);
-        aSwitch.on = NO;
+        aSwitch.on = storedVal;
         aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
         [aSwitch addTarget:self action:@selector(symbolToggle) forControlEvents:UIControlEventValueChanged];
         symbolSwitch = aSwitch;
-
+        
         cell.accessoryView = aSwitch;
         
         [aSwitch release];
     }
     // Gradient
-    else if (row == 2) 
+    else if (row == 1) 
     {
         cellName = [dataSourceArray objectAtIndex:row];
-
+        
         UISwitch *aSwitch = [[UISwitch alloc] init];
         // Fetch User Defaults for Legend
         key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_GRADIENT"];
         if (![defaults objectForKey:key]) {
             storedVal = NO;
         }
-        else {
+        else 
+        {
             storedVal = [defaults boolForKey:key];				
         }
         NSLog(@"config: gradient: %i", storedVal);
-
-        aSwitch.on = NO;
+        
+        aSwitch.on = storedVal;
         aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
         [aSwitch addTarget:self action:@selector(gradientToggle) forControlEvents:UIControlEventValueChanged];
         gradientSwitch = aSwitch;
-    
+        
         cell.accessoryView = aSwitch;
         [aSwitch release];
     }
     // Customize
-    else if (row == 3) 
+    else if (row == 2) 
     {
         cellName = [dataSourceArray objectAtIndex:row];
-
+        
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     // Data Range
-    else if (row == 4) 
+    else if (row == 3) 
     {
         cellName = [dataSourceArray objectAtIndex:row];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -241,29 +226,29 @@
         NSString *rangeString = [defaults objectForKey:defaultsKey];
         if (rangeString==nil) 
         {
-            cell.detailTextLabel.text = @"All";
+            cell.detailTextLabel.text = @"30 days";
         }
         else 
         {
             cell.detailTextLabel.text = [defaults objectForKey:defaultsKey];
-
+            
         }
     }
-
+    
     
     cell.textLabel.text = cellName;
     /*
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-	cell.textLabel.text = cellName;
-    cell.detailTextLabel.text = cellDate;
-    cell.textLabel.font = [UIFont boldSystemFontOfSize:16];
-    cell.textLabel.textAlignment  = UITextAlignmentLeft;
-    cell.backgroundColor = [UIColor whiteColor];
-    //cell.accessoryView.backgroundColor = [UIColor clearColor];
-    cell.contentView.backgroundColor = [UIColor clearColor];
-    cell.backgroundView.backgroundColor = [UIColor clearColor];
-    cell.detailTextLabel.textAlignment = UITextAlignmentRight;
-    [cell setNeedsLayout];
+     cell.selectionStyle = UITableViewCellSelectionStyleNone;
+     cell.textLabel.text = cellName;
+     cell.detailTextLabel.text = cellDate;
+     cell.textLabel.font = [UIFont boldSystemFontOfSize:16];
+     cell.textLabel.textAlignment  = UITextAlignmentLeft;
+     cell.backgroundColor = [UIColor whiteColor];
+     //cell.accessoryView.backgroundColor = [UIColor clearColor];
+     cell.contentView.backgroundColor = [UIColor clearColor];
+     cell.backgroundView.backgroundColor = [UIColor clearColor];
+     cell.detailTextLabel.textAlignment = UITextAlignmentRight;
+     [cell setNeedsLayout];
      */
 }
 
@@ -279,28 +264,28 @@
 {		
     
     NSInteger row = [indexPath indexAtPosition:1];
-
+    
     // Customize
-    if (row == 3) 
+    if (row == 2) 
     {
         NSLog(@"chartoption clicked");
         
         ChartOptionsViewController *chartOptionsViewController = [[ChartOptionsViewController alloc] initWithNibName:@"ChartOptionsViewController" bundle:nil];
-
+        
         [self.myNavController pushViewController:chartOptionsViewController animated:YES];
-       
+        
         [chartOptionsViewController release];    
-
+        
     }
     
     // Date Range
-    else if (row == 4) 
+    else if (row == 3) 
     {
         NSString *notifyName = [NSString stringWithFormat:@"showPicker_%@", whichGraph];
         
         [[NSNotificationCenter defaultCenter] postNotificationName:notifyName object: nil];
     }
-     
+    
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -309,53 +294,6 @@
     return NO;
 }
 
-#pragma mark Fetched results controller
-
-/**
- Returns the fetched results controller. Creates and configures the controller if necessary.
- */
-- (SafeFetchedResultsController *)fetchedResultsController {
-    if (fetchedResultsController != nil) {
-        return fetchedResultsController;
-    }
-	
-	// Create and configure a fetch request with the Group entity.
-	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
-	[fetchRequest setEntity:entity];
-	
-	// Create the sort descriptors array.
-	NSSortDescriptor *sectionTitleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"section" ascending:YES];
-    //	NSSortDescriptor *titleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES];
-	NSSortDescriptor *menuIndexDescriptor = [[NSSortDescriptor alloc] initWithKey:@"menuIndex" ascending:YES];
-	
-	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sectionTitleDescriptor, menuIndexDescriptor, nil];
-	[fetchRequest setSortDescriptors:sortDescriptors];
-	
-	//Create predicate
-	NSString *showGraphPredicateString = [NSString stringWithFormat:@"rateable = YES"];
-	NSPredicate *showGraphPredicate = [NSPredicate predicateWithFormat:showGraphPredicateString];
-	
-    [NSFetchedResultsController deleteCacheWithName:nil]; 
-	[fetchRequest setPredicate:showGraphPredicate];
-	
-	// Create and initialize the fetch results controller.
-	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
-									 self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
-	self.fetchedResultsController.safeDelegate = self;
-	
-	[sectionTitleDescriptor autorelease];
-	[menuIndexDescriptor autorelease];
-	[sortDescriptors  autorelease];
-	[fetchRequest autorelease];
-    
-	NSError *error = nil;
-	if (![[self fetchedResultsController] performFetch:&error]) {
-		[Error showErrorByAppendingString:@"Unable to fetch data for groups." withError:error];
-	}
-    
-	return self.fetchedResultsController;
-}    
 
 
 @end

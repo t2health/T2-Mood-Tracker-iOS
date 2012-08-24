@@ -546,7 +546,15 @@
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
-	[self processChanges];
+    @try {
+        [self processChanges];
+
+                    
+    }
+    @catch (NSException *exception) {
+        NSLog(@"exception: %@", exception);
+    }
+
 	
 	[insertedSections removeAllObjects];
 	[deletedSections  removeAllObjects];

@@ -26,20 +26,125 @@ int seriesCount;
     if (self) {
         
         /*
-        self.dataDict = [NSMutableDictionary dictionaryWithDictionary:[self getChartDictionary]];
-        NSLog(@"dataDict: %@", dataDict);
-        // NSLog(@"groupsArray: %@", groupsArray);
-        
-        seriesData = [[NSMutableArray alloc] init];
-        seriesDates = [[NSMutableArray alloc] init];
-        
-        
-        seriesCount = [[dataDict allKeys] count];
-        */
+         self.dataDict = [NSMutableDictionary dictionaryWithDictionary:[self getChartDictionary]];
+         NSLog(@"dataDict: %@", dataDict);
+         // NSLog(@"groupsArray: %@", groupsArray);
+         
+         seriesData = [[NSMutableArray alloc] init];
+         seriesDates = [[NSMutableArray alloc] init];
+         
+         
+         seriesCount = [[dataDict allKeys] count];
+         */
     }
     return self;
 }
 
+- (NSDictionary *)getScaleDictionary:(NSString *)groupName
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    NSString *tempFileName = [defaults objectForKey:@"savedName"];
+    
+    NSMutableDictionary *dataScalesDict = [[[NSMutableDictionary alloc] init] autorelease];
+    NSMutableArray *dataArray = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray *dateArray = [[[NSMutableArray alloc] init] autorelease];
+    
+    NSDictionary *groupScaleDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"PDF_GroupScaleDictionary"]];
+    
+    
+    NSArray *scalesArray = [groupScaleDict objectForKey:groupName];
+    
+    
+    // Open CSV File
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
+    NSString *documentsDir = [paths objectAtIndex:0];
+    NSString *filePath = [NSString stringWithFormat:@"%@%@",documentsDir, tempFileName];
+    
+    // read everything from text
+    NSString* fileContents = [NSString stringWithContentsOfFile:filePath 
+                                                       encoding:NSUTF8StringEncoding error:nil];
+    
+    NSMutableArray *arrayByDate = [[[NSMutableArray alloc] init] autorelease];
+    [arrayByDate addObject:@"0"];
+    
+    NSArray *rawDataArray = [fileContents componentsSeparatedByString:@"NOTES,-,-,-"];
+    NSArray* allLinedStrings = [[rawDataArray objectAtIndex:0] componentsSeparatedByCharactersInSet:
+                                [NSCharacterSet newlineCharacterSet]];
+    
+    // Add lines that match scaleName to tempDataDict
+    //  NSLog(@"allLinedStrings: %@", allLinedStrings);
+    
+    int value = 0;
+    NSString *timeStamp = @"";
+    NSString *nn = @"";
+    NSString *scale;
+    //  int positiveDesc = 0;
+    
+    // Loop over each scale in groupName
+    for (int a=0; a < scalesArray.count; a++) 
+    {
+        NSString *scaleName = [scalesArray objectAtIndex:a];
+        NSMutableDictionary *scaleDictTemp = [[NSMutableDictionary alloc] init];
+        [scaleDictTemp setObject:dataArray forKey:@"data"];
+        [scaleDictTemp setObject:dateArray forKey:@"date"];
+        
+        [dataScalesDict setObject:scaleDictTemp forKey:scaleName];
+        [scaleDictTemp release];
+    } 
+    
+    // Loop over all lines in CSV
+    for (int i=0; i < allLinedStrings.count; i++)
+    {
+        NSString *tempString1 = [allLinedStrings objectAtIndex:i];
+        NSArray * list = [tempString1 componentsSeparatedByString:@","];
+        
+        
+        if (list.count != 1) 
+        {
+            timeStamp = [NSString stringWithFormat:@"%@",[list objectAtIndex:0]];
+            value = [[list objectAtIndex:3] intValue];
+            scale = [list objectAtIndex:2];
+            nn = [list objectAtIndex:1];
+            //positiveDesc = [[list objectAtIndex:4] intValue];
+            
+            // Format DateTime
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
+            NSDate *date  = [dateFormatter dateFromString:timeStamp];
+            
+            // Convert Date 
+            [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
+            NSString *newDate = [dateFormatter stringFromDate:date];
+            [dateFormatter release];        
+            if ([groupName isEqualToString:nn]) 
+            {
+                NSMutableDictionary *tempDataDictionary = [NSMutableDictionary dictionaryWithDictionary:[dataScalesDict objectForKey:scale]];
+                NSMutableArray *dataTempArray = [NSMutableArray arrayWithArray:[tempDataDictionary objectForKey:@"data"]];
+                NSMutableArray *dateTempArray = [NSMutableArray arrayWithArray:[tempDataDictionary objectForKey:@"date"]];
+                
+                
+                if ([[list objectAtIndex:4] intValue] == 0) 
+                {
+                    value = 100 - value;
+                }
+                
+                [dataTempArray addObject:[NSString stringWithFormat:@"%i",value]];
+                [dateTempArray addObject:[NSString stringWithFormat:@"%@",newDate]];
+                [tempDataDictionary setObject:dataTempArray forKey:@"data"];
+                [tempDataDictionary setObject:dateTempArray forKey:@"date"];
+                
+                [dataScalesDict setObject:tempDataDictionary forKey:scale];
+                
+            }           
+            // NSLog(@"%@ Row: %@-%i-%@", groupName, scale, value, newDate);
+            
+        }
+        
+    }
+    
+    return dataScalesDict;
+}
 
 
 - (NSDictionary *)getChartDictionary
@@ -59,17 +164,17 @@ int seriesCount;
     NSString* fileContents = [NSString stringWithContentsOfFile:filePath 
                                                        encoding:NSUTF8StringEncoding error:nil];
     
-    NSMutableArray *arrayByDate = [[NSMutableArray alloc] init];
+    NSMutableArray *arrayByDate = [[[NSMutableArray alloc] init] autorelease];
     [arrayByDate addObject:@"0"];
     
     NSArray *rawDataArray = [fileContents componentsSeparatedByString:@"NOTES,-,-,-"];
     NSArray* allLinedStrings = [[rawDataArray objectAtIndex:0] componentsSeparatedByCharactersInSet:
                                 [NSCharacterSet newlineCharacterSet]];
     
+    NSLog(@"allLinedStrings: %@", allLinedStrings);
     
-    
-    NSMutableArray *tempTotalArray = [[NSMutableArray alloc] init];
-    NSMutableArray *tempCountArray = [[NSMutableArray alloc] init];
+    NSMutableArray *tempTotalArray = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray *tempCountArray = [[[NSMutableArray alloc] init] autorelease];
     
     
     int value = 0;
@@ -82,7 +187,7 @@ int seriesCount;
     int totalValue = 0;
     bool initRun = YES;
     int avgValue = 0;
-    NSString *scale;
+    // NSString *scale;
     int positiveDesc = 0;
     NSMutableArray *groupNames = [[NSMutableArray alloc] init];
     
@@ -101,7 +206,7 @@ int seriesCount;
             
             timeStamp = [NSString stringWithFormat:@"%@",[list objectAtIndex:0]];
             value = [[list objectAtIndex:3] intValue];
-            scale = [list objectAtIndex:2];
+            // scale = [list objectAtIndex:2];
             nn = [list objectAtIndex:1];
             positiveDesc = [[list objectAtIndex:4] intValue];
             //  NSLog(@"positive: %@ - %@", nn,positiveDesc);
@@ -135,7 +240,7 @@ int seriesCount;
                     // Convert Date 
                     [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
                     NSString *newDate = [dateFormatter stringFromDate:date];
-                    
+                    [dateFormatter release];
                     // Add to array
                     [tempTotalArray addObject:[NSString stringWithFormat:@"%@",newDate]];
                     [tempTotalArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
@@ -174,7 +279,7 @@ int seriesCount;
                     // Convert Date 
                     [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
                     NSString *newDate = [dateFormatter stringFromDate:date];
-                    
+                    [dateFormatter release];
                     // Add to array
                     [tempTotalArray addObject:[NSString stringWithFormat:@"%@",newDate]];
                     [tempTotalArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
@@ -237,14 +342,14 @@ int seriesCount;
         }
     }
     // NSLog(@"arrayByDate:%@", arrayByDate);
-    NSMutableDictionary *chartDictionary = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *chartDictionary = [[[NSMutableDictionary alloc] init] autorelease];
     
     for (NSString *groupTitle in groupNames)
     {
-        NSMutableArray *rawValuesArray = [[NSMutableArray alloc] init];
-        NSMutableArray *dataArray = [[NSMutableArray alloc] init];
-        NSMutableArray *dateArray = [[NSMutableArray alloc] init];
-        NSMutableDictionary *valueDict = [[NSMutableDictionary alloc] init];
+        NSMutableArray *rawValuesArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableArray *dataArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableArray *dateArray = [[[NSMutableArray alloc] init] autorelease];
+        NSMutableDictionary *valueDict = [[[NSMutableDictionary alloc] init] autorelease];
         int averageValue = 0;
         NSString *tempDate = @"";
         
@@ -298,7 +403,7 @@ int seriesCount;
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
     NSDate *myDate = [df dateFromString: str];
-    
+    [df release];
     
     
     return myDate;

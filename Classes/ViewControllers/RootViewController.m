@@ -47,9 +47,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Initial CheckPin 
-  //  [self chkPin];
-
-
+    //  [self chkPin];
+    
+    
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	
@@ -78,13 +78,13 @@
         [defaults setValue:[NSDictionary dictionaryWithDictionary:symbolsSubTempDictionary] forKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"];
         
         
-        NSLog(@"color: %@", [defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]);
+        //  NSLog(@"color: %@", [defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]);
         //   NSLog(@"symbol: %@", [defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"]);
-        NSLog(@"subcolor: %@", [defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]);
+        //  NSLog(@"subcolor: %@", [defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]);
         // NSLog(@"subsymbol: %@", [defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]);
         
     }
-
+    
 	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
     
     
@@ -95,12 +95,18 @@
     else 
     {
         BOOL showTips = [defaults boolForKey:@"SHOW_TIPS_ON_STARTUP"];
-        
+        NSLog(@"BAM");
         if (showTips == YES) {
+            NSLog(@"Show tips");
             UIViewController *tipViewController = [[TipViewController alloc] initWithNibName:@"TipViewController" bundle:nil];
             tipViewController.hidesBottomBarWhenPushed = YES;
             [appDelegate.navigationController pushViewController:tipViewController animated:YES];
             [tipViewController release];
+        }
+        else 
+        {
+            NSLog(@"no tips");
+            
         }
     }
 	
@@ -119,17 +125,17 @@
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
-
+    
     
 }
 
 - (void)chkPin
 {
     NSLog(@"rootview:");
-
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
-
+    
     
     if (pinString != nil && ![pinString isEqual:@""]) {
 		[self.navigationController setNavigationBarHidden:YES];
@@ -413,6 +419,8 @@
 
 - (IBAction)areasButtonClicked:(id)sender {
     EditGroupViewController *editGroupViewController = [[EditGroupViewController alloc] initWithNibName:@"EditGroupViewController" bundle:nil];
+    editGroupViewController.hidesBottomBarWhenPushed = YES;
+
     editGroupViewController.group = nil;
     [self.navigationController pushViewController:editGroupViewController animated:YES];
     [editGroupViewController release];
@@ -514,7 +522,7 @@
     
     
     // create the parent view that will hold header Label
-	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
+	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -530,7 +538,7 @@
     NSArray *sections = [self.fetchedResultsController sections];
 	headerLabel.text = [[sections objectAtIndex:section] name];
 	[customView addSubview:headerLabel];
-    
+    [headerLabel release];
 	return customView;
 }
 
@@ -605,6 +613,8 @@
 		case 0: // Rate
 			selectedGroup = (Group *)[self.fetchedResultsController objectAtIndexPath:indexPath];
 			rateMoodViewController = [[RateMoodViewController alloc] initWithNibName:@"RateMoodViewController" bundle:nil];
+            rateMoodViewController.hidesBottomBarWhenPushed = YES;
+
 			rateMoodViewController.currentGroup = selectedGroup;
 			[self.navigationController pushViewController:rateMoodViewController animated:YES];
 			[rateMoodViewController release];
@@ -833,12 +843,12 @@
 	[fetchRequest setFetchBatchSize:20];
 	
 	// Create and initialize the fetch results controller.
-	self.fetchedResultsController = 
+	fetchedResultsController = 
 	[[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 										  managedObjectContext:self.managedObjectContext 
 											sectionNameKeyPath:@"section" 
 													 cacheName:@"Root"];
-	self.fetchedResultsController.safeDelegate = self;
+	fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
     //	[titleDescriptor autorelease];
@@ -851,7 +861,7 @@
 		[Error showErrorByAppendingString:@"Unable to fetch data for main menu." withError:error];
 	}
 	
-	return self.fetchedResultsController;
+	return fetchedResultsController;
 }
 
 - (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
@@ -1093,10 +1103,10 @@
 }
 
 - (void)dealloc {
-	[self.fetchedResultsController release];
-	[self.managedObjectContext release];
-	[self.reminderArray release];
-	[self.tableView release];
+	[fetchedResultsController release];
+	[managedObjectContext release];
+	[reminderArray release];
+	[tableView release];
 	
 	[super dealloc];
 }

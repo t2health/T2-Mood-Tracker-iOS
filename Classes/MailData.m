@@ -16,9 +16,9 @@
 @synthesize mailBody;
 
 -(void)dealloc {
-	[self.mailRecipients release];
-	[self.mailSubject release];
-	[self.mailBody release];
+	[mailRecipients release];
+	[mailSubject release];
+	[mailBody release];
 	
 	[super dealloc];
 }

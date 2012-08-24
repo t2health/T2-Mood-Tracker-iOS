@@ -30,7 +30,6 @@
     [super viewDidLoad];
 	
 	self.title = @"Tip";
-	
 	NSFetchRequest *fetch = [[[NSFetchRequest alloc] init] autorelease];
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
@@ -47,6 +46,17 @@
 		
 		Tip *tip = [fetchedObjects objectAtIndex:tipNumber];
 		tipView.text = tip.tip;
+        
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            tipView.font = [UIFont fontWithName:@"Arial" size:17.0f];
+            touchLabel.font = [UIFont fontWithName:@"Arial" size:17.0f];
+        }
+        else 
+        {
+            tipView.font= [UIFont fontWithName:@"Arial" size:12.0f];
+            touchLabel.font = [UIFont fontWithName:@"Arial" size:12.0f];
+        }
 	}
 	else {
 		[Error showErrorByAppendingString:@"Unable to fetch tip." withError:error];

@@ -27,7 +27,7 @@
 
 @implementation ViewSavedController
 
-@synthesize saved, activityInd;
+@synthesize saved, activityInd, fileAction;
 @synthesize printContentWebView, pdfPath, finalPath, fileName, fileType, groupsScalesDictionary;
 
 int imageName = 0;
@@ -53,11 +53,13 @@ int rowCount;
     NSLog(@"fileName: %@",self.fileName);
     NSLog(@"finalPath: %@",self.finalPath);
     NSLog(@"fileType: %@",self.fileType);
-   // [self.view bringSubviewToFront:loadView];
+    // [self.view bringSubviewToFront:loadView];
     // Do any additional setup after loading the view from its nib.
     activityInd.hidden = NO;
     NSString *viewTitle = @"";
     NSString *tempTitle = @"";
+    
+    
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if (self.saved) 
@@ -69,7 +71,7 @@ int rowCount;
     {
         NSLog(@"finalPath %@", self.finalPath);
         [defaults setObject:self.finalPath forKey:@"savedName"];
-         tempTitle = self.fileName;
+        tempTitle = self.fileName;
     }
     
     NSArray *components = [tempTitle componentsSeparatedByString:@"("];
@@ -79,19 +81,19 @@ int rowCount;
     NSLog(@"numberString: %@", numberString);
     if (self.saved) 
     {
-
+        
         viewTitle = numberString;
         
     }
     else 
     {
-
+        
         viewTitle = self.fileType;
         
     }
     self.title = viewTitle;
- //   backgroundQueue = dispatch_queue_create("org.t2health.moodtracker.bgqueue", NULL);        
-
+    //   backgroundQueue = dispatch_queue_create("org.t2health.moodtracker.bgqueue", NULL);        
+    
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
@@ -99,7 +101,7 @@ int rowCount;
     [printContentWebView setDelegate:self];
 	pdfPath = [[NSString alloc] initWithString:@"file://"];
     // NavBar Button
-    UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(shareClick)];
+    UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareClick)];
     self.navigationItem.rightBarButtonItem = actionButton;
     [actionButton release];
     
@@ -109,104 +111,49 @@ int rowCount;
     if ([viewTitle isEqualToString:@"PDF"]) 
     {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
+        
         [defaults setObject:groupsScalesDictionary forKey:@"PDF_GroupScaleDictionary"];    
         
         isPDF = YES;
-       // NSLog(@"has groupsScalesDictionary: %@", groupsScalesDictionary);
-        [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(getScreenShot) userInfo:nil repeats:NO];
+        // NSLog(@"has groupsScalesDictionary: %@", groupsScalesDictionary);
+        
+        if ([fileAction isEqualToString:@"create"]) 
+        {
+            //create
+            [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(createPDFDocument) userInfo:nil repeats:NO];
+            NSLog(@"created pdf");
+        }
+        else 
+        {
+            //view
+            NSLog(@"view pdf");
+            [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(viewPDF) userInfo:nil repeats:NO];
+
+        }
+        
     }   
     else 
     {
         isPDF = NO;
-
+        
         [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(createWebViewWithHTML) userInfo:nil repeats:NO];
+        NSLog(@"view csv");
     }
-
+    
 }
 
-
-- (void) finishSetup
-{
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    
-    NSData *imageData;
-    for (int i = 0; i < 2; i++) 
-    {
-        UIImage *screenshot = [chart snapshot];
-        imageData = UIImagePNGRepresentation(screenshot);
-    }
-    
-    NSString *reportName = @"";
-    if (self.saved) 
-    {
-        reportName = self.saved.filename;
-    }
-    else 
-    {
-        reportName = self.finalPath;
-    }
-    
-    NSString *thisFileName = [NSString stringWithFormat:@"%@.png", reportName];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, 
-                                                         NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString* path = [documentsDirectory stringByAppendingPathComponent: 
-                      [NSString stringWithString: thisFileName] ];
-
-    [imageData writeToFile:path atomically:YES];
-    NSLog(@"path: %@", path);
-    [self createPDFDocument];
-//    [self createWebViewWithHTML];
-    
-}
 
 
 - (void)shareClick
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    
-    if (isPDF) 
-    {
-        
-        
-        // Email PDF
-        emailPDF = YES;
-      //  [self makePDF];
-
-        activityInd.hidden = NO;
-        [NSTimer scheduledTimerWithTimeInterval:0.3f target:self selector:@selector(makePDF) userInfo:nil repeats:NO];
-        
-        
-        
-    } 
-    else
-    {
-        // Email CSV
-        emailPDF = NO;
-        [self emailResults];
-        
-    }
-    
-    
-    
-    /*
-    UIActionSheet *actionSheet = [[[UIActionSheet alloc]
-                                   initWithTitle:@"" 
-                                   delegate:self 
-                                   cancelButtonTitle:@"Cancel" 
-                                   destructiveButtonTitle:nil 
-                                   otherButtonTitles:@"Email PDF", @"Email CSV", nil] autorelease];
-    [actionSheet showFromTabBar:self.tabBarController.tabBar];  
-     */
-    
+    [self emailResults];
 }
 
 
 - (NSMutableDictionary *) parseNotes:(NSString *)fileContents
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    NSMutableDictionary *notesDictionary = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *notesDictionary = [[[NSMutableDictionary alloc] init] autorelease];
     // first, separate by new line
     NSArray* allLinedStrings = [fileContents componentsSeparatedByCharactersInSet:
                                 [NSCharacterSet newlineCharacterSet]];
@@ -220,7 +167,7 @@ int rowCount;
             NSString *curLine = [allLinedStrings objectAtIndex:i];
             NSArray *curData = [curLine componentsSeparatedByString:@","];
             
-          //  NSLog(@"curData: %@",[curData objectAtIndex:0]);
+            //  NSLog(@"curData: %@",[curData objectAtIndex:0]);
             
             if ([[curData objectAtIndex:0] isEqualToString:@"NOTES"]) 
             {
@@ -240,24 +187,21 @@ int rowCount;
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
-
-    
-    
-    
-    
     PDFService *service = [PDFService instance];
     service.delegate = self;
-    [service createPDFFile];    
+    [service createPDFFile];   
+    activityInd.hidden = YES;
+    
 }
 
 - (void) createWebViewWithHTML
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    
+
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *reportName = @"";
     NSString *reportTitle = @"";
-
+    
     if (self.saved) 
     {
         reportName = self.saved.filename;
@@ -268,13 +212,24 @@ int rowCount;
         reportName = self.fileName;
         reportTitle = @"need Title";
     }
-        NSLog(@"reportName: %@", reportName);
+    NSLog(@"reportName: %@", reportName);
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
     NSString *documentsDir = [paths objectAtIndex:0];
-    NSString *filePath = [NSString stringWithFormat:@"%@%@",documentsDir, [defaults objectForKey:@"savedName"]];
+    NSString *filePath = @"";
 
+    if (self.saved) 
+    {
+        filePath = [NSString stringWithFormat:@"%@%@",documentsDir, saved.filename];
+
+    }
+    else 
+    {
+        filePath = [NSString stringWithFormat:@"%@%@",documentsDir, [defaults objectForKey:@"savedName"]];
+
+    }
+    
     NSURL *baseURL = [NSURL fileURLWithPath:documentsDir];
-
+    
     // read everything from text
     NSString* fileContents = [NSString stringWithContentsOfFile:filePath 
                                                        encoding:NSUTF8StringEncoding error:nil];
@@ -299,9 +254,9 @@ int rowCount;
     
     // free up memory
     [dateFormatNow release];
-
+    
     NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]];
-
+    
     
     //create the string
     NSMutableString *html = [NSMutableString stringWithString: @"<html><head><title></title>"];
@@ -318,19 +273,19 @@ int rowCount;
     //continue building the string
     [html appendString:@"<table cellpadding='3' cellspacing='0' border='0' width='100%'>"];
     [html appendString:[NSString stringWithFormat:@"<tr><td colspan='2' align='center' class='daterange'>T2 MoodTracker Report</td></tr>"]];
-
+    
     [html appendString:[NSString stringWithFormat:@"<tr><td colspan='2' align='center' class='daterange'>Date Range: %@</td></tr>", reportTitle ]];
     [html appendString:[NSString stringWithFormat:@"<tr><td colspan='2' align='center' class='date'>Generated on: %@</td></tr>", dateString ]];
     NSDateFormatter *dateFormat = [[[NSDateFormatter alloc] init] autorelease];
-
+    
     if (isPDF) 
     {
         NSString *pngName = [NSString stringWithFormat:@"%@.png", reportName];
         pngName = [pngName stringByReplacingOccurrencesOfString:@"/" withString:@""];  
         [html appendString:[NSString stringWithFormat:@"<tr><td colspan='2' height='10'>&nbsp;<center><img src='%@'></center></td></tr>",pngName, pngName]];
     }   
-
-
+    
+    
     
     NSArray* allLinedStrings = [[rawDataArray objectAtIndex:0] componentsSeparatedByCharactersInSet:
                                 [NSCharacterSet newlineCharacterSet]];
@@ -390,7 +345,7 @@ int rowCount;
                 NSData *data = [tColorDict objectForKey:[curData objectAtIndex:1]];
                 UIColor *uicolor = [NSKeyedUnarchiver unarchiveObjectWithData:data];
                 NSString *RGBColorString = [self htmlFromUIColor:uicolor];
-
+                
                 
                 // Print Date and Category Name
                 [html appendString:[NSString stringWithFormat:@"<tr><td class='date'>%@</td><td></td></tr>", dateString]];
@@ -444,9 +399,9 @@ int rowCount;
     [html appendString:@"</body></html>"];
     
     
- //  NSString *finalPath2 = [NSString stringWithFormat:@"%@/htmloutput.html",documentsDir];
-  //  [html writeToFile:finalPath2 atomically:YES encoding:NSUTF8StringEncoding error:nil];
-
+    //  NSString *finalPath2 = [NSString stringWithFormat:@"%@/htmloutput.html",documentsDir];
+    //  [html writeToFile:finalPath2 atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    
     
     //  NSLog(@"html: %@", html);
     //make the background transparent
@@ -455,9 +410,9 @@ int rowCount;
     //pass the string to the webview
     [printContentWebView loadHTMLString:[html description] baseURL:baseURL];
     activityInd.hidden = YES;
-
+    NSLog(@"indicator hide");
     
-   // [self.view sendSubviewToBack:loadView];
+    // [self.view sendSubviewToBack:loadView];
     
     
 }
@@ -503,24 +458,24 @@ int rowCount;
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     activityInd.hidden = YES;
-
-// Fetch filtered data
-//   NSLog(@"Fetching data...");
-
-// Open mail view
-MailData *data = [[MailData alloc] init];
-data.mailRecipients = nil;
-NSString *subjectString = @"T2 Mood Tracker App Results";
-data.mailSubject = subjectString;
-NSString *filteredResults = @"";
-NSString *bodyString = @"T2 Mood Tracker App Results:<p>";
-
-data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults];
-
-[self sendMail:data];
-[data release];
-
-
+    
+    // Fetch filtered data
+    //   NSLog(@"Fetching data...");
+    
+    // Open mail view
+    MailData *data = [[MailData alloc] init];
+    data.mailRecipients = nil;
+    NSString *subjectString = @"My T2 Mood Tracker Results";
+    data.mailSubject = subjectString;
+    NSString *filteredResults = @"";
+    NSString *bodyString = @"My T2 Mood Tracker Results<p>";
+    
+    data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults];
+    
+    [self sendMail:data];
+    [data release];
+    
+    
 }
 
 
@@ -547,7 +502,7 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error 
 {	
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-
+    
 	[self dismissModalViewControllerAnimated:YES];
     [self.navigationController setNavigationBarHidden:NO animated:NO];
 }
@@ -568,26 +523,39 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 		[picker setToRecipients:data.mailRecipients];
 	}
     
+    
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
     NSString *documentsDir = [paths objectAtIndex:0];
-
-    if (emailPDF) 
+    NSString *myPath = @"";
+    
+    
+    if (self.saved) 
     {
-        NSLog(@"pdfPath: %@", pdfPath);
+        myPath = [NSString stringWithFormat:@"%@",saved.filename];
+       // NSLog(@"smyPath: %@",saved.filename);
+
         
-        [picker addAttachmentData:[NSData dataWithContentsOfFile:self.pdfPath]
-                               mimeType:@"application/pdf" fileName:@"Results.pdf"];
-
-
     }
     else 
     {
-        NSString *Path = [documentsDir stringByAppendingString:self.saved.filename];
-        NSData *myData = [NSData dataWithContentsOfFile:Path];
-        [picker addAttachmentData:myData mimeType:@"text/plain" fileName:self.saved.filename];
+        myPath = [NSString stringWithFormat:@"%@",[defaults objectForKey:@"savedName"]];
+       // NSLog(@"myPath: %@", [defaults objectForKey:@"savedName"]);
 
     }
     
+
+    
+    if ([self.title isEqualToString:@"PDF"]) 
+    {
+        myPath = [myPath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
+    }
+    NSString *pdfFileName = [NSString stringWithFormat:@"%@%@",documentsDir, myPath];
+    [picker addAttachmentData:[NSData dataWithContentsOfFile:pdfFileName]
+                         mimeType:@"application/pdf" fileName:myPath];
+
     
     
 	if (data.mailBody != nil) {
@@ -633,231 +601,38 @@ data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults]
 }
 
 
-#pragma mark ActionSheet
--(void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
-    {
-        //    NSLog(@"Ummm.");
-        
-    } 
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    
-    NSLog(@"button press: %i", buttonIndex);
-    
-    if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
-    {
-        // Email PDF
-        emailPDF = YES;
-        
-       [self makePDF];
-        activityInd.hidden = NO;
-        [NSTimer scheduledTimerWithTimeInterval:0.3f target:self selector:@selector(makePDF) userInfo:nil repeats:NO];
-
-        
-        
-    } 
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
-    {
-        // Email CSV
-        emailPDF = NO;
-        [self emailResults];
-
-    }
-    
-    
-}
 
 #pragma mark PDF
-- (void)makePDF
+- (void)viewPDF
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
+    NSString *documentsDir = [paths objectAtIndex:0];
+    NSString *filePath = [NSString stringWithFormat:@"%@%@",documentsDir, saved.filename];
+
     
+    // Show PDF in WebView
+    NSString *path = [filePath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
+    NSLog(@"finished creating PDF: %@", path);
+    NSURL *targetURL = [NSURL fileURLWithPath:path];
     
-	/* 
-     Idea and partial code from : http://itsbrent.net/2011/06/printing-converting-uiwebview-to-pdf/
-     Credit where credit's due.
-	 */
-	
-    /*
-	// Store off the original frame so we can reset it when we're done
-	CGRect origframe = printContentWebView.frame;
-    NSString *heightStr = [printContentWebView stringByEvaluatingJavaScriptFromString:@"document.body.scrollHeight;"]; // Get the height of our webView
-    int height = [heightStr intValue];
+    NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
+    [printContentWebView loadRequest:request];
     
-	// Size of the view in the pdf page
-    CGFloat maxHeight	= kDefaultPageHeight - 2*kMargin;
-	CGFloat maxWidth	= kDefaultPageWidth - 2*kMargin;
-	int pages = ceil(height / maxHeight);
-	
-	[printContentWebView setFrame:CGRectMake(0.f, 0.f, maxWidth, maxHeight)];
-	
-	// Normally we'd want a temp directory and a unique file name, but I want to see the final pdf from Simulator
-	//NSString *path = NSTemporaryDirectory();
-	//self.pdfPath = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"%d.pdf", [[NSDate date] timeIntervalSince1970] ]];
-	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
-	NSString *path = [paths objectAtIndex:0]; 
-    self.pdfPath = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"Results.pdf"]];
-    NSLog(@"pdfPath: %@", pdfPath);
-	// Set up we the pdf we're going to be generating is
-	UIGraphicsBeginPDFContextToFile(self.pdfPath, CGRectZero, nil);
-	int i = 0;
-	for ( ; i < pages; i++) 
-	{
-		if (maxHeight * (i+1) > height) { // Check to see if page draws more than the height of the UIWebView
-            CGRect f = [printContentWebView frame];
-            f.size.height -= (((i+1) * maxHeight) - height);
-            [printContentWebView setFrame: f];
-        }
-		// Specify the size of the pdf page
-		UIGraphicsBeginPDFPageWithInfo(CGRectMake(0, 0, kDefaultPageWidth, kDefaultPageHeight), nil);
-        CGContextRef currentContext = UIGraphicsGetCurrentContext();
-		[self drawPageNumber:(i+1)];
-		// Move the context for the margins
-        CGContextTranslateCTM(currentContext, kMargin, kMargin);
-		// offset the webview content so we're drawing the part of the webview for the current page
-        [[[printContentWebView subviews] lastObject] setContentOffset:CGPointMake(0, maxHeight * i) animated:NO];
-		// draw the layer to the pdf, ignore the "renderInContext not found" warning. 
-        [printContentWebView.layer renderInContext:currentContext];
-    }
-	// all done with making the pdf
-    UIGraphicsEndPDFContext();
-	// Restore the webview and move it to the top. 
-	[printContentWebView setFrame:origframe];
-	[[[printContentWebView subviews] lastObject] setContentOffset:CGPointMake(0, 0) animated:NO];
-    
-    [self emailResults];
-     */
+    activityInd.hidden = YES;
+
 }
 
 
-- (void) drawPDF:(UIImage *)reportImage;
-{
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    /*
-    CGSize pageSize = CGSizeMake(612, 792);
-    CGRect imageBoundsRect = CGRectMake(50, 50, 512, 692);
-
-    NSData *pdfData = [PDFImageConverter convertImageToPDF:reportImage withResolution:300 maxBoundsRect:imageBoundsRect pageSize:pageSize];
-    
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    self.pdfPath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.pdf",@"ResultsPDF"]];
-
-    [pdfData writeToFile:pdfPath atomically:YES];
-    [self emailResults];
-*/
-}
-
-
-- (void) getScreenShot
-{
-#pragma mark - Setup Graph
-/*--------------------------- Setup Graph to print ---------------------------*/
-    chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, 10*72, 7.5*72)]; // 11 x 8 inches with 72dpi
-/*
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        //Create the chart
-        chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
-    } else {
-        //Create the chart
-        chart = [[ShinobiChart alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
-    }
- */   
-    // Set a different theme on the chart
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    SChartMidnightTheme *midnight = [[SChartMidnightTheme alloc] init];
-    [chart setTheme:midnight];
-    [midnight release];
-    
-    
-    
-    //As the chart is a UIView, set its resizing mask to allow it to automatically resize when screen orientation changes.
-    chart.autoresizingMask = ~UIViewAutoresizingNone;
-    
-    // Initialise the data source we will use for the chart
-    // datasource = [[GraphDataSource alloc] init];
-    
-    // Give the chart the data source
-    datasource = [[ChartPrintDataSource alloc] init];
-    
-    chart.datasource = datasource;
-    
-    SChartDateRange *xRange = [[SChartDateRange alloc] init];
-    // Create a date time axis to use as the x axis.    
-    //SChartDateTimeAxis *xAxis = [[SChartDateTimeAxis alloc] initWithRange:xRange];
-    
-    SChartDateTimeAxis *xAxis = [[SChartDateTimeAxis alloc] init];
-
-    // Enable panning and zooming on the x-axis.
-    xAxis.enableGesturePanning = YES;
-    xAxis.enableGestureZooming = YES;
-    xAxis.enableMomentumPanning = YES;
-    xAxis.enableMomentumZooming = YES;
-    xAxis.axisPositionValue = [NSNumber numberWithInt: 0];
-    xAxis.style.majorGridLineStyle.showMajorGridLines = YES;
-    
-    chart.xAxis = xAxis;
-    [xAxis release];
-    [xRange release];
-    
-    //Create a number axis to use as the y axis.
-    SChartNumberAxis *yAxis = [[SChartNumberAxis alloc] init];
-    
-    //Enable panning and zooming on Y
-    yAxis.enableGesturePanning = NO;
-    yAxis.enableGestureZooming = NO;
-    yAxis.enableMomentumPanning = NO;
-    yAxis.enableMomentumZooming = NO;
-    //yAxis.axisLabelsAreFixed = YES;
-    // yAxis.majorTickFrequency = YES;
-    yAxis.titleLabel.textColor = [UIColor grayColor];
-   // yAxis.titleLabel.text = @"<<<   Low                    Hi    >>>";
-    //yAxis.titleLabel.frame
-    yAxis.style.majorGridLineStyle.showMajorGridLines = YES;
-    yAxis.style.majorTickStyle.showLabels = YES;
-    yAxis.style.majorTickStyle.showTicks = YES;
-    
-    chart.yAxis = yAxis;
-    [yAxis release];
-    
-    //Set the chart title
-    chart.title = @"Results";
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        chart.titleLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:27.0f];
-    } else {
-        chart.titleLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:17.0f];
-    }
-    chart.titleLabel.textColor = [UIColor whiteColor];
-   // [self.view addSubview:chart];
-    
-    
-    //dispatch_async(dispatch_get_main_queue(), ^(void) {
-       // [self finishSetup];
-   // });
-    
-    [self.view insertSubview:printContentWebView aboveSubview:chart];
-
-
-    NSLog(@"after que");
-   // dispatch_async(dispatch_get_main_queue(), ^(void) {
-  //  });
-    
-    [self finishSetup];
-}
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
     // Release any retained subviews of the main view.
-   // [self setPrintContentWebView:nil];
+    // [self setPrintContentWebView:nil];
 	[self setPdfPath:nil];
-
+    
 }
 
 #pragma mark - Orientation
@@ -912,14 +687,15 @@ didFailedCreatingPDFFile:(NSString *)filePath
 didFinishCreatingPDFFile:(NSString *)filePath 
        detailNo:(HPDF_STATUS)detailNo
 {
-  //  NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    //  NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
-    
+    activityInd.hidden = YES;
+
     // Show PDF in WebView
     NSString *path = [filePath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
     NSLog(@"finished creating PDF: %@", path);
     NSURL *targetURL = [NSURL fileURLWithPath:path];
-
+    
     NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
     [printContentWebView loadRequest:request];
     

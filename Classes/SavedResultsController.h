@@ -10,6 +10,7 @@
 #import <MessageUI/MessageUI.h>
 #import <MessageUI/MFMailComposeViewController.h>
 #import "SafeFetchedResultsController.h"
+#import "Saved.h"
 
 
 @class MailData;
@@ -18,13 +19,14 @@
     
     SafeFetchedResultsController *fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;
-
 	IBOutlet UITableView *resultsTableView;
+    Saved *selectedIndex;
 
 }
 
 @property (nonatomic, retain) SafeFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) Saved *selectedIndex;
 
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;

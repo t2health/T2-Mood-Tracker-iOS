@@ -24,7 +24,7 @@ int seriesCount;
 
 
         self.dataDict = [NSMutableDictionary dictionaryWithDictionary:[self getChartDictionary]];
-        NSLog(@"dataDict: %@", dataDict);
+       // NSLog(@"dataDict: %@", dataDict);
        // NSLog(@"groupsArray: %@", groupsArray);
         
         seriesData = [[NSMutableArray alloc] init];

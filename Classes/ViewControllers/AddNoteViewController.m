@@ -47,7 +47,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
-
+    
     
     [self deviceOrientationChanged:nil];
     
@@ -95,7 +95,7 @@
         [dateFormat release];
         
     }
-
+    
     
 }
 
@@ -103,7 +103,7 @@
 {
     [super viewWillDisappear:animated];
     
-
+    
 }
 
 #pragma mark ActionSheet
@@ -127,16 +127,16 @@
     if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
     {
         [self.navigationController popViewControllerAnimated:YES];
-
+        
     } 
 }
 
 - (IBAction)cancelNoteClicked:(id)sender
 {
-   // UIApplication *app = [UIApplication sharedApplication];
+    // UIApplication *app = [UIApplication sharedApplication];
 	//VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
     [noteTextView resignFirstResponder];
-   // [appDelegate cancelNote];
+    // [appDelegate cancelNote];
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range 
@@ -157,7 +157,7 @@
 {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs setObject:dateLabel.text forKey:@"landscapeDate"];
-
+    
     NSLog(@"date: %@", dateLabel.text);
     DatePickerController *datePickerController = [[DatePickerController alloc] initWithNibName:@"DatePickerController" bundle:nil];
     [self.navigationController pushViewController:datePickerController animated:YES];
@@ -236,7 +236,7 @@
 - (IBAction)save:(id)sender 
 {
     [self save];
-
+    
 }
 
 // Override to allow orientations other than the default portrait orientation.
@@ -258,18 +258,18 @@
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
-
+    
 	UIDevice *device = [UIDevice currentDevice];
 	if (device.orientation == UIDeviceOrientationPortrait || device.orientation == UIDeviceOrientationPortraitUpsideDown) {
         pickerContainer.hidden = NO;
         pickerButton.hidden = YES;
 		
-
+        
 	}
 	else if(device.orientation == UIDeviceOrientationLandscapeLeft || device.orientation == UIDeviceOrientationLandscapeRight){
         pickerContainer.hidden = YES;
         pickerButton.hidden = NO;
-
+        
 	}
 }
 
@@ -305,11 +305,11 @@
 
 #pragma mark Memory
 - (void)dealloc {
-	[self.dateLabel release];
-	[self.noteTextView release];
+	[dateLabel release];
+	[noteTextView release];
 	
-    [self.timeStamp release];
-	[self.noteDate release];
+    [timeStamp release];
+	[noteDate release];
 	
 	[super dealloc];
 }

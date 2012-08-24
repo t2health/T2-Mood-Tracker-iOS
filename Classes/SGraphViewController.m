@@ -31,11 +31,11 @@
 
 @synthesize switchDictionary, menuBar, loadingLabel;
 @synthesize ledgendColorsDictionary, legendTap, legendSwipeRight, legendSwipeLeft;;
-@synthesize groupsDictionary, groupsArray;
+@synthesize groupsArray;
 @synthesize t2LogoImageView, loadingView, legendButton;
-@synthesize groupName;
+@synthesize groupName, pickerView_iPad, pickerView;
 @synthesize scalesDictionary;
-@synthesize scalesArray, symbolsDictionary;
+@synthesize scalesArray;
 @synthesize _tableView, optionView, legendSwitch, symbolSwitch, gradientSwitch, legendView, subLegendTableViewController, _legendTableView, notesTableViewController, _notesTableView;
 @synthesize optionsTableViewController, _optionsTableView, doneButton, rangePicker, pickerArray;
 
@@ -57,20 +57,21 @@ bool isPortrait;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-  //  NSLog(@"groupName: %@", groupName);
-    /*
+    NSLog(@"groupName: '%@'", groupName);
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:groupName forKey:@"subGraphSelected"];
+
+    
     _notesTableView.backgroundView = nil;
     _tableView.backgroundView = nil;
     
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:groupName forKey:@"subGraphSelected"];
     [defaults synchronize];
-    NSLog(@"groupName: %@", groupName);
+
     //loadingLabel.text = @"Generating Chart";
     
     // Init view state
     [graphView setAlpha:0.0];
-    //[menuView setAlpha:0.0];
+    [menuView setAlpha:0.0];
     containerView.backgroundColor = [UIColor colorWithRed:26.f/255.f green:25.f/255.f blue:25.f/255.f alpha:1.f];
     
     t2LogoImageView.hidden = NO;
@@ -78,9 +79,8 @@ bool isPortrait;
     menuShowing = YES;
     
     // Fill Picker Array
-    self.pickerArray = [[NSArray alloc] initWithObjects:
-                        @"30 days", @"90 days", @"1 year",
-                        @"All", nil];
+    self.pickerArray = [[[NSArray alloc] initWithObjects:
+                        @"30 days", @"90 days", @"180 days", @"1 year", nil] autorelease];
     
     // isOptions default
     isOptions = NO;
@@ -108,26 +108,20 @@ bool isPortrait;
 	self.managedObjectContext = appDelegate.managedObjectContext;
     
     // Setup Data
-    NSLog(@"1");
+
     [self fillScalesDictionary];
-    NSLog(@"2");
 	[self fillColors];
-    NSLog(@"3");
 	[self createSwitches];
-    NSLog(@"4");
-    [self fillSymbols];
-    NSLog(@"5");
     [self fillOptions];
-    NSLog(@"6");
     
     // Orientation
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
     
     // NOTIFICATIONS----------------------------------------------//
     // Listen for Actions from Option UITableViewController
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(legendToggle) name:@"toggleLegend" object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(symbolToggle) name:@"toggleSymbol" object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(gradientToggle) name:@"toggleGradient" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(legendToggle) name:@"toggleLegend_Scale" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(symbolToggle) name:@"toggleSymbol_Scale" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(gradientToggle) name:@"toggleGradient_Scale" object: nil];
     
     // // Listen for Actions from Picker
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(showPicker) name:@"showPicker_Scale" object: nil];
@@ -139,23 +133,66 @@ bool isPortrait;
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
         isPortrait = YES;
+        NSLog(@"Set Portrait");
     }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
     {
         isPortrait = NO;
+        NSLog(@"Set Landscape");
+
     }
     
     backgroundQueue = dispatch_queue_create("org.t2health.moodtracker.bgqueue", NULL);        
     
-    self.title = [NSString stringWithFormat:@"%@",self.groupName];
+    self.title = @"";
     
     [self initSetup];
-    */
+    
 }
 
 -(void) viewWillAppear:(BOOL)animated {
-  //  [_tableView reloadData];    
-   // [_legendTableView reloadData];
+/*
+    if (isPortrait) 
+    {
+        int chartHeight = 0;
+        int menuHeight = 0;
+        int menuStart = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            chartHeight = 512;
+            menuStart = 512;
+            menuHeight = 512;
+        } 
+        else 
+        {
+            // iPhone
+            chartHeight = 211;
+            menuStart = 211;
+            menuHeight = 205;
+        }
+        chart.alpha = 0.0f;    
+        
+        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+        CGRect chartRect = CGRectMake(0.0,
+                                      0.0,
+                                      chartViewSize.width, chartHeight); 
+        
+        chart.frame = chartRect;
+        [self showButtons:1];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     menuStart,
+                                     menuViewSize.width, menuHeight);
+        self.menuView.frame = menuRect;
+        
+        menuView.hidden = NO;
+        [menuView setAlpha:1.0];
+        chart.alpha = 1.0f;
+
+        [self slideDownDidStop];
+    }
+ */
 }
 
 -(void) viewWillDisappear:(BOOL)animated {
@@ -324,7 +361,7 @@ bool isPortrait;
     
     
     //Set the chart title
-    chart.title = @"Results";
+    chart.title = [NSString stringWithFormat:@"%@ Results",self.groupName];
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         chart.titleLabel.font = [UIFont fontWithName:@"TrebuchetMS" size:27.0f];
     } else {
@@ -399,7 +436,7 @@ bool isPortrait;
     {
         
         
-        [self showButtons:2];
+        [self showButtons:1];
         
         CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
         CGRect menuRect = CGRectMake(0.0,
@@ -416,7 +453,7 @@ bool isPortrait;
     }
     
     
-    [self resetLegend];
+   // [self resetLegend];
     
 }
 
@@ -490,10 +527,10 @@ bool isPortrait;
     
     NSString *version = [UIDevice currentDevice].systemVersion;
 	if ([version compare:@"3.2"] != kCFCompareLessThan) {
-		self.legendSwipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)];
-		self.legendSwipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)];
+		self.legendSwipeRight = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)] autorelease];
+		self.legendSwipeLeft = [[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)] autorelease];
         
-        self.legendTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)];
+        self.legendTap = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(legendButtonClicked)] autorelease];
         
 		self.legendSwipeRight.delegate = self;
 		self.legendSwipeLeft.delegate = self;
@@ -935,6 +972,7 @@ bool isPortrait;
     
     // Redraw chart
     [chart redrawChartAndGL: YES];
+     
     
 }
 
@@ -964,129 +1002,113 @@ bool isPortrait;
 #pragma mark Rotation
 
 // Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations.
-	//return (interfaceOrientation == UIInterfaceOrientationPortrait);
-	BOOL shouldRotate = NO;	
-	
-	if (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
-    {
-		shouldRotate = YES;
-	}
-	
-	if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft || interfaceOrientation == UIInterfaceOrientationLandscapeRight) 
-    {
-		shouldRotate = YES;
-	}
-	
-	return shouldRotate;
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation 
+{
+	return YES;
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 
 {
-
-    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     
-    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    if (isPortrait) 
     {
-        if (!isPortrait) 
+        NSLog(@"SUB ORIENTATION: Portrait: %i", isPortrait);
+
+        int chartHeight = 0;
+        int menuHeight = 0;
+        int menuStart = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
         {
-            int chartHeight = 0;
-            int menuHeight = 0;
-            int menuStart = 0;
-            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-            {
-                chartHeight = 512;
-                menuStart = 512;
-                menuHeight = 512;
-            } 
-            else 
-            {
-                // iPhone
-                chartHeight = 211;
-                menuStart = 211;
-                menuHeight = 205;
-            }        
-            [chart removeFromSuperview];
-            
-            
-            CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-            CGRect chartRect = CGRectMake(0.0,
-                                          0.0,
-                                          chartViewSize.width, chartHeight); 
-            
-            chart.frame = chartRect;
-            [self showButtons:1];
-            
-            CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
-            CGRect menuRect = CGRectMake(0.0,
-                                         menuStart,
-                                         menuViewSize.width, menuHeight);
-            self.menuView.frame = menuRect;
-            
-            menuView.hidden = NO;
-            [menuView setAlpha:1.0];
-            [containerView addSubview:chart];
-            [containerView bringSubviewToFront:legendView];
-            [containerView bringSubviewToFront:menuView];
-            
-            [self slideDownDidStop];
-            [self resetLegend];
-            
-            isPortrait = YES;
-        }        
-    }
-    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
-    {
-        if (isPortrait) 
+            chartHeight = 512;
+            menuStart = 512;
+            menuHeight = 512;
+        } 
+        else 
         {
-            int chartHeight = 0;
-            int menuHeight = 0;
-            int menuStart = 0;
-            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-            {
-                chartHeight = 700;
-                menuStart = 0;
-                menuHeight = 700;
-            } 
-            else 
-            {
-                // iPhone
-                chartHeight = 260;
-                menuStart = 0;
-                menuHeight = 320;
-            } 
-            
-            [chart removeFromSuperview];
-            
-            NSLog(@"OrientationCHANGE: LANDSCAPE");
-            CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-            CGRect startRect = CGRectMake(0.0,
-                                          0.0,
-                                          chartViewSize.width, chartHeight); 
-            
-            chart.frame = startRect;
-            [self showButtons:2];
-            
-            CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
-            CGRect menuRect = CGRectMake(0.0,
-                                         menuStart,
-                                         menuViewSize.width, menuHeight);
-            self.menuView.frame = menuRect;
-            
-            
-            [containerView addSubview:chart];
-            [containerView bringSubviewToFront:legendView];
-            [containerView bringSubviewToFront:menuView];
-            menuView.hidden = YES;
-            menuShowing = NO;
-            
-            [self slideDownDidStop];
-            [self resetLegend];
-            isPortrait = NO;
+            // iPhone
+            chartHeight = 211;
+            menuStart = 211;
+            menuHeight = 205;
         }
+        chart.alpha = 0.0f;
+        //            [chart removeFromSuperview];
         
+        
+        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+        CGRect chartRect = CGRectMake(0.0,
+                                      0.0,
+                                      chartViewSize.width, chartHeight); 
+        
+        chart.frame = chartRect;
+        [self showButtons:1];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     menuStart,
+                                     menuViewSize.width, menuHeight);
+        self.menuView.frame = menuRect;
+        
+        menuView.hidden = NO;
+        [menuView setAlpha:1.0];
+        chart.alpha = 1.0f;
+        //            [containerView addSubview:chart];
+        //            [containerView bringSubviewToFront:legendView];
+        //            [containerView bringSubviewToFront:menuView];
+        
+        [self slideDownDidStop];
+        // [self resetLegend];
+        
+        isPortrait = YES;
+    }        
+    else 
+    {
+        int chartHeight = 0;
+        int menuHeight = 0;
+        int menuStart = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            chartHeight = 700;
+            menuStart = 0;
+            menuHeight = 700;
+        } 
+        else 
+        {
+            // iPhone
+            chartHeight = 260;
+            menuStart = 0;
+            menuHeight = 320;
+        } 
+        chart.alpha = 0.0f;
+        //            [chart removeFromSuperview];
+        
+        NSLog(@"SUB ORIENTATION: Landscape: %i", isPortrait);
+        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+        CGRect startRect = CGRectMake(0.0,
+                                      0.0,
+                                      chartViewSize.width, chartHeight); 
+        
+        chart.frame = startRect;
+        [self showButtons:1];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     menuStart,
+                                     menuViewSize.width, menuHeight);
+        self.menuView.frame = menuRect;
+        
+        chart.alpha = 1.0f;
+        //            [containerView addSubview:chart];
+        //            [containerView bringSubviewToFront:legendView];
+        //            [containerView bringSubviewToFront:menuView];
+        menuView.hidden = YES;
+        menuShowing = NO;
+        
+        [self slideDownDidStop];
+        //  [self resetLegend];
+        isPortrait = NO;
     }
+        
+    
     
     
 }
@@ -1344,8 +1366,8 @@ bool isPortrait;
     // Redraw chart
     [chart redrawChartAndGL: YES]; 
     
-    [self resetLegend];
-    [subLegendTableViewController refresh];
+   // [self resetLegend];
+   // [subLegendTableViewController refresh];
     [containerView sendSubviewToBack:loadingView];
     
 }
@@ -1378,7 +1400,15 @@ bool isPortrait;
 			
 			NSMutableArray *sclArray = [NSMutableArray array];
 			for (NSString *minLabel in sortedKeys) {
-				[sclArray addObject:[self.scalesDictionary objectForKey:minLabel]];
+                if ([minLabel isEqualToString:@""]) 
+                {
+                    
+                }
+                else 
+                {
+                    [sclArray addObject:[self.scalesDictionary objectForKey:minLabel]];
+                    
+                }
 			}
 			self.scalesArray = [NSArray arrayWithArray:sclArray];
 		}
@@ -1445,68 +1475,6 @@ bool isPortrait;
     isLegend = storedVal;
     NSLog(@"SWITCH_OPTION_STATE_LEGEND: %i", isLegend);
     
-}
-
-
-- (void)fillSymbols
-{
-	if (self.symbolsDictionary == nil) {
-		self.symbolsDictionary = [NSMutableDictionary dictionary];
-		
-		NSArray *objects = [self.groupsDictionary allKeys];
-		NSInteger index = 0;
-		
-		for (NSString *groupTitle in objects) {
-            
-			UIImage *image = [self UIImageForIndex:index];
-            
-			[self.symbolsDictionary setObject:image forKey:groupTitle];
-			index++;
-		}
-	}    
-    // NSLog(@"symbolsDictionary: %@", symbolsDictionary);
-}
-#pragma mark groups
-
-- (void)fillGroupsDictionary {
-	if (self.groupsDictionary == nil) {
-		NSMutableDictionary *groups = [NSMutableDictionary dictionary];
-		NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-		
-		NSEntityDescription *entity = [NSEntityDescription entityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
-		[fetchRequest setEntity:entity];
-        
-		NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"(showGraph == YES)"];
-		NSPredicate *visiblePredicate = [NSPredicate predicateWithFormat:@"(visible == YES)"];
-		
-		NSArray *finalPredicateArray = [NSArray arrayWithObjects:groupPredicate,visiblePredicate, nil];
-		NSPredicate *finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];
-        
-        [NSFetchedResultsController deleteCacheWithName:nil]; 
-		[fetchRequest setPredicate:finalPredicate];
-        
-		NSError *error = nil;
-		NSArray *objects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-		if (error) {
-			[Error showErrorByAppendingString:@"Unable to get Categories to graph" withError:error];
-		}
-		
-		[fetchRequest release];
-		
-		for (Group *aGroup in objects) {
-			[groups setObject:aGroup forKey:aGroup.title];
-		}			
-		self.groupsDictionary = [NSDictionary dictionaryWithDictionary:groups];
-		
-		NSArray *keys = [self.groupsDictionary allKeys];
-		NSArray *sortedKeys = [keys sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-		
-		NSMutableArray *grpArray = [NSMutableArray array];
-		for (NSString *gName in sortedKeys) {
-			[grpArray addObject:[self.groupsDictionary objectForKey:gName]];
-		}
-		self.groupsArray = [NSArray arrayWithArray:grpArray];
-	}
 }
 
 #pragma mark colors
@@ -1601,51 +1569,49 @@ bool isPortrait;
 #pragma mark Range Picker
 - (void)resignPicker
 {
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
-	CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
-	CGRect endFrame = self.rangePicker.frame;
-	endFrame.origin.y = screenRect.origin.y + screenRect.size.height;
-	
-	// start the slide down animation
-	[UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.3];
-	
-    // we need to perform some post operations after the animation is complete
-    [UIView setAnimationDelegate:self];
-    [UIView setAnimationDidStopSelector:@selector(slideDownDidStop)];
-	
-    self.rangePicker.frame = endFrame;
-	[UIView commitAnimations];
-	
-	// grow the table back again in vertical size to make room for the date picker
-	//CGRect newFrame = self.tableView.frame;
-	//newFrame.size.height += self.datePicker.frame.size.height;
-	//self.tableView.frame = newFrame;
-	
-	// remove the "Done" button in the nav bar
-	self.navigationItem.rightBarButtonItem = nil;
-    
-    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-    
-    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
-        [self showButtons:1];
+        CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
+        CGRect endFrame = self.pickerView_iPad.frame;
+        endFrame.origin.y = screenRect.origin.y + screenRect.size.height;
+        
+        // start the slide down animation
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.3];
+        
+        // we need to perform some post operations after the animation is complete
+        [UIView setAnimationDelegate:self];
+        [UIView setAnimationDidStopSelector:@selector(slideDownDidStop)];
+        
+        self.pickerView_iPad.frame = endFrame;
+        [UIView commitAnimations];
     }
-    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
+    else 
     {
-        [self showButtons:2];
+        CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
+        CGRect endFrame = self.pickerView.frame;
+        endFrame.origin.y = screenRect.origin.y + screenRect.size.height;
+        
+        // start the slide down animation
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.3];
+        
+        // we need to perform some post operations after the animation is complete
+        [UIView setAnimationDelegate:self];
+        [UIView setAnimationDidStopSelector:@selector(slideDownDidStop)];
+        
+        self.pickerView.frame = endFrame;
+        [UIView commitAnimations];
+        
     }
     
+    [self showButtons:1];    
 	
-	// deselect the current table row
 	NSIndexPath *indexPath = [self._optionsTableView indexPathForSelectedRow];
-	//[self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     [_optionsTableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    // UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(generateReport:)];
-	//self.navigationItem.rightBarButtonItem = nextButton;   
-    
-    // If Data Range changed, Refresh all data
     if (doUpdate) 
     {
         [self reloadGraph];
@@ -1656,7 +1622,15 @@ bool isPortrait;
 - (void)slideDownDidStop
 {
 	// the date picker has finished sliding downwards, so remove it
-	[self.rangePicker removeFromSuperview];
+	// the date picker has finished sliding downwards, so remove it
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        [self.pickerView_iPad removeFromSuperview];
+    }
+    else 
+    {
+        [self.pickerView removeFromSuperview];
+    }
 }
 - (IBAction)doneAction:(id)sender
 {
@@ -1709,115 +1683,212 @@ numberOfRowsInComponent:(NSInteger)component
 
 - (void) showPicker
 {
-    NSLog(@"shwpickers: %@", pickerArray);
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    
+    
     int startHeight = 0;
     int startWeight = 0;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
-        //iPad
-        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
+        startHeight = 280;
+        startWeight = 768;
+        
+        // check if our rangePicker is already on screen
+        if (self.pickerView_iPad.superview == nil)
         {
-            startHeight = 329;
-            startWeight = 768;
-        }
-        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
-        {
-            startHeight = 585;
-            startWeight = 1024;
             
+            [self.view addSubview: self.pickerView_iPad];
+            // size up the picker view to our screen and compute the start/end frame origin for our slide up animation
+            //
+            // compute the start frame
+            CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
+            CGSize pickerSize = [self.pickerView_iPad sizeThatFits:CGSizeZero];
+            CGRect startRect = CGRectMake(0.0,
+                                          screenRect.origin.y + screenRect.size.height,
+                                          startWeight, pickerSize.height);
+            self.pickerView_iPad.frame = startRect;
+            // compute the end frame
+            CGRect pickerRect = CGRectMake(0.0,
+                                           screenRect.size.height - pickerSize.height - 44,
+                                           startWeight,
+                                           pickerSize.height);
+            // start the slide up animation
+            [UIView beginAnimations:nil context:NULL];
+            [UIView setAnimationDuration:0.3];
+            
+            // we need to perform some post operations after the animation is complete
+            [UIView setAnimationDelegate:self];
+            
+            self.pickerView_iPad.frame = pickerRect;
+            
+            // shrink the table vertical size to make room for the date picker
+            //CGRect newFrame = self.containerView.frame;
+            //newFrame.size.height -= self.rangePicker.frame.size.height;
+            //self.containerView.frame = newFrame;
+            [UIView commitAnimations];
+            
+            // add the "Done" button to the nav bar
+            self.navigationItem.rightBarButtonItem = nil;
+            
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            NSString *defaultsKey;
+            
+            defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
+            NSString *theRange = [defaults objectForKey:defaultsKey];
+            int whatRow = 3;
+            if ([theRange isEqualToString:@"30 days"]) 
+            {
+                whatRow = 0;
+            }
+            else if ([theRange isEqualToString:@"90 days"])  
+            {
+                whatRow = 1;
+            }
+            else if ([theRange isEqualToString:@"180 days"])  
+            {
+                whatRow = 2;
+            }
+            else if ([theRange isEqualToString:@"1 year"]) 
+            {
+                whatRow = 3;
+            }
+            else 
+            {
+                whatRow = 0;
+            }
+            
+            
+            [self.rangePicker selectRow:whatRow inComponent:0 animated:YES];
+            // self.navigationItem.rightBarButtonItem = self.doneButton;
         }
     }
     else 
     {
         //iPhone
-        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-        if (interfaceOrientation == UIDeviceOrientationPortrait) 
+        startHeight = 280;
+        startWeight = 320;
+        
+        
+        // check if our rangePicker is already on screen
+        if (self.pickerView.superview == nil)
         {
-            startHeight = 280;
-            startWeight = 320;
             
-        }
-        if (interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
-        {
-            startHeight = 260;
-            startWeight = 320;
+            [self.view addSubview: self.pickerView];
+            // size up the picker view to our screen and compute the start/end frame origin for our slide up animation
+            //
+            // compute the start frame
+            CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
+            CGSize pickerSize = [self.pickerView sizeThatFits:CGSizeZero];
+            CGRect startRect = CGRectMake(0.0,
+                                          screenRect.origin.y + screenRect.size.height,
+                                          startWeight, pickerSize.height);
+            self.pickerView.frame = startRect;
+            // compute the end frame
+            CGRect pickerRect = CGRectMake(0.0,
+                                           screenRect.size.height - pickerSize.height - 44,
+                                           startWeight,
+                                           pickerSize.height);
+            // start the slide up animation
+            [UIView beginAnimations:nil context:NULL];
+            [UIView setAnimationDuration:0.3];
             
-        }
-        else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
-        {
-            startHeight = 374;
-            startWeight = 480;
+            // we need to perform some post operations after the animation is complete
+            [UIView setAnimationDelegate:self];
             
+            self.pickerView.frame = pickerRect;
+            
+            // shrink the table vertical size to make room for the date picker
+            //CGRect newFrame = self.containerView.frame;
+            //newFrame.size.height -= self.rangePicker.frame.size.height;
+            //self.containerView.frame = newFrame;
+            [UIView commitAnimations];
+            
+            // add the "Done" button to the nav bar
+            self.navigationItem.rightBarButtonItem = nil;
+            
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            NSString *defaultsKey;
+            
+            defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
+            NSString *theRange = [defaults objectForKey:defaultsKey];
+            int whatRow = 3;
+            if ([theRange isEqualToString:@"30 days"]) 
+            {
+                whatRow = 0;
+            }
+            else if ([theRange isEqualToString:@"90 days"])  
+            {
+                whatRow = 1;
+            }
+            else if ([theRange isEqualToString:@"180 days"])  
+            {
+                whatRow = 2;
+            }
+            else if ([theRange isEqualToString:@"1 year"]) 
+            {
+                whatRow = 3;
+            }
+            else 
+            {
+                whatRow = 0;
+            }
+            
+            
+            [self.rangePicker selectRow:whatRow inComponent:0 animated:YES];
+            // self.navigationItem.rightBarButtonItem = self.doneButton;
         }
     }
     
-    // check if our rangePicker is already on screen
-    if (self.rangePicker.superview == nil)
-    {
-        NSLog(@"MADEIT");
-        [self.view addSubview: self.rangePicker];
-        // size up the picker view to our screen and compute the start/end frame origin for our slide up animation
-        //
-        // compute the start frame
-        CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
-        CGSize pickerSize = [self.rangePicker sizeThatFits:CGSizeZero];
-        CGRect startRect = CGRectMake(0.0,
-                                      screenRect.origin.y + screenRect.size.height,
-                                      startWeight, pickerSize.height);
-        self.rangePicker.frame = startRect;
-        // compute the end frame
-        CGRect pickerRect = CGRectMake(0.0,
-                                       (screenRect.origin.y + screenRect.size.height) - startHeight,
-                                       startWeight,
-                                       pickerSize.height);
-        // start the slide up animation
-        [UIView beginAnimations:nil context:NULL];
-        [UIView setAnimationDuration:0.3];
-        
-        // we need to perform some post operations after the animation is complete
-        [UIView setAnimationDelegate:self];
-        
-        self.rangePicker.frame = pickerRect;
-        
-        // shrink the table vertical size to make room for the date picker
-        //CGRect newFrame = self.containerView.frame;
-        //newFrame.size.height -= self.rangePicker.frame.size.height;
-        //self.containerView.frame = newFrame;
-        [UIView commitAnimations];
-        
-        // add the "Done" button to the nav bar
-        self.navigationItem.rightBarButtonItem = nil;
-        
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSString *defaultsKey;
-        
-        defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
-        NSString *theRange = [defaults objectForKey:defaultsKey];
-        int whatRow = 0;
-        if ([theRange isEqualToString:@"30 days"]) 
-        {
-            whatRow = 0;
-        }
-        else if ([theRange isEqualToString:@"90 days"])  
-        {
-            whatRow = 1;
-        }
-        else if ([theRange isEqualToString:@"1 year"]) 
-        {
-            whatRow = 2;
-        }
-        else if ([theRange isEqualToString:@"All"]) 
-        {
-            whatRow = 3;
-        }
-        
-        [self.rangePicker selectRow:whatRow inComponent:0 animated:YES];
-        self.navigationItem.rightBarButtonItem = self.doneButton;
-    }
+    
 }
 
+- (UIImage *)imageNamed:(UIImage *)name withColor:(UIColor *)color
+{
+    // Load the image
+    // NSString *name = @"Symbol_Clover.png";
+    UIImage *img = name;
+    
+    // Begin new image context, to draw our colored image onto
+    UIGraphicsBeginImageContext(img.size);
+    
+    // Get reference to context created
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    // Set the fill color
+    [color setFill];
+    
+    // Translate/flip graphics context
+    
+    CGContextTranslateCTM(context, 0, img.size.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    
+    // Set the blend mode to colorburn, and the original image
+    
+    CGContextSetBlendMode(context, kCGBlendModeColorBurn);
+    
+    CGRect rect = CGRectMake(0, 0, img.size.width, img.size.height);
+    
+    CGContextDrawImage(context, rect, img.CGImage);
+    
+    // Set a mask that matches the shape of the image, then draw (color burn) a colored rectangle
+    
+    CGContextClipToMask(context, rect, img.CGImage);
+    CGContextAddRect(context, rect);
+    CGContextDrawPath(context, kCGPathFill);
+    
+    // Generate a new UIImage from the graphics context we draw onto
+    UIImage *coloredImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return coloredImage;
+}
+
+- (void)checkTapped:(id)sender
+{
+    UITapGestureRecognizer *gesture = (UITapGestureRecognizer *) sender;
+    NSLog(@"Tag: %d", gesture.view.tag);
+}
 
 #pragma mark tableView
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -1828,8 +1899,12 @@ numberOfRowsInComponent:(NSInteger)component
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-	NSInteger numberOfRows = [self.scalesDictionary count];
+	NSInteger numberOfRows = [self.scalesArray count];
+    
+    
+    
 	return numberOfRows;
+
 }
 
 
@@ -1840,7 +1915,7 @@ numberOfRowsInComponent:(NSInteger)component
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier] autorelease];
     }
     
     // Configure the cell...
@@ -1855,28 +1930,47 @@ numberOfRowsInComponent:(NSInteger)component
     Scale *scale = [self.scalesArray objectAtIndex:row];
 	NSString *gName = scale.minLabel;
     
+    
+    // Fetch saved user symbols/colors
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]];
     NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]];
-    
-    NSDictionary *colorDictionary = [tColorDict objectForKey:self.groupName];
-    
-    NSData *data = [colorDictionary objectForKey:gName];
-    
+    NSDictionary *scaleColorDict = [tColorDict objectForKey:groupName];
+    NSDictionary *scaleSymbolDict = [tSymbolDict objectForKey:groupName];
+    // the image
+    UIImage *image = [self UIImageForIndex:[[scaleSymbolDict objectForKey:gName] intValue]];
+    // the color
+    NSData *data = [scaleColorDict objectForKey:gName];
     UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    NSLog(@"tColorDict: %@", tColorDict);
+    NSLog(@"gName: %@", gName);
+    if (data != nil) 
+    {
+        //  UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+        // button.frame = CGRectMake(200, 20, 43, 43);
+        //[button setBackgroundImage:[self imageNamed:image withColor:color] forState:UIControlStateNormal];
+        // [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
+        
+        cell.imageView.image = [self imageNamed:image withColor:color];
+        cell.imageView.userInteractionEnabled = YES;
+        cell.imageView.tag = indexPath.row;
+        
+        UITapGestureRecognizer *tapped = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(checkTapped:)];
+        tapped.numberOfTapsRequired = 1;
+        [cell.imageView addGestureRecognizer:tapped];
+        [tapped release];
+    }
     
     
 	UISwitch *aSwitch = [self.switchDictionary objectForKey:gName];
 	cell.accessoryView = aSwitch;
 	
-    
-    cell.textLabel.text = scale.minLabel;
+    NSString *scaleName = [NSString stringWithFormat:@"%@/%@", scale.minLabel, scale.maxLabel];
+    cell.textLabel.text = scaleName;
 	cell.textLabel.textColor = color;
 	cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
     
-	
-	cell.detailTextLabel.text = scale.maxLabel;
-	cell.detailTextLabel.textColor = color;
-    cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:14];    
+    
 
 	cell.textLabel.textAlignment = UITextAlignmentRight;
 }
@@ -2014,6 +2108,8 @@ numberOfRowsInComponent:(NSInteger)component
 -(void)dealloc {
     [chart release];
     [datasource release];
+    [pickerArray release];
+
     [super dealloc];
 }
 

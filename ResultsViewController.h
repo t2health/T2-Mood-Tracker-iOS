@@ -16,7 +16,7 @@ typedef enum {
     enExportTypeCSV = 0,
     enExportTypePDF
 }enExportType;
- 
+
 
 @class MailData;
 @class Group;
@@ -39,7 +39,7 @@ typedef enum {
     NSMutableArray *textfieldArray;
     NSMutableArray *groupArray;
     IBOutlet UIView *savingScreen;
-    IBOutlet UIView *datePickView;
+    
     IBOutlet UIDatePicker *datePicker;
     UIBarButtonItem *doneButton;	// this button appears only when the date picker is open
 	
@@ -68,7 +68,6 @@ typedef enum {
 @property (nonatomic, retain) NSMutableArray *textfieldArray;
 @property (nonatomic, retain) NSMutableArray *groupArray;
 @property (nonatomic, retain) UIView *savingScreen;
-@property (nonatomic, retain) UIView *datePickView;
 @property (nonatomic, retain) UIDatePicker *datePicker;
 @property (nonatomic, retain) NSString *curFileName;
 
@@ -89,7 +88,6 @@ typedef enum {
 
 - (void)saveResults;
 - (void)convertArrayToCSV:(NSArray *)valueArray:(NSArray *)withNotes;
-- (void)convertArrayToPDF:(NSArray *)valueArray:(NSArray *)withNotes;
 - (void)fetchFilteredResults;
 - (NSArray *)fetchNotes;
 
@@ -97,11 +95,11 @@ typedef enum {
 - (void)fillGroupsDictionary;
 - (void)fillColors;
 - (NSDictionary *)getValueDictionaryForMonth;
+- (void)makePDF;
 
 - (void)slideDownDidStop;
 
 - (void)resignPicker;
-- (void)createPDF;
 - (void) showPDF;
 
 - (NSArray *)fetchScales:(NSString *)groupTitle;

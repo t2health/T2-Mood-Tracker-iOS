@@ -10,7 +10,7 @@
 #import "SafeFetchedResultsController.h"
 #import "AddNoteViewController.h"
 
-@interface ViewNotesViewController : UIViewController <SafeFetchedResultsControllerDelegate, UITableViewDelegate, UITableViewDataSource> {
+@interface ViewNotesViewController : UIViewController <SafeFetchedResultsControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, UIActionSheetDelegate> {
 	SafeFetchedResultsController *fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;
     AddNoteViewController *addNoteViewController; 
@@ -23,5 +23,6 @@
 
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
+- (void)handleGesture:(UILongPressGestureRecognizer *)recognizer;
 
 @end

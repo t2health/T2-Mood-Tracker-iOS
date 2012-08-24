@@ -47,6 +47,7 @@ didFinishCreatingPDFFile:(NSString *)filePath
 + (PDFService *)instance;
 - (void)createPDFFile;
 - (NSMutableDictionary *) parseNotes:(NSString *)fileContents;
+- (float)getTextHeight:(NSString *)data;
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, assign) id<PDFServiceDelegate> delegate;

@@ -46,7 +46,6 @@
     
     NSMutableDictionary *switchDictionary;
 	NSMutableDictionary *ledgendColorsDictionary;
-	NSDictionary *groupsDictionary;
     NSArray *groupsArray;
     NSDictionary *scalesDictionary;
 	NSArray *scalesArray;
@@ -58,7 +57,6 @@
     IBOutlet NotesTableViewController *notesTableViewController;
     IBOutlet OptionsTableViewController *optionsTableViewController;
     
-    NSMutableDictionary *symbolsDictionary;
     IBOutlet UITableView *_tableView;
     IBOutlet UIView *optionView;
     IBOutlet UISwitch *legendSwitch;
@@ -77,12 +75,15 @@
     
     IBOutlet UIBarButtonItem *doneButton;	// this button appears only when the date picker is open
     IBOutlet UIPickerView *rangePicker;
+    IBOutlet UIView *pickerView;
+    IBOutlet UIView *pickerView_iPad;
 
 }
 
 @property (nonatomic, retain) IBOutlet UIButton *legendButton;
 @property (nonatomic, retain) IBOutlet UIPickerView *rangePicker;
-
+@property (nonatomic, retain) IBOutlet UIView *pickerView;
+@property (nonatomic, retain) IBOutlet UIView *pickerView_iPad;
 @property (nonatomic, retain) IBOutlet UIView *menuView;
 @property (nonatomic, retain) IBOutlet UIView *containerView;
 @property (nonatomic, retain) IBOutlet UIView *graphView;
@@ -92,7 +93,6 @@
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSMutableDictionary *switchDictionary;
 @property (nonatomic, retain) NSMutableDictionary *ledgendColorsDictionary;
-@property (nonatomic, retain) NSDictionary *groupsDictionary;
 @property (nonatomic, retain) NSArray *groupsArray;
 @property (nonatomic, retain) IBOutlet UILabel *loadingLabel;
 @property (nonatomic, retain) NSString *groupName;
@@ -119,7 +119,6 @@
 @property (nonatomic, retain) IBOutlet UISwitch *legendSwitch;
 @property (nonatomic, retain) IBOutlet UISwitch *symbolSwitch;
 @property (nonatomic, retain) IBOutlet UISwitch *gradientSwitch;
-@property (nonatomic, retain) NSMutableDictionary *symbolsDictionary;
 
 @property (nonatomic, retain) IBOutlet UIView *legendView;
 
@@ -132,16 +131,16 @@
 - (void)updateGraphData;
 - (void)redrawGraph;
 
+- (void)checkTapped:(id)sender;
+
 - (void)optionButtonClicked;
 - (void)shareClick;
 
 - (void)createSwitches;
 - (void)switchFlipped:(id)sender;
 - (void)switchProcess;
-- (void)fillGroupsDictionary;
 - (void)fillScalesDictionary;
 - (void)fillColors;
-- (void)fillSymbols;
 - (void)fillOptions;
 
 - (void)saveToGallery;

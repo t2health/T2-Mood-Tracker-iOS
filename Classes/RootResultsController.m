@@ -50,9 +50,9 @@
     if (managedObjectContext == nil) 
     { 
         managedObjectContext = [(VAS002AppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
-
+        
     }
-
+    
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleUnusualEntryNotification:) name:@"UnusualEntryAdded" object:nil];
 	[FlurryUtility report:EVENT_MAIN_ACTIVITY];
@@ -68,7 +68,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
-
+    
 }
 
 - (void)chkPin
@@ -98,10 +98,25 @@
 }
 
 
-- (void)viewWillAppear:(BOOL)animated {
-	//[self.tableView reloadData];
+- (void)viewWillAppear:(BOOL)animated 
+{
+    // Reload Table
     self.tableView.backgroundView = nil;
-	//self.reminderArray = [DateMath remindersDueForGroups];
+    
+    // Show Alert if CSV was saved
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *theAlert = [defaults objectForKey:@"csvSaved"];
+    if ([theAlert isEqualToString:@"csvSaved"]) 
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"CSV Saved" 
+                                                        message:@"Your CSV report has been created.  Please go to Saved Reports to email your report."
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];  
+        [alert show];  
+        [alert release];
+        [defaults setValue:@"" forKey:@"csvSaved"];
+    }
 }
 
 - (void)handleUnusualEntryNotification:(NSNotification *)notification {
@@ -190,7 +205,7 @@
 {
     
     // create the parent view that will hold header Label
-	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
+	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -206,7 +221,7 @@
     NSArray *sections = [self.fetchedResultsController sections];
 	headerLabel.text = [[sections objectAtIndex:section] name];
 	[customView addSubview:headerLabel];
-    
+    [headerLabel release];
 	return customView;
 }
 
@@ -269,24 +284,24 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {		
 	NSInteger row = [indexPath row];
 	NSInteger section = [indexPath section];
-
+    
 	ResultsViewController *resultsViewController;
 	//GraphResultsViewController *graphResultsViewController;
 	ViewNotesViewController *viewNotesViewController;
 	GraphViewController *graphViewController;
-
+    
     SavedResultsController *savedResultsController;
 	
-
+    
 	
 	switch (section) {
 		case 0: //Results
 			switch (row) {
 				case 0: //Graph Results
                     /*
-					graphResultsViewController = [[GraphResultsViewController alloc] initWithNibName:@"GraphResultsViewController" bundle:nil];
-					[self.navigationController pushViewController:graphResultsViewController animated:YES];
-					[graphResultsViewController release];
+                     graphResultsViewController = [[GraphResultsViewController alloc] initWithNibName:@"GraphResultsViewController" bundle:nil];
+                     [self.navigationController pushViewController:graphResultsViewController animated:YES];
+                     [graphResultsViewController release];
                      */
                     graphViewController = [[GraphViewController alloc] initWithNibName:@"GraphViewController" bundle:nil];
                     graphViewController.hidesBottomBarWhenPushed = YES;
@@ -295,16 +310,22 @@
 					break;
                 case 1: //Email Results
 					resultsViewController = [[ResultsViewController alloc] initWithNibName:@"ResultsViewController" bundle:nil];
+                    resultsViewController.hidesBottomBarWhenPushed = YES;
+
 					[self.navigationController pushViewController:resultsViewController animated:YES];
 					[resultsViewController release];
 					break;
                 case 2: //Saved Results
 					savedResultsController = [[SavedResultsController alloc] initWithNibName:@"SavedResultsController" bundle:nil];
+                    savedResultsController.hidesBottomBarWhenPushed = YES;
+
 					[self.navigationController pushViewController:savedResultsController animated:YES];
 					[savedResultsController release];
 					break;    
 				case 3: //View Notes
 					viewNotesViewController = [[ViewNotesViewController alloc] initWithNibName:@"ViewNotesViewController" bundle:nil];
+                    viewNotesViewController.hidesBottomBarWhenPushed = YES;
+
 					[self.navigationController pushViewController:viewNotesViewController animated:YES];
 					[viewNotesViewController release];
 					break;
@@ -533,12 +554,12 @@
 	[fetchRequest setFetchBatchSize:20];
 	
 	// Create and initialize the fetch results controller.
-	self.fetchedResultsController = 
+	fetchedResultsController = 
 	[[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 										  managedObjectContext:self.managedObjectContext 
 											sectionNameKeyPath:@"section" 
 													 cacheName:@"Results"];
-	self.fetchedResultsController.safeDelegate = self;
+	fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
     //	[titleDescriptor autorelease];
@@ -551,7 +572,7 @@
 		[Error showErrorByAppendingString:@"Unable to fetch data for main menu." withError:error];
 	}
 	
-	return self.fetchedResultsController;
+	return fetchedResultsController;
 }
 
 - (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
@@ -788,10 +809,10 @@
 }
 
 - (void)dealloc {
-	[self.fetchedResultsController release];
-	[self.managedObjectContext release];
-	[self.reminderArray release];
-	[self.tableView release];
+	[fetchedResultsController release];
+	[managedObjectContext release];
+	[reminderArray release];
+	[tableView release];
 	
 	[super dealloc];
 }

@@ -63,7 +63,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
-
+    
     
 }
 
@@ -188,7 +188,7 @@
 {
     
     // create the parent view that will hold header Label
-	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
+	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -204,7 +204,7 @@
     NSArray *sections = [self.fetchedResultsController sections];
 	headerLabel.text = [[sections objectAtIndex:section] name];
 	[customView addSubview:headerLabel];
-    
+    [headerLabel release];
 	return customView;
 }
 
@@ -267,7 +267,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {		
 	NSInteger row = [indexPath row];
 	NSInteger section = [indexPath section];
-
+    
 	AboutViewController *aboutViewController;
     HelpViewController *helpViewController;
     OutReachViewController *outReachViewController;
@@ -280,11 +280,15 @@
 			switch (row) {
 				case 0: //About
 					aboutViewController = [[AboutViewController alloc] initWithNibName:@"AboutViewController" bundle:nil];
+                    aboutViewController.hidesBottomBarWhenPushed = YES;
+
 					[self.navigationController pushViewController:aboutViewController animated:YES];
 					[aboutViewController release];
 					break;
 				case 1: //Help
 					helpViewController = [[HelpViewController alloc] initWithNibName:@"HelpViewController" bundle:nil];
+                    helpViewController.hidesBottomBarWhenPushed = YES;
+
 					[self.navigationController pushViewController:helpViewController animated:YES];
 					[helpViewController release];
 					break;
@@ -300,6 +304,8 @@
 					break;
 				case 5: //Outreach
 					outReachViewController = [[OutReachViewController alloc] initWithNibName:@"OutReachViewController" bundle:nil];
+                    outReachViewController.hidesBottomBarWhenPushed = YES;
+
 					[self.navigationController pushViewController:outReachViewController animated:YES];
 					[outReachViewController release];
 					break;
@@ -531,12 +537,12 @@
 	[fetchRequest setFetchBatchSize:20];
 	
 	// Create and initialize the fetch results controller.
-	self.fetchedResultsController = 
+	fetchedResultsController = 
 	[[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 										  managedObjectContext:self.managedObjectContext 
 											sectionNameKeyPath:@"section" 
 													 cacheName:@"Support"];
-	self.fetchedResultsController.safeDelegate = self;
+	fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
     //	[titleDescriptor autorelease];
@@ -549,7 +555,7 @@
 		[Error showErrorByAppendingString:@"Unable to fetch data for main menu." withError:error];
 	}
 	
-	return self.fetchedResultsController;
+	return fetchedResultsController;
 }
 
 - (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
@@ -786,10 +792,10 @@
 }
 
 - (void)dealloc {
-	[self.fetchedResultsController release];
-	[self.managedObjectContext release];
-	[self.reminderArray release];
-	[self.tableView release];
+	[fetchedResultsController release];
+	[managedObjectContext release];
+	[reminderArray release];
+	[tableView release];
 	
 	[super dealloc];
 }

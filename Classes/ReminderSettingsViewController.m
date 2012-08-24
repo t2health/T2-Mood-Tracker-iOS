@@ -767,13 +767,13 @@
     Class notificationClass = (NSClassFromString(@"UILocalNotification"));
 	if (notificationClass != nil) {
 		UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-	
+        
 		localNotification.fireDate = date;
 		localNotification.alertBody = message;
 		localNotification.soundName = UILocalNotificationDefaultSoundName;
 		localNotification.applicationIconBadgeNumber = 1;
 		localNotification.repeatInterval = NSWeekCalendarUnit;
-	
+        
 		[[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
 		[localNotification release];
 	}
@@ -782,19 +782,19 @@
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-	[self.gregorian release];
+	[gregorian release];
 	
-	[self.morningReminderStateSwitch release];
-	[self.noonReminderStateSwitch release];
-	[self.eveningReminderStateSwitch release];
+	[morningReminderStateSwitch release];
+	[noonReminderStateSwitch release];
+	[eveningReminderStateSwitch release];
 	
-	[self.mondayReminderStateSwitch release];
-	[self.tuesdayReminderStateSwitch release];
-	[self.wednesdayReminderStateSwitch release];
-	[self.thursdayReminderStateSwitch release];
-	[self.fridayReminderStateSwitch release];
-	[self.saturdayReminderStateSwitch release];
-	[self.sundayReminderStateSwitch release];
+	[mondayReminderStateSwitch release];
+	[tuesdayReminderStateSwitch release];
+	[wednesdayReminderStateSwitch release];
+	[thursdayReminderStateSwitch release];
+	[fridayReminderStateSwitch release];
+	[saturdayReminderStateSwitch release];
+	[sundayReminderStateSwitch release];
 	
     [super dealloc];
 }

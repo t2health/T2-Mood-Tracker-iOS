@@ -106,10 +106,10 @@
     
     if (_saveStyle == HCPCSaveStyleSaveAndCancel) {
         UIBarButtonItem *buttonItem;
-        
+        /*
         buttonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)] autorelease];
         self.navigationItem.leftBarButtonItem = buttonItem;
-        
+        */
         buttonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Next" style:UIBarButtonItemStyleDone target:self action:@selector(save:)] autorelease];
         self.navigationItem.rightBarButtonItem = buttonItem;
     }
@@ -199,7 +199,7 @@
         symbolViewController.subName = @"";
         
     }
-    [self.navigationController pushViewController:symbolViewController animated:YES];
+    [self.navigationController pushViewController:symbolViewController animated:NO];
 }
 
 - (void)save:(id)sender
@@ -209,7 +209,7 @@
 
 - (void)cancel:(id)sender
 {
-    [self.navigationController popViewControllerAnimated:YES];
+   // [self.navigationController popViewControllerAnimated:YES];
 }
 
 

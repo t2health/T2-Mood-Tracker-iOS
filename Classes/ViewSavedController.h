@@ -28,7 +28,7 @@
 @class Saved;
 @class MailData;
 
-@interface ViewSavedController : UIViewController <UIWebViewDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, SChartDelegate, PDFServiceDelegate>
+@interface ViewSavedController : UIViewController <UIWebViewDelegate, MFMailComposeViewControllerDelegate, SChartDelegate, PDFServiceDelegate>
 {
     ShinobiChart            *chart;
     ChartPrintDataSource         *datasource;    
@@ -41,6 +41,8 @@
     NSString *fileName;
     NSString *fileType;
     NSDictionary *groupsScalesDictionary;
+    NSString *fileAction;
+
 
 
 }
@@ -53,6 +55,7 @@
 @property (nonatomic, retain) NSString *fileName;
 @property (nonatomic, retain) NSString *fileType;
 @property (nonatomic, retain) NSDictionary *groupsScalesDictionary;
+@property (nonatomic, retain) NSString *fileAction;
 
 
 - (void)sendMail:(MailData *)mailData;
@@ -60,14 +63,12 @@
 - (void)launchMailAppOnDeviceWithMailData:(MailData *)data;
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error;
 - (void)emailResults;
-- (void) finishSetup;
-- (void) getScreenShot;
+
 - (void) createPDFDocument;
 - (void) createWebViewWithHTML;
 - (NSMutableDictionary *) parseNotes:(NSString *)fileContents;
 - (void) shareClick;
-- (void) makePDF;
-- (void) drawPDF:(UIImage *)reportImage;
+- (void) viewPDF;
 
 - (void)drawPageNumber:(NSInteger)pageNum;
 

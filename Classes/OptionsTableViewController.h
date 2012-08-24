@@ -8,12 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
-#import "SafeFetchedResultsController.h"
 
 
-@interface OptionsTableViewController : UITableViewController <UINavigationControllerDelegate, SafeFetchedResultsControllerDelegate>
+@interface OptionsTableViewController : UITableViewController <UINavigationControllerDelegate>
 {
-    SafeFetchedResultsController *fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;
     NSArray *dataSourceArray;
     UINavigationController *myNavController;
@@ -23,7 +21,6 @@
     UISwitch *gradientSwitch;
 }
 
-@property (nonatomic, retain) SafeFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSArray *dataSourceArray;
 @property (nonatomic, retain) UINavigationController *myNavController;

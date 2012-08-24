@@ -25,13 +25,26 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
 	self.title = [NSString stringWithFormat:@"Edit %@ Scales",self.group.title];
 	
 	[FlurryUtility report:EVENT_MANAGE_SCALE_ACTIVITY];
 	
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    
+    // Delete Button
+    UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(reloadData)];
+    self.navigationItem.rightBarButtonItem = deleteButton;
+    [deleteButton release];
+    NSLog(@"self.group: %@", self.group);
+
+    NSError *error;
+    if (![[self fetchedResultsController] performFetch:&error]) 
+    {
+        NSLog(@"unresolved error: %@", error);
+    }
+
 }
 
 - (void)viewDidUnload {
@@ -44,6 +57,13 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return YES;
+}
+
+- (void)reloadData
+{
+    [self.scalesTableView reloadData];
+    NSLog(@"Reload Button Click");
+
 }
 
 #pragma mark Table view data source
@@ -80,7 +100,8 @@
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {	
 	// Configure the cell to show the book's title
-	
+    NSLog(@"configureCell: %i", indexPath.row);
+
 	Scale *aScale = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	if (![aScale.minLabel isEqual:@""]) {
 		cell.textLabel.text = aScale.minLabel;
@@ -113,9 +134,10 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	NSArray	*objects = [self.fetchedResultsController fetchedObjects];
 	Scale *scale = [objects objectAtIndex:[indexPath row]];
-
+    
 	EditScaleViewController *editScaleViewController = [[EditScaleViewController alloc] initWithNibName:@"EditScaleViewController" bundle:nil];
 	editScaleViewController.scale = scale;
+    editScaleViewController.groupName = group.title;
 	[self.navigationController pushViewController:editScaleViewController animated:YES];
 	[editScaleViewController release];
 }
@@ -154,7 +176,7 @@
 	// Create and initialize the fetch results controller.
 	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"EditGroups"];
 	fetchedResultsController.safeDelegate = self;
-
+    
 	
 	NSError *error = nil;
 	if (![[self fetchedResultsController] performFetch:&error]) {
@@ -178,20 +200,20 @@
 - (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
 	switch(type) {
 		case NSFetchedResultsChangeInsert:
-			[self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+			[self.scalesTableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
 			break;
 			
 		case NSFetchedResultsChangeDelete:
-			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+			[self.scalesTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
 			break;
 			
 		case NSFetchedResultsChangeUpdate:
-			[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
+			[self configureCell:[self.scalesTableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
 			break;
 			
 		case NSFetchedResultsChangeMove:
-			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+			[self.scalesTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [self.scalesTableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
 			break;
 	}	
 }

@@ -30,7 +30,7 @@
     
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSString *myDateString = [prefs stringForKey:@"landscapeDate"];
-
+    
 	NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
 	[dateFormat setDateStyle:NSDateFormatterMediumStyle];
 	[dateFormat setTimeStyle:NSDateFormatterShortStyle];
@@ -49,7 +49,7 @@
 	[dateFormat setDateStyle:NSDateFormatterMediumStyle];
 	[dateFormat setTimeStyle:NSDateFormatterShortStyle];
 	NSString *dateString = [dateFormat stringFromDate:datePicker.date];
-    
+    [dateFormat release];
     [prefs setObject:dateString forKey:@"landscapeDate"];
     [prefs setObject:@"1" forKey:@"landscapeDateTrigger"];
 }

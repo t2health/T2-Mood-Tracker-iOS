@@ -7,6 +7,7 @@
 //
 
 #import "SymbolViewController.h"
+#import "ChartOptionsViewController.h"
 
 @interface SymbolViewController ()
 
@@ -51,9 +52,11 @@
     NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:dictName]];
     UIImage *image;
     
+    NSLog(@"tSymbolDict:%@", tSymbolDict);
+    
     if (_isSub) 
     {
-        NSDictionary *tSubSymbolDict = [NSDictionary dictionaryWithDictionary:[tSymbolDict objectForKey:subName]];
+        NSDictionary *tSubSymbolDict = [NSDictionary dictionaryWithDictionary:[tSymbolDict objectForKey:groupName]];
         image = [self UIImageForIndex:[[tSubSymbolDict objectForKey:subName] intValue]];
         
         
@@ -79,13 +82,35 @@
 {
     //int count = [self.navigationController.viewControllers count];
     // [self.navigationController popToViewController:[self.navigationController.viewControllers objectAtIndex:count-2]];
-    NSLog(@"gufaw");
+    /*
     NSArray *buh = self.navigationController.viewControllers;
     NSMutableArray *VCs = [NSMutableArray arrayWithArray:buh];
-    [VCs removeObjectAtIndex:[VCs count] - 2];
+    NSLog(@"buh:%@", buh);
+
+    [VCs removeObjectAtIndex:[VCs count] -2];
+
+
     self.navigationController.viewControllers = VCs;
     
-    [self.navigationController popViewControllerAnimated:YES];
+    [self.navigationController popViewControllerAnimated:NO];
+     */
+    
+    ChartOptionsViewController *chartOptionsViewController = [[ChartOptionsViewController alloc] initWithNibName:@"ChartOptionsViewController" bundle:nil];
+    if (_isSub) 
+    {
+        chartOptionsViewController.editGroupName = groupName;
+
+    }
+    else 
+    {
+        //chartOptionsViewController.editGroupName = groupName;
+
+    }
+    
+    [self.navigationController pushViewController:chartOptionsViewController animated:YES];
+    
+    [chartOptionsViewController release];
+     
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 

@@ -9,10 +9,11 @@
 @interface TipViewController : UIViewController {
 	IBOutlet UITextView *tipView;
 	IBOutlet UISwitch *showTipSwitch;
+    IBOutlet UILabel *touchLabel;
+
 }
 
 - (IBAction)showTipSwitchFlipped;
 - (IBAction)closeTipsPressed;
-- (void)chkPin;
-- (void)rsnPin;
+
 @end

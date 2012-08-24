@@ -11,7 +11,7 @@
 
 @class Group;
 
-@interface ManageScalesViewController : UITableViewController<SafeFetchedResultsControllerDelegate> {
+@interface ManageScalesViewController : UIViewController<SafeFetchedResultsControllerDelegate, UITableViewDelegate, UITableViewDataSource> {
 	SafeFetchedResultsController *fetchedResultsController;
 	
 	IBOutlet UITableView *scalesTableView;		
@@ -25,5 +25,5 @@
 
 - (NSFetchedResultsController *)fetchedResultsController;
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
-
+- (void)reloadData;
 @end

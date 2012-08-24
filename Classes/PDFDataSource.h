@@ -21,6 +21,7 @@
 @property (nonatomic, retain) NSMutableArray *seriesData, *seriesDates;
 
 - (NSDictionary *)getChartDictionary;
+- (NSDictionary *)getScaleDictionary:(NSString *)groupName;
 
 @end
 

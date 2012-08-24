@@ -911,6 +911,7 @@
 		FBDF39E3157FC28100E74F12 /* About */ = {
 			isa = PBXGroup;
 			children = (
+				FBF09551152BA7BC00B00AA6 /* RootSupportController.xib */,
 				FE2CB65412C8E813009E418B /* AboutViewController.h */,
 				FE2CB65512C8E813009E418B /* AboutViewController.m */,
 				FE2CB65612C8E813009E418B /* AboutViewController.xib */,
@@ -1058,7 +1059,6 @@
 				1F5DE7E915C8BC9C00F5FD5B /* WebView */,
 				FBF0954F152BA7BC00B00AA6 /* RootSupportController.h */,
 				FBF09550152BA7BC00B00AA6 /* RootSupportController.m */,
-				FBF09551152BA7BC00B00AA6 /* RootSupportController.xib */,
 				FBDF39FE157FCE6C00E74F12 /* OutReach */,
 				FBDF39E3157FC28100E74F12 /* About */,
 				FBDF39E6157FC2BC00E74F12 /* Help */,

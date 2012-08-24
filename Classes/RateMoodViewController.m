@@ -68,7 +68,7 @@
 	
 	NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"(group.title like[cd] %@)",self.currentGroup.title];
 	[fetchRequest setPredicate:groupPredicate];
-
+    
 	[fetchRequest setFetchLimit:31];
 	
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Result" inManagedObjectContext:managedObjectContext];
@@ -76,11 +76,11 @@
 	
 	NSError *error = nil;
 	NSArray *fetchedObjects = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
-
+    
 	if (error) {
 		[Error showErrorByAppendingString:@"Unable to fetch information" withError:error];
 	}
-
+    
 	[scaleIndexDescriptor release];
 	[timestampIndex release];
 	[sortDescriptors release];
@@ -97,7 +97,7 @@
 	if (count > 0) {
 		self.mean = [NSNumber numberWithDouble:total/count];
 	}
-
+    
 	double totalVariance = 0;
 	double variance;
 	double varianceSquared;
@@ -144,7 +144,7 @@
 	if (error) {
 		[Error showErrorByAppendingString:@"Unable to fetch information" withError:error];
 	}
-
+    
 	[indexDescriptor release];
 	[sortDescriptors release];
 	[fetchRequest release];
@@ -222,13 +222,13 @@
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-   if (buttonIndex == 0) {
-	   UIApplication *app = [UIApplication sharedApplication];
-	   VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
-	   ManageScalesViewController *manageScalesViewController = [[ManageScalesViewController alloc] initWithNibName:@"ManageScalesViewController" bundle:nil];
-	   manageScalesViewController.group = self.currentGroup;
-	   [appDelegate.navigationController pushViewController:manageScalesViewController animated:YES];
-	   [manageScalesViewController release];
+    if (buttonIndex == 0) {
+        UIApplication *app = [UIApplication sharedApplication];
+        VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
+        ManageScalesViewController *manageScalesViewController = [[ManageScalesViewController alloc] initWithNibName:@"ManageScalesViewController" bundle:nil];
+        manageScalesViewController.group = self.currentGroup;
+        [appDelegate.navigationController pushViewController:manageScalesViewController animated:YES];
+        [manageScalesViewController release];
     }
 }
 
@@ -241,7 +241,7 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
         sHeight = (numRows * 80) + 10;
-
+        
     } 
     
 	
@@ -255,12 +255,12 @@
     {
         // reached the bottom
         NSLog(@"reached bottom");
-       // self._imageView.hidden = YES;
+        // self._imageView.hidden = YES;
     }
     
     else
     {
-       // self._imageView.hidden = NO;
+        // self._imageView.hidden = NO;
     }
 }
 
@@ -333,7 +333,7 @@
 		[groupResult setYear:year];
 		[groupResult setGroup:self.currentGroup];
 		[self sendNoteRequest:avg];
-
+        
 		double percentMoved = movedCount / count;
 		NSDictionary *usrDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:percentMoved], EVENT_FORM_PERCENT, nil];
 		[FlurryUtility report:EVENT_FORM_SAVED withData:usrDict];
@@ -358,10 +358,10 @@
 }
 
 - (void)dealloc {
-	[self.currentGroup release];
-	[self.sliders release];
-	[self.standardDeviation release];
-	[self.mean release];
+	[currentGroup release];
+	[sliders release];
+	[standardDeviation release];
+	[mean release];
 	
 	[super dealloc];
 }

@@ -14,10 +14,10 @@
 	NSManagedObjectContext *managedObjectContext;	    
 	NSPersistentStoreCoordinator *persistentStoreCoordinator;
 	NSPersistentStore *persistentStore;
-		
+    
     UIWindow *window;
-
-
+    
+    
     UINavigationController *navigationController;
     UITabBarController *tabBarController;
 }
@@ -42,7 +42,6 @@
 - (void)setFirstLauchPreferences;
 - (void)saveContext;
 
-- (void)addNote;
 
 void uncaughtExceptionHandler(NSException *exception);
 

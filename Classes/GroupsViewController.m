@@ -28,7 +28,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     tableView.backgroundView = nil;
-
+    
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
 	self.managedObjectContext = appDelegate.managedObjectContext;
@@ -37,7 +37,7 @@
 	
 	UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addGroup:)];
 	self.navigationItem.rightBarButtonItem = plusButton;
-	
+	[plusButton release];
 	[FlurryUtility report:EVENT_EDIT_GROUP_ACTIVITY];
     
     [self.tableView reloadData];
@@ -46,11 +46,13 @@
 - (void)viewWillAppear:(BOOL)animated {
 	[self fillGroupsDictionary];
 	[self createSwitches];
-	//[self.tableView reloadData];
+	[self.tableView reloadData];
 }
 
 - (void)viewDidUnload {
-	self.fetchedResultsController = nil;
+	self.fetchedResultsController.delegate = nil;
+    groupsDictionary = nil;
+    switchDictionary = nil;
 }
 
 #pragma mark Create dictionaries
@@ -124,10 +126,10 @@
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    //static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"Cell";
     
     // Perm fix for tableview WEIRD Bug from v2.0; 5/15/2012 Mel Manzano
-    NSString *CellIdentifier = [NSString stringWithFormat:@"Cell %d, %d", indexPath.row, indexPath.section];
+    // NSString *CellIdentifier = [NSString stringWithFormat:@"Cell %d, %d", indexPath.row, indexPath.section];
     
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
@@ -295,9 +297,9 @@
 	[fetchRequest setPredicate:showGraphPredicate];
 	
 	// Create and initialize the fetch results controller.
-	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
-									 self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
-	self.fetchedResultsController.safeDelegate = self;
+	fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
+                                managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
+	fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
 	[menuIndexDescriptor autorelease];
@@ -309,7 +311,7 @@
 		[Error showErrorByAppendingString:@"Unable to fetch data for groups." withError:error];
 	}
     
-	return self.fetchedResultsController;
+	return fetchedResultsController;
 }    
 
 - (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
@@ -363,12 +365,12 @@
 - (void)dealloc {
 	// Not sure why I have to explicitly set the delegate to nil, but if I don'tthe delegate will 
 	// persist even after the View Controller has been deallocated.
-	[self.tableView release];
-	self.fetchedResultsController.delegate = nil;
-	[self.fetchedResultsController release];
-	[self.managedObjectContext release];
-	[self.switchDictionary release];
-	[self.groupsDictionary release];
+	[tableView release];
+	fetchedResultsController.delegate = nil;
+	[fetchedResultsController release];
+	[managedObjectContext release];
+	[switchDictionary release];
+	[groupsDictionary release];
 	
     [super dealloc];
 }

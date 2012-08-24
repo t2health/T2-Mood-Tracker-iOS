@@ -58,6 +58,9 @@
 - (void)openPicker:(UIColor *)withColor;
 - (void)refreshTable;
 - (void)cancelEdit;
+- (void)popNav;
+- (void)popToGroups;
+
 
 - (void)addSwitchForGroup:(Group *)group;
 - (NSInteger) numberSwitchesOn;

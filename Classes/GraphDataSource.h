@@ -48,6 +48,7 @@
     NSDictionary *scalesUpdateDict;
     NSMutableArray *hideSeriesArray;
     
+    
 }
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;

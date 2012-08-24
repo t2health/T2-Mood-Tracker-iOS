@@ -27,8 +27,10 @@
     // Do any additional setup after loading the view from its nib.
     NSString *urlPath = [[NSBundle mainBundle] pathForResource:@"outreach_wefeature" ofType:@"html"];
 	NSURL *url = [NSURL fileURLWithPath:urlPath isDirectory:NO];
+    [_webView setBackgroundColor:[UIColor clearColor]];
+    [_webView setOpaque:NO];
 	[self._webView loadRequest:[NSURLRequest requestWithURL:url]];	
-    self.title = @"24/7 Outreach Center";
+    self.title = @"DCoE 24/7 Outreach Center";
 }
 
 - (void)viewDidUnload
