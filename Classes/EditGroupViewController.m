@@ -169,8 +169,8 @@ BOOL isPortrait;
         [Error showErrorByAppendingString:@"Unable to get data" withError:error];
     }
     
-    NSMutableArray *scaleArray = [[[NSMutableArray alloc] init] retain];
-    NSMutableArray *allScaleArray = [[[NSMutableArray alloc] init] retain];
+    NSMutableArray *scaleArray = [[NSMutableArray alloc] init];
+    NSMutableArray *allScaleArray = [[NSMutableArray alloc] init];
 
     for (Scale *aScales in objects) 
     {
@@ -224,7 +224,8 @@ BOOL isPortrait;
     }
     NSArray *valueArray = [allValueDict allKeys];
      self.pickerArray = [[[NSArray alloc] initWithArray:valueArray] autorelease];
-
+    [fetchRequest release];
+    [allValueDict release];
 }
 
 
@@ -914,13 +915,11 @@ numberOfRowsInComponent:(NSInteger)component
             {
                 startHeight = 1024;
                 startWeight = 780;
-                headerSpace = 24;
             }
             else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
             {
                 startHeight = 780;
                 startWeight = 1024;
-                headerSpace = 24;
             }
             
             
@@ -1307,7 +1306,6 @@ numberOfRowsInComponent:(NSInteger)component
             cell.textLabel.font = [UIFont boldSystemFontOfSize:10];
 
             cell.textLabel.text = @"Is this category a positive in nature?";
-            
             
                          
         }

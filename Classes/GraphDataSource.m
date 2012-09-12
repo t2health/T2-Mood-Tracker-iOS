@@ -619,7 +619,6 @@ bool symbolOn;
             }
             
             
-            tempDate = [arrayByDate objectAtIndex:i];
             [rawValuesArray addObject:[arrayByDate objectAtIndex:i + 3]];
             [rawValuesArray addObject:[arrayByDate objectAtIndex:i]];
             [rawValuesArray addObject:[NSString stringWithFormat:@"%i", averageValue]];
@@ -669,6 +668,30 @@ bool symbolOn;
     [groupsDictionary release];
     [dataDict release];
     [dataDictCopy release];
+    [managedObjectContext release];
+
+    
+    
+    seriesData = nil;
+    seriesDates = nil;
+    dataDict = nil;
+    managedObjectContext = nil;
+
+
+    groupsDictionary = nil;
+    groupsArray = nil;
+    gregorian = nil;
+    notesForMonth = nil;
+    valuesArraysForMonth = nil;
+    switchDictionary = nil;
+    ledgendColorsDictionary = nil;
+    tempDict = nil;    
+    dataDictCopy = nil;
+    symbolsDictionary = nil;
+    scalesUpdateDict = nil;
+    hideSeriesArray = nil;
+    
+    
 	[super dealloc];
 }
 

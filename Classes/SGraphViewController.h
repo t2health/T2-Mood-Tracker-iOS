@@ -25,7 +25,7 @@
 @class OptionsTableViewController;
 
 
-@interface SGraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource, HRColorPickerViewControllerDelegate> 
+@interface SGraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource, HRColorPickerViewControllerDelegate, HRColorPickerViewControllerDelegate> 
 {
     
     ShinobiChart            *chart;

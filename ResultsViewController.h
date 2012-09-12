@@ -95,7 +95,6 @@ typedef enum {
 - (void)fillGroupsDictionary;
 - (void)fillColors;
 - (NSDictionary *)getValueDictionaryForMonth;
-- (void)makePDF;
 
 - (void)slideDownDidStop;
 

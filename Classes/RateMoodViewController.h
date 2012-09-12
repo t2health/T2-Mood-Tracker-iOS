@@ -14,6 +14,8 @@
 	IBOutlet UIScrollView *_scrollView;
 	NSNumber *standardDeviation;
 	NSNumber *mean;
+    NSManagedObjectContext *managedObjectContext;
+
 
 }
 
@@ -22,6 +24,7 @@
 @property (nonatomic, retain) NSNumber *standardDeviation;
 @property (nonatomic, retain) NSNumber *mean;
 @property (nonatomic, retain) IBOutlet UIScrollView *_scrollView;
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
 
 - (IBAction)savePressed:(id)sender;

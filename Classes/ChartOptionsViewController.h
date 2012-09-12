@@ -13,7 +13,7 @@
 
 @class Group;
 
-@interface ChartOptionsViewController : UIViewController <SafeFetchedResultsControllerDelegate, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource, HRColorPickerViewControllerDelegate>
+@interface ChartOptionsViewController : UIViewController <SafeFetchedResultsControllerDelegate, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource, HRColorPickerViewControllerDelegate, HRColorPickerViewControllerDelegate>
 {
 	NSManagedObjectContext *managedObjectContext;
 	SafeFetchedResultsController *fetchedResultsController;

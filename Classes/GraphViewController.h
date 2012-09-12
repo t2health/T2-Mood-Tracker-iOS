@@ -151,7 +151,6 @@
 
 - (void)saveToGallery;
 
-- (void)legendButtonClicked;
 - (void)showLegend;
 - (void)resetLegend;
 
@@ -166,7 +165,6 @@
 - (void)legendToggle;
 - (void)symbolToggle;
 - (void)gradientToggle;
-- (IBAction) legendButtonClicked:(id)sender;
 
 - (void)sendMenuToBack;
 - (void)emailResults;

@@ -60,6 +60,7 @@ bool isPortrait;
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 
     [super viewDidLoad];
+    
     _notesTableView.backgroundView = nil;
     _tableView.backgroundView = nil;
     
@@ -276,13 +277,14 @@ bool isPortrait;
 -(void) viewWillDisappear:(BOOL)animated 
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-
+    managedObjectContext = nil;
     if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) 
     {
         // back button was pressed.  We know this is true because self is no longer
         // in the navigation stack. 
 
     }
+    
     [super viewWillDisappear:animated];
 }
 
@@ -355,17 +357,22 @@ bool isPortrait;
     // Initialise the data source we will use for the chart
     if (datasource == nil) 
     {
+        NSLog(@"datasource 1");
+
         datasource = [[GraphDataSource alloc] init];
     }
     else 
     {
+        NSLog(@"datasource 2");
+
         datasource = nil;
         [datasource release];
         
         datasource = [[GraphDataSource alloc] init];
 
+
     }
-    
+
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self setupGraph];
     });
@@ -606,32 +613,6 @@ bool isPortrait;
 
         
     }
-}
-
-#pragma mark Legend
-
-
-- (void)legendButtonClicked
-{
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-
-    if (isMyLegend) 
-    {
-        [self resignLegend];
-        isMyLegend = NO;
-    }
-    else 
-    {
-        [self showLegend];
-        isMyLegend = YES;
-    } 
-}
-
-- (IBAction) legendButtonClicked:(id)sender
-{
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-
-    [self legendButtonClicked];
 }
 
 
@@ -1529,6 +1510,7 @@ bool isPortrait;
     yMax = [chart.yAxis.axisRange.maximum doubleValue];
     
     // Change series type
+    datasource.managedObjectContext = self.managedObjectContext;
     [datasource toggleSeries];
 
     // Reload data
@@ -1897,12 +1879,10 @@ numberOfRowsInComponent:(NSInteger)component
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    
     
-    int startHeight = 0;
     int startWeight = 0;
 
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
-        startHeight = 280;
         startWeight = 768;
         
         // check if our rangePicker is already on screen
@@ -1977,7 +1957,6 @@ numberOfRowsInComponent:(NSInteger)component
     else 
     {
         //iPhone
-        startHeight = 280;
         startWeight = 320;
 
         
@@ -2345,12 +2324,11 @@ numberOfRowsInComponent:(NSInteger)component
 
 -(void)dealloc {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    dispatch_release(backgroundQueue);
+   // dispatch_release(backgroundQueue);
     [chart release];
     [datasource release];
     [optionsTableViewController release];
     [notesTableViewController release];
-    [legendTableViewController release];
     [managedObjectContext release];
     [switchDictionary release];
 	[ledgendColorsDictionary release];
@@ -2361,6 +2339,39 @@ numberOfRowsInComponent:(NSInteger)component
     [legendSwipeRight release];
 	[legendSwipeLeft release];
     [legendTap release];
+    
+    
+    switchDictionary = nil;
+    menuBar = nil;
+    loadingLabel = nil;
+    ledgendColorsDictionary = nil;
+    legendTap = nil;
+    legendSwipeRight = nil;
+    legendSwipeLeft = nil;
+    groupsDictionary = nil;
+    groupsArray = nil;
+    t2LogoImageView = nil;
+    loadingView = nil;
+    symbolsDictionary = nil;
+    legendButton = nil;
+    _tableView = nil;
+    optionView = nil;
+    legendSwitch = nil;
+    symbolSwitch = nil;
+    gradientSwitch = nil;
+    legendView = nil;
+    _legendTableView = nil;
+    notesTableViewController = nil;
+    _notesTableView = nil;
+    optionsTableViewController = nil;
+    _optionsTableView = nil;
+    doneButton = nil;
+    rangePicker = nil;
+    pickerArray = nil;
+    pickerView = nil;
+    
+    
+    
     [super dealloc];
 }
 

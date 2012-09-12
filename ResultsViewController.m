@@ -822,7 +822,6 @@ int pickerShow;
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     if (indexPath.section == 0) 
     {
-        int startHeight = 0;
         int startWeight = 0;
         int offSet = 44;
         
@@ -832,14 +831,12 @@ int pickerShow;
             UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
             if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
             {
-                startHeight = 280;
                 startWeight = 780;
                 offSet = 43;
 
             }
             else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
             {
-                startHeight = 535;
                 startWeight = 1024;
                 offSet = 320;
     
@@ -851,13 +848,11 @@ int pickerShow;
             UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
             if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
             {
-                startHeight = 480;
                 startWeight = 320;
                 
             }
             else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
             {
-                startHeight = 480;
                 startWeight = 480;
                 offSet = 210;
 

@@ -32,7 +32,6 @@
 
 int imageName = 0;
 double webViewHeight = 0.0;
-static bool emailPDF = YES;
 static bool isPDF = NO;
 int rowCount;
 

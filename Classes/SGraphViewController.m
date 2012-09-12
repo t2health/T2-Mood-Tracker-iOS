@@ -136,6 +136,44 @@ bool isPortrait;
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
         isPortrait = YES;
+        
+        int chartHeight = 0;
+        int menuHeight = 0;
+        int menuStart = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            chartHeight = 512;
+            menuStart = 512;
+            menuHeight = 512;
+        } 
+        else 
+        {
+            // iPhone
+            chartHeight = 211;
+            menuStart = 211;
+            menuHeight = 205;
+        }
+        chart.alpha = 0.0f;
+        //            [chart removeFromSuperview];
+        
+        
+        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+        CGRect chartRect = CGRectMake(0.0,
+                                      0.0,
+                                      chartViewSize.width, chartHeight); 
+        
+        chart.frame = chartRect;
+        [self showButtons:1];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     menuStart,
+                                     menuViewSize.width, menuHeight);
+        self.menuView.frame = menuRect;
+        
+        menuView.hidden = NO;
+        [menuView setAlpha:1.0];
+        
         NSLog(@"Set Portrait");
     }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
@@ -406,15 +444,7 @@ bool isPortrait;
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
         
-        int startHeight = 0;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-        {
-            startHeight = 512;
-        } 
-        else 
-        {
-            startHeight = 205;
-        }
+
         
         
         [self showButtons:1];
@@ -1697,12 +1727,10 @@ numberOfRowsInComponent:(NSInteger)component
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    
     
-    int startHeight = 0;
     int startWeight = 0;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
-        startHeight = 280;
         startWeight = 768;
         
         // check if our rangePicker is already on screen
@@ -1777,7 +1805,6 @@ numberOfRowsInComponent:(NSInteger)component
     else 
     {
         //iPhone
-        startHeight = 280;
         startWeight = 320;
         
         

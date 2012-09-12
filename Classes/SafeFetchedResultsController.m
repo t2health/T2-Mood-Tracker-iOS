@@ -437,33 +437,35 @@
 		
 		for (SafeSectionChange *sectionChange in insertedSections)
 		{
-			NSLog(@"%@", sectionChange);
+			NSLog(@"1%@", sectionChange);
 		}
 		for (SafeSectionChange *sectionChange in deletedSections)
 		{
-			NSLog(@"%@", sectionChange);
+			NSLog(@"2%@", sectionChange);
 		}
 		
 		for (SafeObjectChange *objectChange in insertedObjects)
 		{
-			NSLog(@"%@", objectChange);
+			NSLog(@"3%@", objectChange);
 		}
 		for (SafeObjectChange *objectChange in deletedObjects)
 		{
-			NSLog(@"%@", objectChange);
+			NSLog(@"4%@", objectChange);
 		}
 		for (SafeObjectChange *objectChange in updatedObjects)
 		{
-			NSLog(@"%@", objectChange);
+			NSLog(@"5%@", objectChange);
 		}
 		for (SafeObjectChange *objectChange in movedObjects)
 		{
-			NSLog(@"%@", objectChange);
+			NSLog(@"6%@", objectChange);
 		}
 #endif
 	
 	if ([self hasUnsafeChanges])
 	{
+        NSLog(@"Unsafe Changes");
+
 		if ([safeDelegate respondsToSelector:@selector(controllerDidMakeUnsafeChanges:)])
 		{
 			[safeDelegate controllerDidMakeUnsafeChanges:self];
@@ -471,17 +473,22 @@
 	}
 	else
 	{
-        
+        NSLog(@"Safe Changes");
+
 		if (s_myViewDelegate && [safeDelegate respondsToSelector:@selector(controllerWillChangeContent:)])
 		{
+            NSLog(@"Safe Change: 1");
+
 			[safeDelegate controllerWillChangeContent:self];
 		}
 		
 		[self processSectionChanges];
+        NSLog(@"Safe Change: 2");
 		[self processObjectChanges];
-		
+		NSLog(@"Safe Change: 3");
 		if ([safeDelegate respondsToSelector:@selector(controllerDidChangeContent:)])
 		{
+            NSLog(@"Safe Change: 4");
 			[safeDelegate controllerDidChangeContent:self];
 		}
 	}
@@ -548,7 +555,7 @@
 {
     @try {
         [self processChanges];
-
+        NSLog(@"didChangeRUN");
                     
     }
     @catch (NSException *exception) {

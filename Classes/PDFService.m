@@ -141,8 +141,6 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
     HPDF_Font fontEn = HPDF_GetFont(pdf, "Helvetica", "StandardEncoding");
     
     
-    path = [filePath stringByAppendingString:@".png"];
-
     const int maxLinesPerPage = 6;
     const int maxLinesPerSubPage = 10;
     const int maxLinesPerNotePage = 10;
@@ -327,7 +325,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                 
                 float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX))/2;
                 float intercept = ((sumY - (slope * sumX))/theNumber)/2;
-                float correlation = fabs((theNumber * sumXY) - (sumX * sumY)) / (sqrt((theNumber * sumX2 - sumX * sumX) * (theNumber * sumY2 - (sumY * sumY))));
+
                 
                 
              //   NSLog(@"slope: %f", slope);
@@ -500,19 +498,8 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                             HPDF_Page_SetDash(page, DASH_MODE1, 1, 1);
                             
                             HPDF_Page_SetRGBStroke(page, 0.0, 0, 1.0);
-                            NSLog(@"slope: %f", slope);
-                            NSLog(@"intercept: %f", intercept);
-                            NSLog(@" %@/%@ - chart_startY: %f", minLabel, maxLabel, chart_startY + intercept);
-                            NSLog(@"chart_endY: %f", ((chart_startY + intercept) + (dpi(slope) * (chart_width/xIncrement))));
-                            NSLog(@"chart_MaxYTop: %f", chart_startY + chart_height);
-                            NSLog(@"chart_MaxYBottom: %f", chart_startY);
-                            float chckIntercept = chart_startY + intercept;
-                            if (chckIntercept < chart_startY) 
-                            {
-                                chckIntercept = chart_startY;
-                            }
+
                             
-                            float startPoint = chart_startY + intercept;
                             float endPoint =((chart_startY + intercept) + (dpi(slope) * (chart_width/xIncrement)));
                             float topBorder = chart_startY + chart_height;
                             float bottomBorder = chart_startY;

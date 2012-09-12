@@ -27,10 +27,17 @@
 @synthesize sliders;
 @synthesize standardDeviation;
 @synthesize mean, _scrollView;
+@synthesize managedObjectContext;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 	
+    // Core Data
+    UIApplication *app = [UIApplication sharedApplication];
+	VAS002AppDelegate *appDelegate = (VAS002AppDelegate *)[app delegate];
+	self.managedObjectContext = appDelegate.managedObjectContext;
+
+    
 	self.title = self.currentGroup.title;
 	
 	UIBarButtonItem *saveButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(savePressed:)];
@@ -58,11 +65,7 @@
 
 - (void)calculateStatistics {
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	
-	UIApplication *app = [UIApplication sharedApplication];
-	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
-	NSManagedObjectContext *managedObjectContext = appDeleate.managedObjectContext;
-	
+		
 	NSSortDescriptor *scaleIndexDescriptor = [[NSSortDescriptor alloc] initWithKey:@"scale.index" ascending:YES];
 	NSSortDescriptor *timestampIndex = [[NSSortDescriptor alloc] initWithKey:@"timestamp" ascending:YES];
 	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:scaleIndexDescriptor,timestampIndex, nil];
@@ -73,7 +76,7 @@
     
 	[fetchRequest setFetchLimit:31];
 	
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Result" inManagedObjectContext:managedObjectContext];
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Result" inManagedObjectContext:self.managedObjectContext];
 	[fetchRequest setEntity:entity];
 	
 	NSError *error = nil;
@@ -125,11 +128,7 @@
     
     
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	
-	UIApplication *app = [UIApplication sharedApplication];
-	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
-	NSManagedObjectContext *managedObjectContext = appDeleate.managedObjectContext;
-	
+		
 	NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"(group.title like[cd] %@)",self.currentGroup.title];
 	[fetchRequest setPredicate:groupPredicate];
 	
@@ -138,7 +137,7 @@
 	[fetchRequest setSortDescriptors:sortDescriptors];
 	
 	
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Scale" inManagedObjectContext:managedObjectContext];
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Scale" inManagedObjectContext:self.managedObjectContext];
 	[fetchRequest setEntity:entity];
 	
 	NSError *error = nil;
@@ -277,18 +276,17 @@
 
 
 - (IBAction)savePressed:(id)sender {
+    NSLog(@"debug:1");
 	[self calculateStatistics];
-	
+	NSLog(@"debug:2");
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	
-	UIApplication *app = [UIApplication sharedApplication];
-	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
-	NSManagedObjectContext *managedObjectContext = appDeleate.managedObjectContext;
+
 	
 	NSPredicate *groupPredicate = [NSPredicate predicateWithFormat:@"(group.title like[cd] %@)",self.currentGroup.title];
 	[fetchRequest setPredicate:groupPredicate];
 	
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Scale" inManagedObjectContext:managedObjectContext];
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Scale" inManagedObjectContext:self.managedObjectContext];
 	[fetchRequest setEntity:entity];
 	
 	NSError *error = nil;
@@ -313,13 +311,14 @@
 	NSInteger count = 0;
 	NSInteger total = 0;
 	NSInteger movedCount = 0;
-	
+    NSLog(@"debug:3");
+
 	for (Scale *scale in fetchedObjects) {
 		if (![scale.minLabel isEqual:@""] && ![scale.maxLabel isEqual:@""]) {
 			
 			UISlider *slider = [self.sliders objectForKey:scale.minLabel];
 			if (slider != nil) {
-				Result *result = (Result *)[NSEntityDescription insertNewObjectForEntityForName:@"Result" inManagedObjectContext:managedObjectContext];
+				Result *result = (Result *)[NSEntityDescription insertNewObjectForEntityForName:@"Result" inManagedObjectContext:self.managedObjectContext];
 				[result setValue:[NSNumber numberWithFloat:slider.value]];
 				[result setTimestamp:now];			
 				[result setDay:dayOfMonth];
@@ -335,9 +334,11 @@
 			}
 		}
 	}
+    NSLog(@"debug:4");
+
 	if (count > 0) {
 		double avg = total / count;
-		GroupResult *groupResult = (GroupResult *)[NSEntityDescription insertNewObjectForEntityForName:@"GroupResult" inManagedObjectContext:managedObjectContext];
+		GroupResult *groupResult = (GroupResult *)[NSEntityDescription insertNewObjectForEntityForName:@"GroupResult" inManagedObjectContext:self.managedObjectContext];
 		[groupResult setValue:[NSNumber numberWithDouble:avg]];
 		[groupResult setDay:dayOfMonth];
 		[groupResult setMonth:monthOfYear];
@@ -348,12 +349,14 @@
 		double percentMoved = movedCount / count;
 		NSDictionary *usrDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:percentMoved], EVENT_FORM_PERCENT, nil];
 		[FlurryUtility report:EVENT_FORM_SAVED withData:usrDict];
+        NSLog(@"debug:5");
+
 	}
-	
+    NSLog(@"debug:6");
+
 	if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) {
 		[Error showErrorByAppendingString:@"Unable to save rating" withError:error];
 	} 
-	
 	[self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -373,7 +376,7 @@
 	[sliders release];
 	[standardDeviation release];
 	[mean release];
-	
+	[managedObjectContext release];
 	[super dealloc];
 }
 
