@@ -34,11 +34,10 @@
 @synthesize switchDictionary, ledgendColorsDictionary, tempDict, symbolsDictionary;
 @synthesize dataDictCopy, scalesArray, scalesDictionary, groupName, scalesUpdateDict;
 
-int seriesCount;
+int mySeriesCount;
 bool gradientOn;
 bool symbolOn;
 
-int seriesCount;
 
 - (id)init
 {
@@ -79,7 +78,7 @@ int seriesCount;
             self.dataDictCopy = [NSMutableDictionary dictionaryWithDictionary:dataDict];
         }
         
-        seriesCount = [[dataDictCopy allKeys] count];
+        mySeriesCount = [[dataDictCopy allKeys] count];
         
         [self printData];
         
@@ -776,7 +775,7 @@ int seriesCount;
 // Returns the number of series in the specified chart
 - (int)numberOfSeriesInSChart:(ShinobiChart *)chart 
 {
-    return seriesCount;
+    return mySeriesCount;
 }
 
 // Returns the data point at the specified index for the given series/chart.

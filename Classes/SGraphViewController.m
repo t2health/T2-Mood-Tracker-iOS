@@ -23,6 +23,9 @@
 #import "SubLegendTableViewController.h"
 #import "NotesTableViewController.h"
 #import "OptionsTableViewController.h"
+#import "HRColorUtil.h"
+#import "HRColorPickerViewController.h"
+
 
 @implementation SGraphViewController
 
@@ -193,6 +196,15 @@ bool isPortrait;
         [self slideDownDidStop];
     }
  */
+    
+    [NSTimer scheduledTimerWithTimeInterval:0.01
+                                     target:self 
+                                   selector:@selector(switchProcess) 
+                                   userInfo:nil 
+                                    repeats:NO];
+    
+    [_tableView reloadData];    
+
 }
 
 -(void) viewWillDisappear:(BOOL)animated {
@@ -1884,10 +1896,37 @@ numberOfRowsInComponent:(NSInteger)component
     return coloredImage;
 }
 
-- (void)checkTapped:(id)sender
+
+- (void) imageTapped:(UITapGestureRecognizer *)gesture
 {
-    UITapGestureRecognizer *gesture = (UITapGestureRecognizer *) sender;
-    NSLog(@"Tag: %d", gesture.view.tag);
+
+    UITableViewCell *cell = [[[gesture view] superview] superview];
+    NSIndexPath *tappedIndexPath = [self._tableView indexPathForCell:cell];
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    UITableViewCell *myCell = [_tableView cellForRowAtIndexPath:tappedIndexPath];
+    NSLog(@"tappedIndexPath: %@",tappedIndexPath);
+	NSInteger row = [tappedIndexPath indexAtPosition:1];
+    Scale *scale = [self.scalesArray objectAtIndex:row];
+	NSString *gName = scale.minLabel;
+    
+
+    NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]];
+    NSDictionary *scaleColorDict = [tColorDict objectForKey:groupName];
+    // the color
+    NSData *data = [scaleColorDict objectForKey:gName];
+    UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    
+    HRColorPickerViewController* controller;
+    controller = [HRColorPickerViewController cancelableFullColorPickerViewControllerWithColor:color];
+    controller.groupName = groupName;
+    controller.subName = gName;
+    controller.delegate = self;
+    [self.navigationController pushViewController:controller animated:YES];    
+    
+    NSLog(@"image tap %@", myCell.textLabel.text);
+    
 }
 
 #pragma mark tableView
@@ -1942,23 +1981,16 @@ numberOfRowsInComponent:(NSInteger)component
     // the color
     NSData *data = [scaleColorDict objectForKey:gName];
     UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    NSLog(@"tColorDict: %@", tColorDict);
-    NSLog(@"gName: %@", gName);
+   // NSLog(@"scaleColorDict: %@", scaleColorDict);
+    
     if (data != nil) 
     {
-        //  UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
-        // button.frame = CGRectMake(200, 20, 43, 43);
-        //[button setBackgroundImage:[self imageNamed:image withColor:color] forState:UIControlStateNormal];
-        // [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
-        
         cell.imageView.image = [self imageNamed:image withColor:color];
-        cell.imageView.userInteractionEnabled = YES;
-        cell.imageView.tag = indexPath.row;
         
-        UITapGestureRecognizer *tapped = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(checkTapped:)];
-        tapped.numberOfTapsRequired = 1;
-        [cell.imageView addGestureRecognizer:tapped];
-        [tapped release];
+        // Gesture Recognizer for custom symbol click
+        UITapGestureRecognizer *tapGesture = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(imageTapped:)] autorelease];
+        [cell.imageView addGestureRecognizer:tapGesture];
+        cell.imageView.userInteractionEnabled = YES;
     }
     
     

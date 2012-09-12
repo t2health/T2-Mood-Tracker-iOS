@@ -24,6 +24,9 @@
 #import "LegendTableViewController.h"
 #import "NotesTableViewController.h"
 #import "OptionsTableViewController.h"
+#import "HRColorUtil.h"
+#import "HRColorPickerViewController.h"
+
 
 @implementation GraphViewController
 
@@ -157,6 +160,8 @@ bool isPortrait;
 -(void) viewWillAppear:(BOOL)animated 
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+
+    NSLog(@"groupsArray: %@", groupsArray);
     
     // Capture initial orientation
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -178,7 +183,7 @@ bool isPortrait;
             // iPhone
             chartHeight = 211;
             menuStart = 211;
-            menuHeight = 205;
+            menuHeight = 215;
         }
         chart.alpha = 0.0f;
         //            [chart removeFromSuperview];
@@ -258,6 +263,11 @@ bool isPortrait;
     }
     
     
+    [NSTimer scheduledTimerWithTimeInterval:0.01
+                                     target:self 
+                                   selector:@selector(switchProcess) 
+                                   userInfo:nil 
+                                    repeats:NO];
     
     [_tableView reloadData];    
     //[_legendTableView reloadData];
@@ -2144,12 +2154,12 @@ numberOfRowsInComponent:(NSInteger)component
     
     if (data != nil) 
     {
-      //  UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
-       // button.frame = CGRectMake(200, 20, 43, 43);
-        //[button setBackgroundImage:[self imageNamed:image withColor:color] forState:UIControlStateNormal];
-       // [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
-
         cell.imageView.image = [self imageNamed:image withColor:color];
+        
+        // Gesture Recognizer for custom symbol click
+        UITapGestureRecognizer *tapGesture = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(imageTapped:)] autorelease];
+        [cell.imageView addGestureRecognizer:tapGesture];
+        cell.imageView.userInteractionEnabled = YES;
     }
     
     cell.textLabel.text = groupName;
@@ -2177,6 +2187,35 @@ numberOfRowsInComponent:(NSInteger)component
     [sGraphViewController release];
    
     // [self optionButtonClicked];
+    
+}
+
+- (void) imageTapped:(UITapGestureRecognizer *)gesture
+{
+    UITableViewCell *cell = [[[gesture view] superview] superview];
+    NSIndexPath *tappedIndexPath = [self._tableView indexPathForCell:cell];
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    UITableViewCell *myCell = [_tableView cellForRowAtIndexPath:tappedIndexPath];
+    
+
+    NSString *editGroupName = myCell.textLabel.text;
+    
+    NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]];
+    
+    NSData *data = [tColorDict objectForKey:editGroupName];
+    // the color
+    UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    HRColorPickerViewController* controller;
+    controller = [HRColorPickerViewController cancelableFullColorPickerViewControllerWithColor:color];
+    controller.groupName = editGroupName;
+    controller.subName = @"";
+    controller.delegate = self;
+    [self.navigationController pushViewController:controller animated:YES];    
+    
+    
+    NSLog(@"image tap %@", myCell.textLabel.text);
     
 }
 

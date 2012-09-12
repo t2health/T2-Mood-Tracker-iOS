@@ -58,7 +58,7 @@ int editWhat;
 
 - (void)viewWillAppear:(BOOL)animated {
 
-    NSLog(@"groupName: %@", self.groupName);
+   // NSLog(@"groupName: %@", self.groupName);
     [self fillScalesDictionary];
 	//[_tableView reloadData];
 }

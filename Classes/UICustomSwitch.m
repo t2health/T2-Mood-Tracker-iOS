@@ -49,8 +49,8 @@
 	self.maximumValue = 1;
 	self.continuous = NO;
 	
-	self.on = NO;
-	self.value = 0.0;
+	//self.on = YES;
+	//self.value = 1.0;
 	
 	self.clippingView = [[UIView alloc] initWithFrame:CGRectMake(4,2,87,23)];
 	self.clippingView.clipsToBounds = YES;
@@ -170,7 +170,7 @@
 - (void)setOn:(BOOL)turnOn animated:(BOOL)animated;
 {
 	on = turnOn;
-	
+	int theValue;
 	if (animated)
 	{
 		[UIView	 beginAnimations:nil context:nil];
@@ -180,29 +180,33 @@
 	if (on)
 	{
 		self.value = 1.0;
+        theValue = 1;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"toggleSwitch_makePositive" object: nil];
+
 	}
 	else 
 	{
 		self.value = 0.0;
+        theValue = 0;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"toggleSwitch_makeNegative" object: nil];
+
 	}
 	
 	if (animated)
 	{
 		[UIView	commitAnimations];	
 	}
-}
+    NSLog(@"switch: %i", theValue);
+    
 
-- (void)setOn:(BOOL)turnOn
-{
-	[self setOn:turnOn animated:NO];
 }
 
 
 - (void)endTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
-	NSLog(@"preendTrackingWithtouch");
+	//NSLog(@"preendTrackingWithtouch");
 	[super endTrackingWithTouch:touch withEvent:event];
-	NSLog(@"postendTrackingWithtouch");
+	//NSLog(@"postendTrackingWithtouch");
 	m_touchedSelf = YES;
 	
 	[self setOn:on animated:YES];
@@ -211,7 +215,7 @@
 - (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
 {
 	[super touchesBegan:touches withEvent:event];
-    NSLog(@"touchesBegan");
+   // NSLog(@"touchesBegan");
 	m_touchedSelf = NO;
 	on = !on;
 }
@@ -219,7 +223,7 @@
 - (void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
 {
 	[super touchesEnded:touches withEvent:event];
-	NSLog(@"touchesEnded");
+	//NSLog(@"touchesEnded");
 	
 	if (!m_touchedSelf)
 	{

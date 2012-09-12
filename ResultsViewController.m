@@ -32,7 +32,7 @@ static NSString *kViewKey = @"viewKey";
 
 const NSInteger kViewTag = 1;
 enExportType whichExport;
-
+BOOL isPortrait;
 @implementation ResultsViewController
 
 @synthesize groupsDictionary;
@@ -75,7 +75,17 @@ int pickerShow;
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     [super viewDidLoad];
     tableView.backgroundView = nil;
-    
+    UIDeviceOrientation interfaceOrientation = [UIDevice currentDevice].orientation;
+
+    if (UIDeviceOrientationIsValidInterfaceOrientation(interfaceOrientation) && (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown)) 
+    {
+        isPortrait = YES;
+        
+    }
+    else if (UIDeviceOrientationIsValidInterfaceOrientation(interfaceOrientation) && (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight))  
+    {
+        isPortrait = NO;
+    }
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
     
@@ -195,27 +205,46 @@ int pickerShow;
     {
 		shouldRotate = YES;
 	}
-	
+
 	return shouldRotate;
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+   // UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    UIDeviceOrientation interfaceOrientation = [UIDevice currentDevice].orientation;
+
+    if (UIDeviceOrientationIsValidInterfaceOrientation(interfaceOrientation) && (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown)) 
     {
-        [tableView reloadData];
-        [self resignPicker];
-    }
-    else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
-    {
-        [tableView reloadData];
-        [self resignPicker];
+        NSLog(@"***** Orientation: Portrait");
+        if (!isPortrait) {
+            [tableView reloadData];
+            [self resignPicker];
+        }
+        isPortrait = YES;
 
     }
+    else if (UIDeviceOrientationIsValidInterfaceOrientation(interfaceOrientation) && (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight))  
+    {
+        NSLog(@"***** Orientation: Landscape");
+
+        if (isPortrait) {
+            [tableView reloadData];
+            [self resignPicker];
+        }
+        isPortrait = NO;
+
+    }
+    else if (interfaceOrientation == UIDeviceOrientationFaceUp || interfaceOrientation == UIDeviceOrientationFaceDown)
+    {
+        NSLog(@"***** Orientation: Other");
+    
+    }
     else {
-        
+        NSLog(@"***** Orientation: Unknown");
+
     }
     
     
@@ -795,6 +824,7 @@ int pickerShow;
     {
         int startHeight = 0;
         int startWeight = 0;
+        int offSet = 44;
         
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
         {
@@ -802,14 +832,17 @@ int pickerShow;
             UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
             if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
             {
-                startHeight = 329;
-                startWeight = 768;
+                startHeight = 280;
+                startWeight = 780;
+                offSet = 43;
+
             }
             else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
             {
-                startHeight = 585;
+                startHeight = 535;
                 startWeight = 1024;
-                
+                offSet = 320;
+    
             }
         }
         else 
@@ -818,15 +851,16 @@ int pickerShow;
             UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
             if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
             {
-                startHeight = 329;
+                startHeight = 480;
                 startWeight = 320;
                 
             }
             else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
             {
-                startHeight = 423;
+                startHeight = 480;
                 startWeight = 480;
-                
+                offSet = 210;
+
             }
         }
         
@@ -850,7 +884,7 @@ int pickerShow;
             // NSLog(@"startheight: %i", startHeight);
             // compute the end frame
             CGRect pickerRect = CGRectMake(0.0,
-                                           (screenRect.origin.y + screenRect.size.height) - startHeight,
+                                           screenRect.size.height - (pickerSize.height + offSet),
                                            startWeight,
                                            pickerSize.height);
             // start the slide up animation

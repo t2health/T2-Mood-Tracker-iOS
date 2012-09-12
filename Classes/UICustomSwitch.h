@@ -27,7 +27,7 @@
 
 + (UICustomSwitch *) switchWithLeftText: (NSString *) tag1 andRight: (NSString *) tag2;
 
-- (void)setOn:(BOOL)on animated:(BOOL)animated;
+- (void)setOn:(BOOL)turnOn animated:(BOOL)animated;
 
 
 @end

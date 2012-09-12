@@ -16,6 +16,8 @@
 #import "ShinobiCharts/ShinobiChart+Screenshot.h"
 #import <MessageUI/MFMailComposeViewController.h>
 #import <dispatch/dispatch.h>
+#import "HRColorPickerViewController.h"
+
 
 @class ViewNotesViewController;
 @class SubLegendTableViewController;
@@ -23,7 +25,7 @@
 @class OptionsTableViewController;
 
 
-@interface SGraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource> 
+@interface SGraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource, HRColorPickerViewControllerDelegate> 
 {
     
     ShinobiChart            *chart;
@@ -131,7 +133,7 @@
 - (void)updateGraphData;
 - (void)redrawGraph;
 
-- (void)checkTapped:(id)sender;
+- (void) imageTapped:(UITapGestureRecognizer *)gesture;
 
 - (void)optionButtonClicked;
 - (void)shareClick;

@@ -128,12 +128,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
     // free up memory
     [dateFormatNow release];
     [dateFormat release];
-    //NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]];
-    
-    
-    
-    
-    
+
     PDFService_userData userData;
     HPDF_Doc pdf = HPDF_New(PDFService_defaultErrorHandler, &userData);
     userData.pdf = pdf;
@@ -147,37 +142,8 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
     
     
     path = [filePath stringByAppendingString:@".png"];
-    // NSLog(@"Path for chart image is %@", path);
-    //pathCString = [path cStringUsingEncoding:NSASCIIStringEncoding];
-    
-    // Header with date
-    /*
-     HPDF_Image image = HPDF_LoadPngImageFromFile(pdf, pathCString);
-     NSDate *currentTimestamp;
-     
-     page = HPDF_AddPage(pdf);
-     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_PORTRAIT);
-     HPDF_Page_BeginText(page);
-     HPDF_Page_SetFontAndSize(page, fontEn, 27.0);
-     HPDF_Page_TextRect(page, dpi(0.25), dpi(8.0), dpi(8.0), dpi(2.0), [[NSString stringWithFormat: @"T2 Mood Tracker Report\nGenerated On: %@",[dateFormat stringFromDate: [NSDate date]]] UTF8String], HPDF_TALIGN_CENTER, nil);
-     HPDF_Page_EndText(page);
-     HPDF_Page_SetLineWidth(page, 1.0);
-     HPDF_Page_SetRGBStroke(page, 0.0, 0, 0);
-     HPDF_Page_Rectangle(page, dpi(0.25), dpi(0.25), dpi(8.0), dpi(8.0));
-     HPDF_Page_Stroke(page);
-     */
-    
-    /*
-     NSDate *currentDate = [[NSDate alloc] init];
-     NSString *currentCategory = @"";
-     int lineNumber = 0;
-     CGFloat linePos = 0.0f;
-     NSArray *grpArray = [groupScaleDictionary allKeys];
-     */
-    
-    
-    
-    const int maxLinesPerPage = 3;
+
+    const int maxLinesPerPage = 6;
     const int maxLinesPerSubPage = 10;
     const int maxLinesPerNotePage = 10;
     
@@ -196,7 +162,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
         HPDF_Page_SetFontAndSize(page, fontEn, 16.0);
         HPDF_Page_TextRect(page, dpi(0.25), dpi(10.75), dpi(8.0), dpi(2.0), [[NSString stringWithFormat: @"T2 Mood Tracker Report\nGenerated On: %@",dateString] UTF8String], HPDF_TALIGN_CENTER, nil);
         HPDF_Page_EndText(page);
-        
+        int counter = 0;
         
         for (int i = 0; i < categoryNameArray.count; i++) 
         {
@@ -206,7 +172,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
             NSDictionary *groupDict = [myObjects objectForKey:[categoryNameArray objectAtIndex:i]];
             NSArray *dateArray = [groupDict objectForKey:@"date"];
             NSArray *dataArray = [groupDict objectForKey:@"data"];
-            NSLog(@"Category:%@ - %@",[categoryNameArray objectAtIndex:i], dataArray);
+          //  NSLog(@"Category:%@ - %@",[categoryNameArray objectAtIndex:i], dataArray);
             
             int topValue = 0;
             NSString *topDateStr = @"";
@@ -219,35 +185,37 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
             float lowY = 0.0;
             
             
-            if (dataArray != nil) 
-            {
-                if (i == 3) 
+                // Check when to start new page
+                if (counter == 6) 
                 {
                     pageNumber++;
-                    
-                    // End Page after 3rd Category
-                    HPDF_Page_BeginText(page);
-                    HPDF_Page_SetFontAndSize(page, fontEn, 11.0);
-                    HPDF_Page_TextRect(page, dpi(1.0), dpi(0.25), dpi(7.5), dpi(0.5), [[NSString stringWithFormat:@"Page %d", pageNumber] UTF8String], HPDF_TALIGN_CENTER, nil);
-                    HPDF_Page_EndText(page);
-                    // Start New Page
                     page = HPDF_AddPage(pdf);
                     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_LETTER, HPDF_PAGE_PORTRAIT);
+                    counter = 0;
                 }
                 
-                
+                NSString *catName = @"";
+            
+                if (dataArray != nil && dataArray.count > 1) 
+                {
+                    catName = [NSString stringWithFormat:@"%@", [categoryNameArray objectAtIndex:i]];
+                }
+                else 
+                {
+                    catName = [NSString stringWithFormat:@"%@ (No Data)", [categoryNameArray objectAtIndex:i]];
+                }
                 
                 HPDF_Page_BeginText(page);
                 HPDF_Page_SetFontAndSize(page, fontEn, 18.0);
-                HPDF_Page_TextRect(page, dpi(0.25), dpi(9.75)-(dpi(3.0) * (i%maxLinesPerPage)), dpi(8.0), dpi(1.0), [[NSString stringWithFormat: @"%@",[categoryNameArray objectAtIndex:i]] UTF8String], HPDF_TALIGN_LEFT, nil);
+                HPDF_Page_TextRect(page, dpi(0.25), dpi(9.75)-(dpi(1.6) * (i%maxLinesPerPage)), dpi(8.0), dpi(1.0), [[NSString stringWithFormat: @"%@",catName] UTF8String], HPDF_TALIGN_LEFT, nil);
                 HPDF_Page_EndText(page);
                 
                 
                 
                 // Set Bounderies
                 float chart_width = dpi(8.0);
-                float chart_height = dpi(1.5);
-                float chart_startY = dpi(7.75)-(dpi(3.0) * (i%maxLinesPerPage));
+                float chart_height = dpi(1.2);
+                float chart_startY = dpi(8.2)-(dpi(1.6) * (i%maxLinesPerPage));
                 float chart_startX = dpi(0.25);
                 //float chart_endX = chart_startX + chart_width;
                 //float chart_endY = chart_startY + chart_height;
@@ -264,7 +232,8 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                 HPDF_Page_Stroke(page);
                 // NSLog(@"width: %f, height: %f, x: %f-%f, y: %f-%f", chart_width, chart_height, chart_startX, chart_endX, chart_startY, chart_endY);
                 
-                
+            if (dataArray != nil && dataArray.count > 1) 
+            {         
                 // Draw Points/Lines
                 float stepX = chart_startX;
                 HPDF_Page_SetRGBStroke(page, 1.0, 0, 0);
@@ -274,12 +243,12 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                     int intVal = [[dataArray objectAtIndex:a] intValue];
                     if (a == 0) 
                     {
-                        HPDF_Page_Circle(page, stepX, chart_startY + value, .1);
+                        HPDF_Page_Circle(page, stepX, chart_startY + value/2, .1);
                         
                     }
                     else 
                     {
-                        HPDF_Page_LineTo(page, stepX, chart_startY + value);
+                        HPDF_Page_LineTo(page, stepX, chart_startY + value/2);
                     }
                     
                     // Capture top/low values
@@ -289,7 +258,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                         topValue = value;
                         topDateStr = [NSString stringWithFormat:@"%@",[dateArray objectAtIndex:a]];
                         topX = stepX;
-                        topY = chart_startY + value;
+                        topY = chart_startY + value/2;
                     }
                     
                     if (intVal < lowValue) 
@@ -297,7 +266,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                         lowValue = value;
                         lowDateStr = [NSString stringWithFormat:@"%@",[dateArray objectAtIndex:a]];
                         lowX = stepX;
-                        lowY = chart_startY + value;
+                        lowY = chart_startY + value/2;
                         
                     }
                     
@@ -306,8 +275,8 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                 HPDF_Page_Stroke(page);
                 
                 // Hi/Low Dates
-                NSLog(@"hi: %i - %@: %f,%f", topValue, topDateStr, topX, topY);
-                NSLog(@"low: %i - %@: %f,%f", lowValue, lowDateStr, lowX, lowY);
+             //   NSLog(@"hi: %i - %@: %f,%f", topValue, topDateStr, topX, topY);
+             //   NSLog(@"low: %i - %@: %f,%f", lowValue, lowDateStr, lowX, lowY);
                 
                 
                 NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -356,42 +325,54 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                     stepX += xIncrement;
                 }
                 
-                float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX));
-                float intercept = ((sumY - (slope * sumX))/theNumber);
+                float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX))/2;
+                float intercept = ((sumY - (slope * sumX))/theNumber)/2;
                 float correlation = fabs((theNumber * sumXY) - (sumX * sumY)) / (sqrt((theNumber * sumX2 - sumX * sumX) * (theNumber * sumY2 - (sumY * sumY))));
                 
                 
-                NSLog(@"slope: %f", slope);
-                NSLog(@"intercept: %f", intercept);
-                NSLog(@"correlation: %f", correlation);
-                NSLog(@"reg_xs: %f", chart_startX);
-                NSLog(@"reg_ys: %f", chart_startY + intercept);
-                NSLog(@"reg_x: %f", chart_startX + chart_width);
-                NSLog(@"reg_y: %f", ((chart_startY + intercept) + (slope * (chart_width/xIncrement))));
+             //   NSLog(@"slope: %f", slope);
+              //  NSLog(@"intercept: %f", intercept);
+              //  NSLog(@"correlation: %f", correlation);
+              //  NSLog(@"reg_xs: %f", chart_startX);
+              //  NSLog(@"reg_ys: %f", chart_startY + intercept);
+              //  NSLog(@"reg_x: %f", chart_startX + chart_width);
+              //  NSLog(@"reg_y: %f", ((chart_startY + intercept) + (slope * (chart_width/xIncrement))));
                 
                 DASH_MODE1[0] = 3;
                 DASH_MODE1[1] = 3;
+                
+                float endPoint =((chart_startY + intercept) + (dpi(slope) * (chart_width/xIncrement)));
+                float topBorder = chart_startY + chart_height;
+                float bottomBorder = chart_startY;
+                
+                if (endPoint > topBorder) {
+                    endPoint = topBorder;
+                }
+                if (endPoint < bottomBorder) {
+                    endPoint = bottomBorder;
+                }
                 
                 HPDF_Page_SetDash(page, DASH_MODE1, 1, 1);
                 
                 HPDF_Page_SetRGBStroke(page, 0.0, 0, 1.0);
                 HPDF_Page_Circle(page, chart_startX, chart_startY + intercept, .1);
-                HPDF_Page_LineTo(page, chart_startX + chart_width, ((chart_startY + intercept) + (dpi(slope) * (chart_width/xIncrement))));
+                HPDF_Page_LineTo(page, chart_startX + chart_width, endPoint);
                 
                 HPDF_Page_Stroke(page);
                 
                 
                 
-                
+
                 
             }
-            
+            counter++;
+
             
         }
+        
         ////////////////////////////------------------- GRAPH CATEGORY SCALES
         
         // Scale Details
-        
         for (int i = 0; i < categoryNameArray.count; i++) 
         {
             
@@ -400,7 +381,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
             NSArray *dataArray = [groupDict objectForKey:@"data"];
             
             
-            if (dataArray != nil) 
+            if (dataArray != nil && dataArray.count > 1) 
             {
                 // Create a new page for each scale
                 page = HPDF_AddPage(pdf);
@@ -408,118 +389,150 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                 
                 
                 HPDF_Page_BeginText(page);
-                HPDF_Page_SetFontAndSize(page, fontEn, 27.0);
+                HPDF_Page_SetFontAndSize(page, fontEn, 20.0);
                 HPDF_Page_TextRect(page, dpi(0.25), dpi(10.85), dpi(8.0), dpi(2.0), [[NSString stringWithFormat: @"%@",[categoryNameArray objectAtIndex:i]] UTF8String], HPDF_TALIGN_CENTER, nil);
                 HPDF_Page_EndText(page);
                 
                 
                 NSDictionary *myScaleDict = [NSDictionary dictionaryWithDictionary:[myDataSource getScaleDictionary:[categoryNameArray objectAtIndex:i]]];
                 NSArray *scaleKeys = [myScaleDict allKeys];
-                
+
                 for (int a = 0; a < scaleKeys.count; a++) 
                 {
                     
-                    // Pull Data
-                    NSDictionary *containerArray = [NSDictionary dictionaryWithDictionary:[myScaleDict objectForKey:[scaleKeys objectAtIndex:a]]];
-                    //NSArray *dateArray = [NSArray arrayWithArray:[containerArray objectForKey:@"date"]];
-                    NSArray *dataArray = [NSArray arrayWithArray:[containerArray objectForKey:@"data"]];
-                    
-                    // Set Bounderies
-                    float chart_width = dpi(6.0);
-                    float chart_height = dpi(1.0);
-                    float chart_startY = dpi(9.48)-(dpi(1.00) * (a%maxLinesPerSubPage));
-                    float chart_startX = dpi(2.0);
-                    float xIncrement = chart_width / dataArray.count;
-                    
-                    // NSString *rawDataName = [scaleKeys objectAtIndex:a];
-                    NSArray *rawDataName = [[scaleKeys objectAtIndex:a] componentsSeparatedByString:@"/"];
-                    NSString *minLabel = [rawDataName objectAtIndex:0];
-                    NSString *maxLabel = [rawDataName objectAtIndex:1];
-                    
-                    HPDF_Page_BeginText(page);
-                    HPDF_Page_SetFontAndSize(page, fontEn, 14.0);
-                    HPDF_Page_TextRect(page, dpi(0.25), dpi(9.70)-(dpi(1.0) * (a%maxLinesPerSubPage)), dpi(8.0), dpi(1.0), [[NSString stringWithFormat: @"%@",minLabel] UTF8String], HPDF_TALIGN_LEFT, nil);
-                    HPDF_Page_TextRect(page, dpi(0.25), dpi(9.70)-(dpi(1.0) * (a%maxLinesPerSubPage)) + 40, dpi(8.0), dpi(1.0), [[NSString stringWithFormat: @"%@",maxLabel] UTF8String], HPDF_TALIGN_LEFT, nil);            
-                    HPDF_Page_EndText(page);
-                    
-                    
-                    // Draw Border
-                    HPDF_Page_SetDash(page, NULL, 0, 0); 
-                    
-                    HPDF_Page_SetLineWidth(page, 1.0);
-                    HPDF_Page_SetRGBStroke(page, 0.0, 0, 0);
-                    HPDF_Page_Rectangle(page, chart_startX, chart_startY, chart_width, chart_height);
-                    HPDF_Page_Stroke(page);
-                    
-                    float stepX = chart_startX;
-                    
-                    
-                    // Draw Points/Lines
-                    HPDF_Page_SetRGBStroke(page, 1.0, 0, 0);
-                    for (int c=0; c < dataArray.count; c++) 
-                    {
-                        float value = [[dataArray objectAtIndex:c] floatValue];
-                        
-                        if (c == 0) 
-                        {
-                            HPDF_Page_Circle(page, stepX, chart_startY + value/2, .1);
-                            
-                        }
-                        else 
-                        {
-                            HPDF_Page_LineTo(page, stepX, chart_startY + value/2);
-                        }
-                        stepX += xIncrement;
-                    }
-                    HPDF_Page_Stroke(page);
-                    
-                    
-                    // Draw Regression/Trend Line
-                    
-                    NSInteger theNumber = dataArray.count;
-                    
-                    float sumY = 0.0;
-                    float sumX = 0.0;
-                    float sumXY = 0.0;
-                    float sumX2 = 0.0;
-                    float sumY2 = 0.0;
-                    
-                    
-                    stepX = chart_startX;
-                    for (int c=0;c < dataArray.count;c++) 
-                    {
-                        float stepY = [[dataArray objectAtIndex:c] doubleValue];
-                        sumX += stepX;
-                        sumY += stepY;
-                        sumXY += (stepX * stepY);
-                        sumX2 += (stepX * stepX);
-                        sumY2 += (stepY * stepY);
-                        stepX += xIncrement;
-                    }
-                    
-                    float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX))/2;
-                    float intercept = ((sumY - (slope * sumX))/theNumber)/2;
-                    // float correlation = fabs((theNumber * sumXY) - (sumX * sumY)) / (sqrt((theNumber * sumX2 - sumX * sumX) * (theNumber * sumY2 - (sumY * sumY))));
-                    DASH_MODE1[0] = 3;
-                    DASH_MODE1[1] = 3;
-                    
-                    HPDF_Page_SetDash(page, DASH_MODE1, 1, 1);
-                    
-                    HPDF_Page_SetRGBStroke(page, 0.0, 0, 1.0);
-                    NSLog(@"chart_startY: %f", chart_startY);
-                    NSLog(@"starIntercept: %f", chart_startY + intercept);
-                    float chckIntercept = chart_startY + intercept;
-                    if (chckIntercept < chart_startY) 
-                    {
-                        chckIntercept = chart_startY;
-                    }
-                    HPDF_Page_Circle(page, chart_startX, chart_startY + intercept, .1);
-                    HPDF_Page_LineTo(page, chart_startX + chart_width, ((chart_startY + intercept) + (dpi(slope) * (chart_width/xIncrement))));
 
                     
-                    HPDF_Page_Stroke(page);
-                    
-                    
+                    // Check if empty scale and more than 1 value
+                    if (![[scaleKeys objectAtIndex:a] isEqualToString:@"/"]) 
+                    {
+                        // Pull Data
+                        NSDictionary *containerArray = [NSDictionary dictionaryWithDictionary:[myScaleDict objectForKey:[scaleKeys objectAtIndex:a]]];
+                        
+                        //NSArray *dateArray = [NSArray arrayWithArray:[containerArray objectForKey:@"date"]];
+                        NSArray *dataArray = [NSArray arrayWithArray:[containerArray objectForKey:@"data"]];
+                        NSLog(@"dataArray: %@", dataArray);
+                        if (dataArray.count > 1) 
+                        {
+                            
+                            NSLog(@"booyah");
+
+                            // Set Bounderies
+                            float chart_width = dpi(6.0);
+                            float chart_height = dpi(0.75);
+                            float chart_startY = dpi(9.48)-(dpi(1.00) * (a%maxLinesPerSubPage));
+                            float chart_startX = dpi(2.0);
+                            float xIncrement = chart_width / dataArray.count;
+                            
+                            
+                            
+                            // NSString *rawDataName = [scaleKeys objectAtIndex:a];
+                            NSArray *rawDataName = [[scaleKeys objectAtIndex:a] componentsSeparatedByString:@"/"];
+                            NSString *minLabel = [rawDataName objectAtIndex:0];
+                            NSString *maxLabel = [rawDataName objectAtIndex:1];
+                            
+                            HPDF_Page_BeginText(page);
+                            HPDF_Page_SetFontAndSize(page, fontEn, 14.0);
+                            HPDF_Page_TextRect(page, dpi(0.25), dpi(9.80)-(dpi(1.0) * (a%maxLinesPerSubPage)), dpi(1.8), dpi(1.0), [[NSString stringWithFormat: @"%@",minLabel] UTF8String], HPDF_TALIGN_RIGHT, nil);
+                            HPDF_Page_TextRect(page, dpi(0.25), dpi(9.80)-(dpi(1.0) * (a%maxLinesPerSubPage)) + 40, dpi(1.8), dpi(1.0), [[NSString stringWithFormat: @"%@",maxLabel] UTF8String], HPDF_TALIGN_RIGHT, nil);            
+                            HPDF_Page_EndText(page);
+                            
+                            
+                            // Draw Border
+                            HPDF_Page_SetDash(page, NULL, 0, 0); 
+                            
+                            HPDF_Page_SetLineWidth(page, 1.0);
+                            HPDF_Page_SetRGBStroke(page, 0.0, 0, 0);
+                            HPDF_Page_Rectangle(page, chart_startX, chart_startY, chart_width, chart_height);
+                            HPDF_Page_Stroke(page);
+                            
+                            float stepX = chart_startX;
+                            
+                            
+                            // Draw Points/Lines
+                            HPDF_Page_SetRGBStroke(page, 1.0, 0, 0);
+                            for (int c=0; c < dataArray.count; c++) 
+                            {
+                                float value = [[dataArray objectAtIndex:c] floatValue];
+                                
+                                if (c == 0) 
+                                {
+                                    HPDF_Page_Circle(page, stepX, chart_startY + value/2, .1);
+                                    
+                                }
+                                else 
+                                {
+                                    HPDF_Page_LineTo(page, stepX, chart_startY + value/2);
+                                }
+                                stepX += xIncrement;
+                            }
+                            HPDF_Page_Stroke(page);
+                            
+                            
+                            // Draw Regression/Trend Line
+                            
+                            NSInteger theNumber = dataArray.count;
+                            
+                            float sumY = 0.0;
+                            float sumX = 0.0;
+                            float sumXY = 0.0;
+                            float sumX2 = 0.0;
+                            float sumY2 = 0.0;
+                            
+                            
+                            stepX = chart_startX;
+                            for (int c=0;c < dataArray.count;c++) 
+                            {
+                                float stepY = [[dataArray objectAtIndex:c] doubleValue];
+                                sumX += stepX;
+                                sumY += stepY;
+                                sumXY += (stepX * stepY);
+                                sumX2 += (stepX * stepX);
+                                sumY2 += (stepY * stepY);
+                                stepX += xIncrement;
+                            }
+                            
+                            float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX))/2;
+                            float intercept = ((sumY - (slope * sumX))/theNumber)/2;
+                            // float correlation = fabs((theNumber * sumXY) - (sumX * sumY)) / (sqrt((theNumber * sumX2 - sumX * sumX) * (theNumber * sumY2 - (sumY * sumY))));
+                            DASH_MODE1[0] = 3;
+                            DASH_MODE1[1] = 3;
+                            
+                            HPDF_Page_SetDash(page, DASH_MODE1, 1, 1);
+                            
+                            HPDF_Page_SetRGBStroke(page, 0.0, 0, 1.0);
+                            NSLog(@"slope: %f", slope);
+                            NSLog(@"intercept: %f", intercept);
+                            NSLog(@" %@/%@ - chart_startY: %f", minLabel, maxLabel, chart_startY + intercept);
+                            NSLog(@"chart_endY: %f", ((chart_startY + intercept) + (dpi(slope) * (chart_width/xIncrement))));
+                            NSLog(@"chart_MaxYTop: %f", chart_startY + chart_height);
+                            NSLog(@"chart_MaxYBottom: %f", chart_startY);
+                            float chckIntercept = chart_startY + intercept;
+                            if (chckIntercept < chart_startY) 
+                            {
+                                chckIntercept = chart_startY;
+                            }
+                            
+                            float startPoint = chart_startY + intercept;
+                            float endPoint =((chart_startY + intercept) + (dpi(slope) * (chart_width/xIncrement)));
+                            float topBorder = chart_startY + chart_height;
+                            float bottomBorder = chart_startY;
+                            
+                            if (endPoint > topBorder) {
+                                endPoint = topBorder;
+                            }
+                            if (endPoint < bottomBorder) {
+                                endPoint = bottomBorder;
+                            }
+                            
+                            HPDF_Page_Circle(page, chart_startX, chart_startY + intercept, .1);
+                            
+                            HPDF_Page_LineTo(page, chart_startX + chart_width, endPoint);
+
+                            
+                            HPDF_Page_Stroke(page);
+                        
+                        }                        
+                    }
                 }
             }
         }

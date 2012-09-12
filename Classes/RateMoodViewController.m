@@ -18,6 +18,8 @@
 #import "GroupResult.h"
 #import "ManageScalesViewController.h"
 #import "VAS002AppDelegate.h"
+#import "EditGroupViewController.h"
+
 
 @implementation RateMoodViewController
 
@@ -223,12 +225,21 @@
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 0) {
-        UIApplication *app = [UIApplication sharedApplication];
-        VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
+        
+        EditGroupViewController *editGroupViewController = [[EditGroupViewController alloc] initWithNibName:@"EditGroupViewController" bundle:nil];
+        editGroupViewController.hidesBottomBarWhenPushed = YES;
+        
+        editGroupViewController.group = self.currentGroup;
+        [self.navigationController pushViewController:editGroupViewController animated:YES];
+        [editGroupViewController release];
+        
+        
+        /*
         ManageScalesViewController *manageScalesViewController = [[ManageScalesViewController alloc] initWithNibName:@"ManageScalesViewController" bundle:nil];
         manageScalesViewController.group = self.currentGroup;
         [appDelegate.navigationController pushViewController:manageScalesViewController animated:YES];
         [manageScalesViewController release];
+         */
     }
 }
 

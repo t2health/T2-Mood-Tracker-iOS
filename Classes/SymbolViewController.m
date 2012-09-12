@@ -38,7 +38,7 @@
         _isSub = YES;
     }
     
-    NSLog(@"groupName: %@", groupName);
+    NSLog(@"symbol view groupName: %@ sub name: %@", groupName, subName);
     
     NSString *dictName = @"LEGEND_SYMBOL_DICTIONARY";
     
@@ -82,19 +82,14 @@
 {
     //int count = [self.navigationController.viewControllers count];
     // [self.navigationController popToViewController:[self.navigationController.viewControllers objectAtIndex:count-2]];
-    /*
+    
     NSArray *buh = self.navigationController.viewControllers;
     NSMutableArray *VCs = [NSMutableArray arrayWithArray:buh];
-    NSLog(@"buh:%@", buh);
-
     [VCs removeObjectAtIndex:[VCs count] -2];
-
-
     self.navigationController.viewControllers = VCs;
-    
-    [self.navigationController popViewControllerAnimated:NO];
-     */
-    
+    [self.navigationController popViewControllerAnimated:YES];
+     
+    /*
     ChartOptionsViewController *chartOptionsViewController = [[ChartOptionsViewController alloc] initWithNibName:@"ChartOptionsViewController" bundle:nil];
     if (_isSub) 
     {
@@ -110,7 +105,7 @@
     [self.navigationController pushViewController:chartOptionsViewController animated:YES];
     
     [chartOptionsViewController release];
-     
+     */
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 

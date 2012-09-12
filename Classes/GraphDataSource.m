@@ -77,7 +77,10 @@ bool symbolOn;
             self.dataDictCopy = [NSMutableDictionary dictionaryWithDictionary:dataDict];
         }
         seriesCount = [[dataDictCopy allKeys] count];
-        NSLog(@"seriesCount: %i", seriesCount);
+        
+       // NSLog(@"dataDictCopy: %@",dataDictCopy);
+        
+       // NSLog(@"seriesCount: %i", seriesCount);
 
         [self printData];
         
@@ -664,6 +667,8 @@ bool symbolOn;
     [symbolsDictionary release];
     [groupsArray release];
     [groupsDictionary release];
+    [dataDict release];
+    [dataDictCopy release];
 	[super dealloc];
 }
 
@@ -706,7 +711,8 @@ bool symbolOn;
 // Returns the series at the specified index for a given chart
 -(SChartSeries *)sChart:(ShinobiChart *)chart seriesAtIndex:(int)index 
 {
-    
+    NSLog(@"series at Array index: %i", index);
+    NSLog(@"groupsArray: %@", groupsArray);
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *grpName = [[groupsArray objectAtIndex:index] title];
     NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"]];
@@ -777,6 +783,8 @@ bool symbolOn;
 // Returns the number of series in the specified chart
 - (int)numberOfSeriesInSChart:(ShinobiChart *)chart 
 {
+    NSLog(@"seriesCount: %i", seriesCount);
+
     return seriesCount - 1;
 }
 

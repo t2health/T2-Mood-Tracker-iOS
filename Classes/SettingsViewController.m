@@ -137,7 +137,7 @@
 	
 	switch (section) {
 		case 0: //Number of sections
-			numRows = 5;
+			numRows = 6;
 			break;
 		default:
 			numRows = 0;
@@ -219,7 +219,7 @@
 					//[cell addSubview:aSwitch];
 					[aSwitch release];
 					break;
-				case 6: //Flurry data
+				case 5: //Flurry data
 					cell.textLabel.text = @"Improve Application";
 					break;
 				default:

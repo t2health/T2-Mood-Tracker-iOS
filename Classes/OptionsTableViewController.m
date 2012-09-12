@@ -35,7 +35,7 @@
 	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
 	self.managedObjectContext = appDeleate.managedObjectContext;
     
-    self.dataSourceArray = [NSArray arrayWithObjects: @"Symbols", @"Gradient", @"Edit Colors/Symbols", @"Data Range", nil];
+    self.dataSourceArray = [NSArray arrayWithObjects: @"Symbols", @"Gradient", @"Data Range", nil];
     
     
 }
@@ -208,15 +208,9 @@
         cell.accessoryView = aSwitch;
         [aSwitch release];
     }
-    // Customize
-    else if (row == 2) 
-    {
-        cellName = [dataSourceArray objectAtIndex:row];
-        
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    }
+
     // Data Range
-    else if (row == 3) 
+    else if (row == 2) 
     {
         cellName = [dataSourceArray objectAtIndex:row];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -265,21 +259,9 @@
     
     NSInteger row = [indexPath indexAtPosition:1];
     
-    // Customize
-    if (row == 2) 
-    {
-        NSLog(@"chartoption clicked");
-        
-        ChartOptionsViewController *chartOptionsViewController = [[ChartOptionsViewController alloc] initWithNibName:@"ChartOptionsViewController" bundle:nil];
-        
-        [self.myNavController pushViewController:chartOptionsViewController animated:YES];
-        
-        [chartOptionsViewController release];    
-        
-    }
     
     // Date Range
-    else if (row == 3) 
+    if (row == 2) 
     {
         NSString *notifyName = [NSString stringWithFormat:@"showPicker_%@", whichGraph];
         
