@@ -63,7 +63,6 @@ bool isPortrait;
     
     _notesTableView.backgroundView = nil;
     _tableView.backgroundView = nil;
-    
     loadingLabel.text = @"Generating Chart";
     // Init view state
     [graphView setAlpha:1.0];
@@ -161,14 +160,11 @@ bool isPortrait;
 -(void) viewWillAppear:(BOOL)animated 
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-
-    NSLog(@"groupsArray: %@", groupsArray);
     
     // Capture initial orientation
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
-        NSLog(@"ORIENTATION: Portrait: %i", isPortrait);
         
         int chartHeight = 0;
         int menuHeight = 0;
@@ -196,7 +192,7 @@ bool isPortrait;
                                       chartViewSize.width, chartHeight); 
         
         chart.frame = chartRect;
-        [self showButtons:1];
+       // [self showButtons:1];
         
         CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
         CGRect menuRect = CGRectMake(0.0,
@@ -236,7 +232,6 @@ bool isPortrait;
         chart.alpha = 0.0f;
         //            [chart removeFromSuperview];
         
-        NSLog(@"ORIENTATION: Landscape: %i", isPortrait);
         CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
         CGRect startRect = CGRectMake(0.0,
                                       0.0,
@@ -263,13 +258,13 @@ bool isPortrait;
         isPortrait = NO;
     }
     
-    
+    /*
     [NSTimer scheduledTimerWithTimeInterval:0.01
                                      target:self 
                                    selector:@selector(switchProcess) 
                                    userInfo:nil 
                                     repeats:NO];
-    
+    */
     [_tableView reloadData];    
     //[_legendTableView reloadData];
 }
@@ -357,13 +352,10 @@ bool isPortrait;
     // Initialise the data source we will use for the chart
     if (datasource == nil) 
     {
-        NSLog(@"datasource 1");
-
         datasource = [[GraphDataSource alloc] init];
     }
     else 
     {
-        NSLog(@"datasource 2");
 
         datasource = nil;
         [datasource release];
@@ -675,22 +667,16 @@ bool isPortrait;
         if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
         {
             startWidth = 320;
-            NSLog(@"PORTRAIT");
-
-            
         }
         else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
         {
             startWidth = 480;
-            NSLog(@"LANDSCAPE");
-
         }
 
         
         //
         // compute the start frame
         CGSize legendViewSize = [self.legendView sizeThatFits:CGSizeZero];
-        NSLog(@"startWidth3: %i", startWidth - 46);
         CGRect startRect = CGRectMake(startWidth - 46,
                                       0.0,
                                       legendViewSize.width, legendViewSize.height);  
@@ -703,7 +689,6 @@ bool isPortrait;
     {
         [containerView addSubview:legendView];
         [containerView bringSubviewToFront:legendView];
-        NSLog(@"bring legen view to front");
     }
     else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
     {
@@ -715,7 +700,6 @@ bool isPortrait;
         }    
     }
     
-    NSLog(@"legendSwitch.on2: %i", isLegend);
     if (isLegend) 
     {
         legendView.hidden = NO;
@@ -734,9 +718,6 @@ bool isPortrait;
 - (void)showLegend
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-
-  //  NSLog(@"groupsArray: %@", groupsArray);
-    //legendView.hidden = NO;
     int legendItemCount = 0;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *defaultsKey = @"";
@@ -765,7 +746,6 @@ bool isPortrait;
     int addSize = 44 * legendItemCount;
     
     startHeight = startHeight + addSize;
-   // NSLog(@"startHeight: %i", startHeight);
     
     if (legendItemCount < 3) 
     {
@@ -860,7 +840,6 @@ bool isPortrait;
         {
             startWidth = 480;
             
-           // NSLog(@"startWidth2: %i", startWidth);
             if (startHeight > 280) 
             {
                 startHeight = 280;
@@ -1150,7 +1129,6 @@ bool isPortrait;
     {
         if (!isPortrait) 
         {
-            NSLog(@"ORIENTATION: Portrait: %i", isPortrait);
 
             int chartHeight = 0;
             int menuHeight = 0;
@@ -1178,7 +1156,7 @@ bool isPortrait;
                                           chartViewSize.width, chartHeight); 
             
             chart.frame = chartRect;
-            [self showButtons:1];
+           // [self showButtons:1];
             
             CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
             CGRect menuRect = CGRectMake(0.0,
@@ -1222,14 +1200,13 @@ bool isPortrait;
             chart.alpha = 0.0f;
 //            [chart removeFromSuperview];
 
-            NSLog(@"ORIENTATION: Landscape: %i", isPortrait);
             CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
             CGRect startRect = CGRectMake(0.0,
                                           0.0,
                                           chartViewSize.width, chartHeight); 
             
             chart.frame = startRect;
-            [self showButtons:1];
+          //  [self showButtons:1];
             
             CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
             CGRect menuRect = CGRectMake(0.0,
@@ -1306,6 +1283,7 @@ bool isPortrait;
    //  dispatch_async(backgroundQueue, ^(void) {
    // [self switchProcess];
    //  }); 
+    self.navigationItem.rightBarButtonItem = nil;
     [containerView bringSubviewToFront:loadingView];
     
     
@@ -1360,12 +1338,10 @@ bool isPortrait;
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
-    NSLog(@"button press: %i", buttonIndex);
     
     if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
     {
         // Save
-        NSLog(@"Save CSV");
         loadingLabel.text = @"Saving to Photo Gallery";
         [containerView bringSubviewToFront:loadingView]; 
         // Delay to prevent block
@@ -1379,7 +1355,6 @@ bool isPortrait;
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
     {
         // Email Screenshot
-        NSLog(@"Email Screenshot");
         [self emailResults];
         
     }
@@ -1444,7 +1419,6 @@ bool isPortrait;
     if (!menuShowing) 
     {
         menuView.hidden = NO;
-        NSLog(@"show menu!");
         // Show
         [menuView setAlpha:0.0];
         
@@ -1501,7 +1475,6 @@ bool isPortrait;
 - (void)switchProcess
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-
     // Change series type
     double xMin, xMax, yMin, yMax;
     xMin = [chart.xAxis.axisRange.minimum doubleValue];
@@ -1527,6 +1500,7 @@ bool isPortrait;
     //[self resetLegend];
     //[legendTableViewController refresh];
     [containerView sendSubviewToBack:loadingView];
+    [self showButtons:1];
     
 }
 
@@ -1689,7 +1663,6 @@ bool isPortrait;
         storedVal = [defaults boolForKey:key];				
     }
     isLegend = storedVal;
-    NSLog(@"SWITCH_OPTION_STATE_LEGEND: %i", isLegend);
 
     
 }
@@ -1853,7 +1826,6 @@ bool isPortrait;
         doUpdate = YES;
     }
     
-    NSLog(@"picked: %@", [defaults objectForKey:defaultsKey]);
 }
 
 #pragma mark -
@@ -2124,6 +2096,9 @@ numberOfRowsInComponent:(NSInteger)component
     NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"]];
     NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]];
     
+    NSLog(@"tSymbolDict: %@", tSymbolDict);
+    NSLog(@"tColorDict: %@", tColorDict);
+    
     // the image
     UIImage *image = [self UIImageForIndex:[[tSymbolDict objectForKey:group.title] intValue]];
     // the color
@@ -2159,7 +2134,6 @@ numberOfRowsInComponent:(NSInteger)component
     
     Group *group = [self.groupsArray objectAtIndex:row];
     NSString *groupName = group.title;
-     NSLog(@"before pop");
     SGraphViewController *sGraphViewController = [[SGraphViewController alloc] initWithNibName:@"SGraphViewController" bundle:nil];
     sGraphViewController.groupName = groupName;
     [self.navigationController pushViewController:sGraphViewController animated:YES];
@@ -2194,7 +2168,6 @@ numberOfRowsInComponent:(NSInteger)component
     [self.navigationController pushViewController:controller animated:YES];    
     
     
-    NSLog(@"image tap %@", myCell.textLabel.text);
     
 }
 
@@ -2205,7 +2178,6 @@ numberOfRowsInComponent:(NSInteger)component
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
 
     // Fetch filtered data
-    NSLog(@"Fetching data...");
     
     // Open mail view
     MailData *data = [[MailData alloc] init];
@@ -2320,6 +2292,12 @@ numberOfRowsInComponent:(NSInteger)component
 	email = [email stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:email]];
+}
+
+-(void) didReceiveMemoryWarning
+{
+    NSLog(@"MEMORY WARNING");
+    
 }
 
 -(void)dealloc {

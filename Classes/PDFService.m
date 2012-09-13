@@ -241,12 +241,12 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                     int intVal = [[dataArray objectAtIndex:a] intValue];
                     if (a == 0) 
                     {
-                        HPDF_Page_Circle(page, stepX, chart_startY + value/2, .1);
+                        HPDF_Page_Circle(page, stepX, chart_startY + value/1.17, .1);
                         
                     }
                     else 
                     {
-                        HPDF_Page_LineTo(page, stepX, chart_startY + value/2);
+                        HPDF_Page_LineTo(page, stepX, chart_startY + value/1.17);
                     }
                     
                     // Capture top/low values
@@ -256,7 +256,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                         topValue = value;
                         topDateStr = [NSString stringWithFormat:@"%@",[dateArray objectAtIndex:a]];
                         topX = stepX;
-                        topY = chart_startY + value/2;
+                        topY = chart_startY + value/1.17;
                     }
                     
                     if (intVal < lowValue) 
@@ -264,7 +264,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                         lowValue = value;
                         lowDateStr = [NSString stringWithFormat:@"%@",[dateArray objectAtIndex:a]];
                         lowX = stepX;
-                        lowY = chart_startY + value/2;
+                        lowY = chart_startY + value/1.17;
                         
                     }
                     
@@ -323,8 +323,8 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                     stepX += xIncrement;
                 }
                 
-                float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX))/2;
-                float intercept = ((sumY - (slope * sumX))/theNumber)/2;
+                float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX))/1.17;
+                float intercept = ((sumY - (slope * sumX))/theNumber)/1.17;
 
                 
                 
@@ -408,11 +408,9 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                         
                         //NSArray *dateArray = [NSArray arrayWithArray:[containerArray objectForKey:@"date"]];
                         NSArray *dataArray = [NSArray arrayWithArray:[containerArray objectForKey:@"data"]];
-                        NSLog(@"dataArray: %@", dataArray);
                         if (dataArray.count > 1) 
                         {
                             
-                            NSLog(@"booyah");
 
                             // Set Bounderies
                             float chart_width = dpi(6.0);
@@ -454,12 +452,12 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                                 
                                 if (c == 0) 
                                 {
-                                    HPDF_Page_Circle(page, stepX, chart_startY + value/2, .1);
+                                    HPDF_Page_Circle(page, stepX, chart_startY + value/1.9, .1);
                                     
                                 }
                                 else 
                                 {
-                                    HPDF_Page_LineTo(page, stepX, chart_startY + value/2);
+                                    HPDF_Page_LineTo(page, stepX, chart_startY + value/1.9);
                                 }
                                 stepX += xIncrement;
                             }
@@ -489,8 +487,8 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                                 stepX += xIncrement;
                             }
                             
-                            float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX))/2;
-                            float intercept = ((sumY - (slope * sumX))/theNumber)/2;
+                            float slope = ((theNumber * sumXY) - sumX * sumY) / ((theNumber * sumX2) - (sumX * sumX))/1.9;
+                            float intercept = ((sumY - (slope * sumX))/theNumber)/1.9;
                             // float correlation = fabs((theNumber * sumXY) - (sumX * sumY)) / (sqrt((theNumber * sumX2 - sumX * sumX) * (theNumber * sumY2 - (sumY * sumY))));
                             DASH_MODE1[0] = 3;
                             DASH_MODE1[1] = 3;
@@ -559,7 +557,6 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
             [dateFormat release];
             float textHeight = dpi(1.0);//[self getTextHeight:noteData];
             
-            NSLog(@"textHeight: %f", textHeight);
             
             HPDF_Page_BeginText(page);
             HPDF_Page_SetFontAndSize(page, fontEn, 14.0);            
@@ -575,7 +572,6 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
     // Save PDF
     path = [filePath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
     pathCString = [path cStringUsingEncoding:1];
-    NSLog(@"Saving PDF to %@", path);
     HPDF_SaveToFile(pdf, pathCString);
     if (HPDF_HasDoc(pdf)) {
         HPDF_Free(pdf);
@@ -595,7 +591,6 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
     float textHeight = dpi(1.0);
     int textWidth = [data length];
     float lineMultiplier = textWidth/160; //80 char per line
-    NSLog(@"data: %@ - %i", data, textWidth);
     
     textHeight = dpi(1.0) * lineMultiplier;
     

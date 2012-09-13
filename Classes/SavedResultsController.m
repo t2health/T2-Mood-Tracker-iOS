@@ -306,7 +306,6 @@ int whichActionMenu;
         Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
         // NSLog(@"Edit-indexPath: %@", indexPath);
         
-        NSLog(@"clicked: %@", saved.filename);
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
         NSString *documentsDir = [paths objectAtIndex:0];
         NSString *finalPath = [NSString stringWithFormat:@"%@%@",documentsDir, saved.filename];
@@ -330,7 +329,6 @@ int whichActionMenu;
 {
     Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
     selectedIndex = saved;
-    NSLog(@"selected filename: %@", saved.title);
     
     NSString *fileString = saved.title;
     

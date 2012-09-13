@@ -64,25 +64,14 @@
     key = [NSString stringWithFormat:@"LEGEND_COLOR_DICTIONARY"];
     if (![defaults objectForKey:key]) 
     {
-        NSLog(@"initial not exist");
         [self fillGroupsDictionary];
         [self fillColors];
         [self fillSymbols];
-        //  [self fillSubColors];
-        // [self fillSubSymbols];
-        
         
         [defaults setValue:[NSDictionary dictionaryWithDictionary:colorsDictionary] forKey:@"LEGEND_COLOR_DICTIONARY"];
         [defaults setValue:[NSDictionary dictionaryWithDictionary:symbolsDictionary] forKey:@"LEGEND_SYMBOL_DICTIONARY"];
         [defaults setValue:[NSDictionary dictionaryWithDictionary:colorsSubTempDictionary] forKey:@"LEGEND_SUB_COLOR_DICTIONARY"];
         [defaults setValue:[NSDictionary dictionaryWithDictionary:symbolsSubTempDictionary] forKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"];
-        
-        
-        //  NSLog(@"color: %@", [defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]);
-        //   NSLog(@"symbol: %@", [defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"]);
-        //  NSLog(@"subcolor: %@", [defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]);
-        // NSLog(@"subsymbol: %@", [defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]);
-        
     }
     
 	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
@@ -95,9 +84,7 @@
     else 
     {
         BOOL showTips = [defaults boolForKey:@"SHOW_TIPS_ON_STARTUP"];
-        NSLog(@"BAM");
         if (showTips == YES) {
-            NSLog(@"Show tips");
             UIViewController *tipViewController = [[TipViewController alloc] initWithNibName:@"TipViewController" bundle:nil];
             tipViewController.hidesBottomBarWhenPushed = YES;
             [appDelegate.navigationController pushViewController:tipViewController animated:YES];
@@ -130,9 +117,7 @@
 }
 
 - (void)chkPin
-{
-    NSLog(@"rootview:");
-    
+{    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
     
@@ -183,7 +168,7 @@
         int overCount = [[digits objectAtIndex:lastDigit] intValue];
         color = [colorsArray objectAtIndex:overCount];
     }
-    
+    NSLog(@"color: %@", color);
 	return color;
 }
 
@@ -207,7 +192,6 @@
 		}
 	}
     
-    // NSLog(@"colorDict: %@", ledgendColorsDictionary);
 }
 
 - (void)fillSubColors {
@@ -229,7 +213,6 @@
 		}
 	}
     
-    // NSLog(@"colorDict: %@", ledgendColorsDictionary);
 }
 
 #pragma mark Symbols Dictionary
@@ -241,17 +224,12 @@
 		NSArray *objects = [self.groupsDictionary allKeys];
 		NSInteger index = 0;
 		
-		for (NSString *groupTitle in objects) {
-            
-			//UIImage *image = [self UIImageForIndex:index];
-            
-			//[self.symbolsDictionary setObject:image forKey:groupTitle];
-            
+		for (NSString *groupTitle in objects) 
+        {
             [self.symbolsDictionary setValue:[NSString stringWithFormat:@"%i", index] forKey:groupTitle];
 			index++;
 		}
 	}    
-    // NSLog(@"symbolsDictionary: %@", symbolsDictionary);
 }
 
 - (void)fillSubSymbols
@@ -266,20 +244,17 @@
             
 			UIImage *image = [self UIImageForIndex:index];
             
-			//[self.symbolsDictionary setObject:image forKey:groupTitle];
             NSData *data = [NSKeyedArchiver archivedDataWithRootObject:image];
             [self.symbolsSubDictionary setObject:data forKey:scaleTitle];
 			index++;
 		}
 	}    
-    //  NSLog(@"symbolsSubDictionary: %@", symbolsSubDictionary);
 }
 
 -(UIImage *)UIImageForIndex:(NSInteger)index {
 	NSArray *imageArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"Symbol_Circle.png"], [UIImage imageNamed:@"Symbol_Cross.png"], [UIImage imageNamed:@"Symbol_Diamondring.png"], [UIImage imageNamed:@"Symbol_Hourglass.png"], [UIImage imageNamed:@"Symbol_Pentagon.png"], [UIImage imageNamed:@"Symbol_Square.png"], [UIImage imageNamed:@"Symbol_Fivestar.png"], [UIImage imageNamed:@"Symbol_Triangle.png"], [UIImage imageNamed:@"Symbol_Spade.png"], [UIImage imageNamed:@"Symbol_Club.png"], [UIImage imageNamed:@"Symbol_Moon.png"], [UIImage imageNamed:@"Symbol_Diamondclassic.png"], [UIImage imageNamed:@"Symbol_Clover.png"], [UIImage imageNamed:@"Symbol_Skew.png"], [UIImage imageNamed:@"Symbol_Quadstar.png"], [UIImage imageNamed:@"Symbol_Octogon.png"], nil];
 	
 	UIImage *image = nil;
-	//NSLog(@"imageArray: %@", imageArray);
     // Perm fix for color bug from v2.0; 5/17/2012 Mel Manzano
 	if (index >=0 && index < [imageArray count]) {
 		image = [imageArray objectAtIndex:index];
@@ -398,16 +373,11 @@
             [subColors setObject:[NSDictionary dictionaryWithDictionary:[self fillScalesDictionary:aGroup.title:1]] forKey:aGroup.title];
             [subSymbols setObject:[NSDictionary dictionaryWithDictionary:[self fillScalesDictionary:aGroup.title:0]] forKey:aGroup.title];
             
-            // Fill Scales for each group
-            
-            
-            // NSLog(@"%@: %@",aGroup.title, [self scalesForGroup:aGroup]);
 		}			
 		self.groupsDictionary = [NSDictionary dictionaryWithDictionary:groups];
 		self.colorsSubTempDictionary = [NSDictionary dictionaryWithDictionary:subColors];
         self.symbolsSubTempDictionary = [NSDictionary dictionaryWithDictionary:subSymbols];
         
-        //  NSLog(@"scalesDictionary: %@", scalesDictionary);
 	}
 }
 

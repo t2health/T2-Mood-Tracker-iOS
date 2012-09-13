@@ -218,7 +218,6 @@ int pickerShow;
 
     if (UIDeviceOrientationIsValidInterfaceOrientation(interfaceOrientation) && (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown)) 
     {
-        NSLog(@"***** Orientation: Portrait");
         if (!isPortrait) {
             [tableView reloadData];
             [self resignPicker];
@@ -228,7 +227,6 @@ int pickerShow;
     }
     else if (UIDeviceOrientationIsValidInterfaceOrientation(interfaceOrientation) && (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight))  
     {
-        NSLog(@"***** Orientation: Landscape");
 
         if (isPortrait) {
             [tableView reloadData];
@@ -239,11 +237,9 @@ int pickerShow;
     }
     else if (interfaceOrientation == UIDeviceOrientationFaceUp || interfaceOrientation == UIDeviceOrientationFaceDown)
     {
-        NSLog(@"***** Orientation: Other");
     
     }
     else {
-        NSLog(@"***** Orientation: Unknown");
 
     }
     
@@ -684,10 +680,15 @@ int pickerShow;
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     
-    NSDictionary *dictionary = [filterViewItems objectAtIndex:section];
-    NSArray *array = [dictionary objectForKey:@"Groups"];
-     NSLog(@"arraycount: %i", [array count]);
-    return [array count];
+    int rowCount = 3;
+    if (section == 1) 
+    {
+        rowCount = [groupsArray count];
+    }
+
+    
+
+    return rowCount;
     
 }
 
@@ -759,8 +760,6 @@ int pickerShow;
     NSInteger row = [indexPath indexAtPosition:1];
 	
     // Fetch categories
-	Group *group = [self.groupsArray objectAtIndex:row];
-	NSString *groupName = group.title;
     NSString *cellName = @"";
     NSString *cellDate = @"";
     
@@ -786,6 +785,9 @@ int pickerShow;
     }
     else
     {
+        Group *group = [self.groupsArray objectAtIndex:row];
+        NSString *groupName = group.title;
+
         // groups
         cellName = groupName;
         UISwitch *aSwitch = [self.switchDictionary objectForKey:groupName];
@@ -954,16 +956,26 @@ int pickerShow;
     [df setDateFormat:@"MM/dd/yyyy"];
     NSDate *myFromDate = [df dateFromString: rawFromDate];
     NSDate *myToDate = [df dateFromString: rawToDate];
+    
+    NSDateComponents *components = [[[NSDateComponents alloc] init] autorelease];
+    [components setDay:1];
+    
+    NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+    
+    NSDate *newToDate = [gregorian dateByAddingComponents:components toDate:myToDate options:0];
+    
+    
     [df release];
     
+
+    
     [defaults setObject:myFromDate forKey:@"PDF_FromDate"];
-    [defaults setObject:myToDate forKey:@"PDF_ToDate"];
+    [defaults setObject:newToDate forKey:@"PDF_ToDate"];
 
-    NSLog(@"from: %@ - to: %@", myFromDate, myToDate);
 
     
     
-    NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(timestamp >= %@) AND (timestamp <= %@)", myFromDate, myToDate];
+    NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(timestamp >= %@) AND (timestamp <= %@)", myFromDate, newToDate];
     
     NSString *categoryString = @"";
     int counter = 0;
@@ -1045,7 +1057,6 @@ int pickerShow;
     NSDate *myFromDate = [df dateFromString: rawFromDate];
     NSDate *myToDate = [df dateFromString: rawToDate];
     [df release];
-    NSLog(@"from: %@ - to: %@", myFromDate, myToDate);
 
     
     NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(timestamp >= %@) AND (timestamp <= %@)", myFromDate, myToDate];
@@ -1128,7 +1139,6 @@ didFinishCreatingPDFFile:(NSString *)filePath
        detailNo:(HPDF_STATUS)detailNo
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    NSLog(@"finished creating PDF");
     savingScreen.hidden = YES;
     /*
     WebViewController *webViewController = [[WebViewController alloc] initWithNibName:@"WebViewController" bundle:nil];

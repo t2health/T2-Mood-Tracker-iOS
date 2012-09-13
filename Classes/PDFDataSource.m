@@ -171,7 +171,6 @@ int seriesCount;
     NSArray* allLinedStrings = [[rawDataArray objectAtIndex:0] componentsSeparatedByCharactersInSet:
                                 [NSCharacterSet newlineCharacterSet]];
     
-    NSLog(@"allLinedStrings: %@", allLinedStrings);
     
     NSMutableArray *tempTotalArray = [[[NSMutableArray alloc] init] autorelease];
     NSMutableArray *tempCountArray = [[[NSMutableArray alloc] init] autorelease];

@@ -49,9 +49,7 @@ int rowCount;
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
     [super viewDidLoad];
-    NSLog(@"fileName: %@",self.fileName);
-    NSLog(@"finalPath: %@",self.finalPath);
-    NSLog(@"fileType: %@",self.fileType);
+
     // [self.view bringSubviewToFront:loadView];
     // Do any additional setup after loading the view from its nib.
     activityInd.hidden = NO;
@@ -68,7 +66,6 @@ int rowCount;
     }
     else 
     {
-        NSLog(@"finalPath %@", self.finalPath);
         [defaults setObject:self.finalPath forKey:@"savedName"];
         tempTitle = self.fileName;
     }
@@ -77,7 +74,6 @@ int rowCount;
     NSString *afterOpenBracket = [components objectAtIndex:1];
     components = [afterOpenBracket componentsSeparatedByString:@")"];
     NSString *numberString = [components objectAtIndex:0];    
-    NSLog(@"numberString: %@", numberString);
     if (self.saved) 
     {
         
@@ -120,12 +116,10 @@ int rowCount;
         {
             //create
             [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(createPDFDocument) userInfo:nil repeats:NO];
-            NSLog(@"created pdf");
         }
         else 
         {
             //view
-            NSLog(@"view pdf");
             [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(viewPDF) userInfo:nil repeats:NO];
 
         }
@@ -136,7 +130,6 @@ int rowCount;
         isPDF = NO;
         
         [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(createWebViewWithHTML) userInfo:nil repeats:NO];
-        NSLog(@"view csv");
     }
     
 }
@@ -211,7 +204,6 @@ int rowCount;
         reportName = self.fileName;
         reportTitle = @"need Title";
     }
-    NSLog(@"reportName: %@", reportName);
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
     NSString *documentsDir = [paths objectAtIndex:0];
     NSString *filePath = @"";
@@ -289,7 +281,6 @@ int rowCount;
     NSArray* allLinedStrings = [[rawDataArray objectAtIndex:0] componentsSeparatedByCharactersInSet:
                                 [NSCharacterSet newlineCharacterSet]];
     
-    NSLog(@"theCount: %i", allLinedStrings.count);
     
     // Start Parsing CSV
     for (int i=0; i < allLinedStrings.count; i++)
@@ -409,7 +400,6 @@ int rowCount;
     //pass the string to the webview
     [printContentWebView loadHTMLString:[html description] baseURL:baseURL];
     activityInd.hidden = YES;
-    NSLog(@"indicator hide");
     
     // [self.view sendSubviewToBack:loadView];
     
@@ -613,7 +603,6 @@ int rowCount;
     
     // Show PDF in WebView
     NSString *path = [filePath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
-    NSLog(@"finished creating PDF: %@", path);
     NSURL *targetURL = [NSURL fileURLWithPath:path];
     
     NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
@@ -692,7 +681,6 @@ didFinishCreatingPDFFile:(NSString *)filePath
 
     // Show PDF in WebView
     NSString *path = [filePath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
-    NSLog(@"finished creating PDF: %@", path);
     NSURL *targetURL = [NSURL fileURLWithPath:path];
     
     NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];

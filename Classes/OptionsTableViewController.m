@@ -73,7 +73,6 @@
     BOOL val = legendSwitch.on;
     [defaults setBool:val forKey:defaultsKey];
     [defaults synchronize];
-    NSLog(@"Toggle Legend: %i", val);
     
     
     
@@ -90,7 +89,6 @@
     BOOL val = symbolSwitch.on;
     [defaults setBool:val forKey:defaultsKey];
     [defaults synchronize];
-    NSLog(@"Toggle Symbol: %i", val);
     
     
     
@@ -107,7 +105,6 @@
     BOOL val = gradientSwitch.on;
     [defaults setBool:val forKey:defaultsKey];
     [defaults synchronize];
-    NSLog(@"Toggle Gradient: %i", val);
     
     
     
@@ -171,9 +168,8 @@
             storedVal = NO;
         }
         else {
-            storedVal = [defaults boolForKey:key];				
+            storedVal = NO;				
         }
-        NSLog(@"config: symbol: %i", storedVal);
         aSwitch.on = storedVal;
         aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
         [aSwitch addTarget:self action:@selector(symbolToggle) forControlEvents:UIControlEventValueChanged];
@@ -196,9 +192,8 @@
         }
         else 
         {
-            storedVal = [defaults boolForKey:key];				
+            storedVal = NO;				
         }
-        NSLog(@"config: gradient: %i", storedVal);
         
         aSwitch.on = storedVal;
         aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 

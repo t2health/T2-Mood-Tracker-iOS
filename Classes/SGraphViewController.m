@@ -54,16 +54,15 @@ bool doSeries;
 bool isRefreshTable;
 bool isMyLegend;
 bool isPortrait;
-
+bool isLoading;
 
 #pragma mark - Load/Init
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSLog(@"groupName: '%@'", groupName);
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:groupName forKey:@"subGraphSelected"];
-
+    self.navigationItem.rightBarButtonItem = nil;
     
     _notesTableView.backgroundView = nil;
     _tableView.backgroundView = nil;
@@ -90,7 +89,7 @@ bool isPortrait;
     isLegend = NO;
     isSymbol = NO;
     isGradient = NO;
-    
+    isLoading = YES;
     isMyLegend = NO;
     doUpdate = NO;
     doSeries = NO;
@@ -123,8 +122,8 @@ bool isPortrait;
     // NOTIFICATIONS----------------------------------------------//
     // Listen for Actions from Option UITableViewController
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(legendToggle) name:@"toggleLegend_Scale" object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(symbolToggle) name:@"toggleSymbol_Scale" object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(gradientToggle) name:@"toggleGradient_Scale" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(loadingSymbol) name:@"toggleSymbol_Scale" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(loadingGradient) name:@"toggleGradient_Scale" object: nil];
     
     // // Listen for Actions from Picker
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(showPicker) name:@"showPicker_Scale" object: nil];
@@ -163,7 +162,7 @@ bool isPortrait;
                                       chartViewSize.width, chartHeight); 
         
         chart.frame = chartRect;
-        [self showButtons:1];
+       // [self showButtons:1];
         
         CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
         CGRect menuRect = CGRectMake(0.0,
@@ -171,15 +170,13 @@ bool isPortrait;
                                      menuViewSize.width, menuHeight);
         self.menuView.frame = menuRect;
         
-        menuView.hidden = NO;
-        [menuView setAlpha:1.0];
+        menuView.hidden = YES;
+        [menuView setAlpha:0.0];
         
-        NSLog(@"Set Portrait");
     }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
     {
         isPortrait = NO;
-        NSLog(@"Set Landscape");
 
     }
     
@@ -234,13 +231,13 @@ bool isPortrait;
         [self slideDownDidStop];
     }
  */
-    
+    /*
     [NSTimer scheduledTimerWithTimeInterval:0.01
                                      target:self 
                                    selector:@selector(switchProcess) 
                                    userInfo:nil 
                                     repeats:NO];
-    
+    */
     [_tableView reloadData];    
 
 }
@@ -255,6 +252,30 @@ bool isPortrait;
     [super viewWillDisappear:animated];
 }
 
+
+- (void) loadingSymbol
+{
+    self.navigationItem.rightBarButtonItem = nil;
+
+    [containerView bringSubviewToFront:loadingView];
+    [NSTimer scheduledTimerWithTimeInterval:0.01
+                                     target:self 
+                                   selector:@selector(symbolToggle) 
+                                   userInfo:nil 
+                                    repeats:NO];
+}
+
+- (void) loadingGradient
+{
+    self.navigationItem.rightBarButtonItem = nil;
+
+    [containerView bringSubviewToFront:loadingView];
+    [NSTimer scheduledTimerWithTimeInterval:0.01
+                                     target:self 
+                                   selector:@selector(gradientToggle) 
+                                   userInfo:nil 
+                                    repeats:NO];
+}
 #pragma mark Graph Menu 
 
 
@@ -494,7 +515,7 @@ bool isPortrait;
         menuShowing = NO;
     }
     
-    
+    isLoading = NO;
    // [self resetLegend];
     
 }
@@ -615,14 +636,12 @@ bool isPortrait;
         if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIDeviceOrientationPortraitUpsideDown) 
         {
             startWidth = 320;
-            NSLog(@"PORTRAIT");
             
             
         }
         else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
         {
             startWidth = 480;
-            NSLog(@"LANDSCAPE");
             
         }
         
@@ -630,7 +649,6 @@ bool isPortrait;
         //
         // compute the start frame
         CGSize legendViewSize = [self.legendView sizeThatFits:CGSizeZero];
-        NSLog(@"startWidth3: %i", startWidth - 46);
         CGRect startRect = CGRectMake(startWidth - 46,
                                       0.0,
                                       legendViewSize.width, legendViewSize.height);  
@@ -643,7 +661,6 @@ bool isPortrait;
     {
         [containerView addSubview:legendView];
         [containerView bringSubviewToFront:legendView];
-        NSLog(@"bring legen view to front");
     }
     else if(interfaceOrientation == UIDeviceOrientationLandscapeLeft || interfaceOrientation == UIDeviceOrientationLandscapeRight)
     {
@@ -655,7 +672,6 @@ bool isPortrait;
         }    
     }
     
-    NSLog(@"legendSwitch.on2: %i", isLegend);
     if (isLegend) 
     {
         legendView.hidden = NO;
@@ -989,6 +1005,9 @@ bool isPortrait;
     
     // Redraw chart
     [chart redrawChartAndGL: YES];
+    
+    [containerView sendSubviewToBack:loadingView];
+    [self showButtons:1];
 }
 
 - (void)gradientToggle
@@ -1015,7 +1034,9 @@ bool isPortrait;
     // Redraw chart
     [chart redrawChartAndGL: YES];
      
-    
+    [containerView sendSubviewToBack:loadingView];
+    [self showButtons:1];
+
 }
 
 -(void)switchSeriesType {
@@ -1051,106 +1072,107 @@ bool isPortrait;
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 
 {
-    
-    if (isPortrait) 
+    if (!isLoading)
     {
-        NSLog(@"SUB ORIENTATION: Portrait: %i", isPortrait);
+        
+    
+        if (isPortrait) 
+        {
 
-        int chartHeight = 0;
-        int menuHeight = 0;
-        int menuStart = 0;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-        {
-            chartHeight = 512;
-            menuStart = 512;
-            menuHeight = 512;
-        } 
+            int chartHeight = 0;
+            int menuHeight = 0;
+            int menuStart = 0;
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+            {
+                chartHeight = 512;
+                menuStart = 512;
+                menuHeight = 512;
+            } 
+            else 
+            {
+                // iPhone
+                chartHeight = 211;
+                menuStart = 211;
+                menuHeight = 205;
+            }
+            chart.alpha = 0.0f;
+            //            [chart removeFromSuperview];
+            
+            
+            CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+            CGRect chartRect = CGRectMake(0.0,
+                                          0.0,
+                                          chartViewSize.width, chartHeight); 
+            
+            chart.frame = chartRect;
+            [self showButtons:1];
+            
+            CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+            CGRect menuRect = CGRectMake(0.0,
+                                         menuStart,
+                                         menuViewSize.width, menuHeight);
+            self.menuView.frame = menuRect;
+            
+            menuView.hidden = NO;
+            [menuView setAlpha:1.0];
+            chart.alpha = 1.0f;
+            //            [containerView addSubview:chart];
+            //            [containerView bringSubviewToFront:legendView];
+            //            [containerView bringSubviewToFront:menuView];
+            
+            [self slideDownDidStop];
+            // [self resetLegend];
+            
+            isPortrait = YES;
+        }        
         else 
         {
-            // iPhone
-            chartHeight = 211;
-            menuStart = 211;
-            menuHeight = 205;
+            int chartHeight = 0;
+            int menuHeight = 0;
+            int menuStart = 0;
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+            {
+                chartHeight = 700;
+                menuStart = 0;
+                menuHeight = 700;
+            } 
+            else 
+            {
+                // iPhone
+                chartHeight = 260;
+                menuStart = 0;
+                menuHeight = 320;
+            } 
+            chart.alpha = 0.0f;
+            //            [chart removeFromSuperview];
+            
+            CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+            CGRect startRect = CGRectMake(0.0,
+                                          0.0,
+                                          chartViewSize.width, chartHeight); 
+            
+            chart.frame = startRect;
+            [self showButtons:1];
+            
+            CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+            CGRect menuRect = CGRectMake(0.0,
+                                         menuStart,
+                                         menuViewSize.width, menuHeight);
+            self.menuView.frame = menuRect;
+            
+            chart.alpha = 1.0f;
+            //            [containerView addSubview:chart];
+            //            [containerView bringSubviewToFront:legendView];
+            //            [containerView bringSubviewToFront:menuView];
+            menuView.hidden = YES;
+            menuShowing = NO;
+            
+            [self slideDownDidStop];
+            //  [self resetLegend];
+            isPortrait = NO;
         }
-        chart.alpha = 0.0f;
-        //            [chart removeFromSuperview];
         
-        
-        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-        CGRect chartRect = CGRectMake(0.0,
-                                      0.0,
-                                      chartViewSize.width, chartHeight); 
-        
-        chart.frame = chartRect;
-        [self showButtons:1];
-        
-        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
-        CGRect menuRect = CGRectMake(0.0,
-                                     menuStart,
-                                     menuViewSize.width, menuHeight);
-        self.menuView.frame = menuRect;
-        
-        menuView.hidden = NO;
-        [menuView setAlpha:1.0];
-        chart.alpha = 1.0f;
-        //            [containerView addSubview:chart];
-        //            [containerView bringSubviewToFront:legendView];
-        //            [containerView bringSubviewToFront:menuView];
-        
-        [self slideDownDidStop];
-        // [self resetLegend];
-        
-        isPortrait = YES;
-    }        
-    else 
-    {
-        int chartHeight = 0;
-        int menuHeight = 0;
-        int menuStart = 0;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-        {
-            chartHeight = 700;
-            menuStart = 0;
-            menuHeight = 700;
-        } 
-        else 
-        {
-            // iPhone
-            chartHeight = 260;
-            menuStart = 0;
-            menuHeight = 320;
-        } 
-        chart.alpha = 0.0f;
-        //            [chart removeFromSuperview];
-        
-        NSLog(@"SUB ORIENTATION: Landscape: %i", isPortrait);
-        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-        CGRect startRect = CGRectMake(0.0,
-                                      0.0,
-                                      chartViewSize.width, chartHeight); 
-        
-        chart.frame = startRect;
-        [self showButtons:1];
-        
-        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
-        CGRect menuRect = CGRectMake(0.0,
-                                     menuStart,
-                                     menuViewSize.width, menuHeight);
-        self.menuView.frame = menuRect;
-        
-        chart.alpha = 1.0f;
-        //            [containerView addSubview:chart];
-        //            [containerView bringSubviewToFront:legendView];
-        //            [containerView bringSubviewToFront:menuView];
-        menuView.hidden = YES;
-        menuShowing = NO;
-        
-        [self slideDownDidStop];
-        //  [self resetLegend];
-        isPortrait = NO;
     }
-        
-    
     
     
 }
@@ -1203,6 +1225,8 @@ bool isPortrait;
     //  dispatch_async(backgroundQueue, ^(void) {
     // [self switchProcess];
     //  }); 
+    self.navigationItem.rightBarButtonItem = nil;
+
     [containerView bringSubviewToFront:loadingView];
     
     
@@ -1261,7 +1285,6 @@ bool isPortrait;
     if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
     {
         // Save
-        NSLog(@"Save CSV");
         loadingLabel.text = @"Saving to Photo Gallery";
         [containerView bringSubviewToFront:loadingView]; 
         // Delay to prevent block
@@ -1275,7 +1298,6 @@ bool isPortrait;
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
     {
         // Email Screenshot
-        NSLog(@"Email Screenshot");
         [self emailResults];
         
     }
@@ -1332,7 +1354,6 @@ bool isPortrait;
     if (!menuShowing) 
     {
         menuView.hidden = NO;
-        NSLog(@"show menu!");
         // Show
         [menuView setAlpha:0.0];
         
@@ -1411,7 +1432,7 @@ bool isPortrait;
    // [self resetLegend];
    // [subLegendTableViewController refresh];
     [containerView sendSubviewToBack:loadingView];
-    
+    [self showButtons:1];
 }
 
 
@@ -1515,7 +1536,6 @@ bool isPortrait;
         storedVal = [defaults boolForKey:key];				
     }
     isLegend = storedVal;
-    NSLog(@"SWITCH_OPTION_STATE_LEGEND: %i", isLegend);
     
 }
 
@@ -1701,7 +1721,6 @@ bool isPortrait;
         doUpdate = YES;
     }
     
-    NSLog(@"picked: %@", [defaults objectForKey:defaultsKey]);
 }
 
 #pragma mark -
@@ -1932,7 +1951,6 @@ numberOfRowsInComponent:(NSInteger)component
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     UITableViewCell *myCell = [_tableView cellForRowAtIndexPath:tappedIndexPath];
-    NSLog(@"tappedIndexPath: %@",tappedIndexPath);
 	NSInteger row = [tappedIndexPath indexAtPosition:1];
     Scale *scale = [self.scalesArray objectAtIndex:row];
 	NSString *gName = scale.minLabel;
@@ -1952,7 +1970,6 @@ numberOfRowsInComponent:(NSInteger)component
     controller.delegate = self;
     [self.navigationController pushViewController:controller animated:YES];    
     
-    NSLog(@"image tap %@", myCell.textLabel.text);
     
 }
 

@@ -45,7 +45,6 @@
 	
     
 	if (![self doesDatabaseHaveData]) {
-        NSLog(@"dsfd");
 		[self fillDefaultGroups];
 		DAL *dal = [[[DAL alloc] init] autorelease];
 		dal.managedObjectContext = self.managedObjectContext;
@@ -53,7 +52,6 @@
 		dal.persistentStoreCoordinator = self.persistentStoreCoordinator;
 		[dal loadXMLByFile:@"data.xml"];
 	}
-	NSLog(@"5555");
     
 	RootViewController *rootViewController = (RootViewController *)[navigationController topViewController];
 	rootViewController.managedObjectContext = self.managedObjectContext;
@@ -156,7 +154,6 @@ void uncaughtExceptionHandler(NSException *exception) {
     }
     // Unregister
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:self.managedObjectContext];
-    NSLog(@"saveContext");
 }    
 
 - (void)applicationWillTerminate:(UIApplication *)application {

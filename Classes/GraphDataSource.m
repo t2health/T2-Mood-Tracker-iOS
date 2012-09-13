@@ -343,7 +343,6 @@ bool symbolOn;
     NSString *theRange = [defaults objectForKey:defaultsKey];
     NSDate *theFromDate = [[NSDate alloc] init];
 
-    NSLog(@"theRange: %@", theRange);
     NSDateComponents *components = [cal components:( NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit ) fromDate:theFromDate];
     
     // Today's Date
@@ -651,7 +650,6 @@ bool symbolOn;
 	[fetchRequest release];
     [arrayByDate release];
     
-     NSLog(@"chartDictionary:%@",chartDictionary);
     
 	return chartDictionary;
 }
@@ -702,7 +700,6 @@ bool symbolOn;
 - (int) getSeriesDataCount:(int) seriesIndex
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    NSLog(@"seriesIndex: %i", seriesIndex);
     int seriesDataCount = 1;
     NSString *grpName = [[groupsArray objectAtIndex:seriesIndex] title];
     
@@ -734,8 +731,6 @@ bool symbolOn;
 // Returns the series at the specified index for a given chart
 -(SChartSeries *)sChart:(ShinobiChart *)chart seriesAtIndex:(int)index 
 {
-    NSLog(@"series at Array index: %i", index);
-    NSLog(@"groupsArray: %@", groupsArray);
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *grpName = [[groupsArray objectAtIndex:index] title];
     NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"]];
@@ -806,8 +801,6 @@ bool symbolOn;
 // Returns the number of series in the specified chart
 - (int)numberOfSeriesInSChart:(ShinobiChart *)chart 
 {
-    NSLog(@"seriesCount: %i", seriesCount);
-
     return seriesCount - 1;
 }
 

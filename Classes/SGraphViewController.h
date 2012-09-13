@@ -153,7 +153,8 @@
 
 - (void)resignLegend;
 - (void)showButtons:(int)howMany;
-
+- (void) loadingSymbol;
+- (void) loadingGradient;
 
 - (void)legendToggle;
 - (void)symbolToggle;
