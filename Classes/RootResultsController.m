@@ -166,9 +166,15 @@
 
 // Customize the number of sections in the table view.
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    
+    /*
 	NSInteger numberOfSections = [[self.fetchedResultsController sections] count];
 	
 	return numberOfSections;
+    */
+    
+    return 1;
+     
 }
 
 // Customize the appearance of table view cells.
@@ -188,22 +194,47 @@
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    NSInteger numRows;
+	
+	switch (section) {
+		case 0: //Number of sections
+			numRows = 4;
+			break;
+		default:
+			numRows = 0;
+			break;
+	}
+	
+    return numRows;
+    
+    /*
 	id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
 	NSInteger numberOfRows = [sectionInfo numberOfObjects];
 	
 	return numberOfRows;
+     */
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-	
+	/*
 	NSArray *sections = [self.fetchedResultsController sections];
 	NSString *sectionName = [[sections objectAtIndex:section] name];
+     */
+	NSString *sectionName;
+	
+	switch (section) {
+		case 0: //Settings
+			sectionName = nil;
+			break;
+		default:
+			sectionName = nil;
+			break;
+	}
 	return sectionName;
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    
     // create the parent view that will hold header Label
 	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
 	
@@ -218,8 +249,7 @@
     
 	// If you want to align the header text as centered
 	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
-    NSArray *sections = [self.fetchedResultsController sections];
-	headerLabel.text = [[sections objectAtIndex:section] name];
+	headerLabel.text = @"Results";
 	[customView addSubview:headerLabel];
     [headerLabel release];
 	return customView;
@@ -231,52 +261,35 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {	
-	// Configure the cell to show the Categories title
-	Group *group = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	cell.textLabel.text = group.title;
-	if (self.reminderArray != nil && [group.rateable boolValue] == YES) {
-		if ([self.reminderArray containsObject:group.title]) {
-			cell.imageView.image = [UIImage imageNamed:@"warning.png"];		
-		}
-		else {
-			cell.imageView.image = [UIImage imageNamed:@"check.png"];
-		}
-	}
-	else {
-		cell.imageView.image = nil;
-	}
-	
-	if ([group.visible boolValue] == NO) {
-		cell.userInteractionEnabled = NO;
-		cell.hidden = YES;
-	}
-	else {
-		cell.userInteractionEnabled = YES;
-		cell.hidden = NO;
-	}
-	
-	
-	cell.backgroundColor = [UIColor whiteColor];
-	cell.accessoryView.backgroundColor = [UIColor clearColor];
-	cell.contentView.backgroundColor = [UIColor clearColor];
-	cell.backgroundView.backgroundColor = [UIColor clearColor];
-}
-
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
+    NSInteger section = [indexPath indexAtPosition:0];
+	NSInteger row = [indexPath indexAtPosition:1];
 		
-		// Delete the managed object.
-		[self.managedObjectContext deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
-		
-		NSError *error = nil;
-		if (![self.managedObjectContext save:&error]) {
-			[Error showErrorByAppendingString:@"Unable to delete Category." withError:error];
-		}
-    }   
-}
+	switch (section) {
+		case 0: //Settings
+			switch (row) {
+				case 0: //Areas Of Interest
+					cell.textLabel.text = @"Graph Results";
+					break; 
+                    //  case 1: //Custom Charting
+                    //	cell.textLabel.text = @"Custom Charting";
+					//break;
+				case 1: //Reminders
+					cell.textLabel.text = @"Create Reports";
+					break;
+				case 2: //Security
+					cell.textLabel.text = @"Saved Reports";
+					break;
+				case 3: //Clear Data
+					cell.textLabel.text = @"View Notes";
+					break;
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
+	}
 
-- (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return UITableViewCellEditingStyleNone;
 }
 
 #pragma mark Table view delegate
@@ -298,11 +311,6 @@
 		case 0: //Results
 			switch (row) {
 				case 0: //Graph Results
-                    /*
-                     graphResultsViewController = [[GraphResultsViewController alloc] initWithNibName:@"GraphResultsViewController" bundle:nil];
-                     [self.navigationController pushViewController:graphResultsViewController animated:YES];
-                     [graphResultsViewController release];
-                     */
                     graphViewController = [[GraphViewController alloc] initWithNibName:@"GraphViewController" bundle:nil];
                     graphViewController.hidesBottomBarWhenPushed = YES;
 					[self.navigationController pushViewController:graphViewController animated:YES];
@@ -538,7 +546,6 @@
 	[fetchRequest setEntity:entity];
 	
 	// Create the sort descriptors array.
-	
 	NSSortDescriptor *sectionTitleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"section" ascending:YES];
 	NSSortDescriptor *menuIndexDescriptor = [[NSSortDescriptor alloc] initWithKey:@"menuIndex" ascending:YES];
     //	NSSortDescriptor *titleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES];

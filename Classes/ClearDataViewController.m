@@ -372,6 +372,9 @@
 
 - (void)viewDidDisappear:(BOOL)animated {
 	self.fetchedResultsController = nil;
+    [self.currentGroup release];
+    [self.fetchedResultsController release];
+	[self.managedObjectContext release], self.managedObjectContext = nil;
 	[super viewDidDisappear:animated];
 }
 

@@ -37,7 +37,7 @@
 int mySeriesCount;
 bool gradientOn;
 bool symbolOn;
-
+bool isToggle;
 
 - (id)init
 {
@@ -79,7 +79,7 @@ bool symbolOn;
         }
         
         mySeriesCount = [[dataDictCopy allKeys] count];
-        
+        isToggle = NO;
         [self printData];
         
     }
@@ -96,12 +96,14 @@ bool symbolOn;
 - (void)toggleGradient
 {
     gradientMode = !gradientMode;
+    isToggle = YES;
 }
 
 - (void)toggleSymbol
 {
     symbolMode = !symbolMode;
-    
+    isToggle = YES;
+
 }
 
 
@@ -728,6 +730,25 @@ bool symbolOn;
     UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     UIImage *image = [self UIImageForIndex:[[symbolDictionary objectForKey:grpName] intValue]];
     
+    if (!isToggle)
+    {
+        if (![defaults objectForKey:@"SWITCH_OPTION_STATE_SYMBOL"]) {
+            symbolMode = NO;
+        }
+        else 
+        {
+            symbolMode = YES;				
+        }
+        
+        if (![defaults objectForKey:@"SWITCH_OPTION_STATE_GRADIENT"]) {
+            gradientMode = NO;
+        }
+        else 
+        {
+            gradientMode = YES;				
+        }
+        
+    }
 
     // Symbol
     lineSeries.style.pointStyle.texture = image;

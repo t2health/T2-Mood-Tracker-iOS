@@ -464,8 +464,6 @@
 	
 	if ([self hasUnsafeChanges])
 	{
-        NSLog(@"Unsafe Changes");
-
 		if ([safeDelegate respondsToSelector:@selector(controllerDidMakeUnsafeChanges:)])
 		{
 			[safeDelegate controllerDidMakeUnsafeChanges:self];
@@ -473,22 +471,16 @@
 	}
 	else
 	{
-        NSLog(@"Safe Changes");
 
 		if (s_myViewDelegate && [safeDelegate respondsToSelector:@selector(controllerWillChangeContent:)])
 		{
-            NSLog(@"Safe Change: 1");
-
 			[safeDelegate controllerWillChangeContent:self];
 		}
 		
 		[self processSectionChanges];
-        NSLog(@"Safe Change: 2");
 		[self processObjectChanges];
-		NSLog(@"Safe Change: 3");
 		if ([safeDelegate respondsToSelector:@selector(controllerDidChangeContent:)])
 		{
-            NSLog(@"Safe Change: 4");
 			[safeDelegate controllerDidChangeContent:self];
 		}
 	}
@@ -555,7 +547,7 @@
 {
     @try {
         [self processChanges];
-        NSLog(@"didChangeRUN");
+       // NSLog(@"didChangeRUN");
                     
     }
     @catch (NSException *exception) {

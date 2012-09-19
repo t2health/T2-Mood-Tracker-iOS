@@ -38,7 +38,7 @@
         _isSub = YES;
     }
     
-    NSLog(@"symbol view groupName: %@ sub name: %@", groupName, subName);
+   // NSLog(@"symbol view groupName: %@ sub name: %@", groupName, subName);
     
     NSString *dictName = @"LEGEND_SYMBOL_DICTIONARY";
     
@@ -52,7 +52,7 @@
     NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:dictName]];
     UIImage *image;
     
-    NSLog(@"tSymbolDict:%@", tSymbolDict);
+   //NSLog(@"tSymbolDict:%@", tSymbolDict);
     
     if (_isSub) 
     {
@@ -116,12 +116,12 @@
         //iPad
         if(device.orientation == UIDeviceOrientationLandscapeLeft || device.orientation == UIDeviceOrientationLandscapeRight)
         {
-            NSLog(@"ipad land");
+          //  NSLog(@"ipad land");
             
         }
         else 
         {
-            NSLog(@"ipad portrait");
+           // NSLog(@"ipad portrait");
             
         }
         
@@ -131,12 +131,12 @@
         //iPhone
         if (device.orientation == UIDeviceOrientationPortrait || device.orientation == UIDeviceOrientationPortraitUpsideDown) 
         {
-            NSLog(@"iphone portrait");
+         //   NSLog(@"iphone portrait");
             
         }
         else if(device.orientation == UIDeviceOrientationLandscapeLeft || device.orientation == UIDeviceOrientationLandscapeRight)
         {
-            NSLog(@"iphone land");
+          //  NSLog(@"iphone land");
             
         }
         
@@ -166,7 +166,7 @@
     
     if (_isSub) 
     {
-        NSLog(@"sub");
+        //NSLog(@"sub");
         NSMutableDictionary *tSubSymbolDict = [NSMutableDictionary dictionaryWithDictionary:[tSymbolDict objectForKey:groupName]];
         
         [tSubSymbolDict setObject:[NSString stringWithFormat:@"%i", tag] forKey:subName];
@@ -174,7 +174,7 @@
     }
     else 
     {
-        NSLog(@"nosub");
+      //  NSLog(@"nosub");
         
         [tSymbolDict setValue:[NSString stringWithFormat:@"%i", tag] forKey:groupName];
     }

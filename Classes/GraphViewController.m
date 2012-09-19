@@ -57,7 +57,9 @@ bool isPortrait;
 #pragma mark - Load/Init
 - (void)viewDidLoad
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     [super viewDidLoad];
     
@@ -142,7 +144,9 @@ bool isPortrait;
 
 -(void) viewDidUnload
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     switchDictionary = nil;
 	ledgendColorsDictionary = nil;
@@ -159,8 +163,9 @@ bool isPortrait;
 
 -(void) viewWillAppear:(BOOL)animated 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    
+    #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif 
     // Capture initial orientation
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
@@ -271,7 +276,9 @@ bool isPortrait;
 
 -(void) viewWillDisappear:(BOOL)animated 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
     managedObjectContext = nil;
     if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) 
     {
@@ -288,7 +295,9 @@ bool isPortrait;
 
 - (void)reloadGraph
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     [containerView bringSubviewToFront:loadingView];
     [_optionsTableView reloadData];
@@ -306,7 +315,9 @@ bool isPortrait;
 
 - (void)updateGraphData
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     // Initialise the data source we will use for the chart
     datasource = [[GraphDataSource alloc] init];
@@ -318,7 +329,9 @@ bool isPortrait;
 
 - (void)redrawGraph
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     chart.datasource = datasource;
 
@@ -336,7 +349,9 @@ bool isPortrait;
 
 - (void)initSetup
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     loadingLabel.text = @"Loading Data";
     dispatch_async(backgroundQueue, ^(void) {
@@ -347,7 +362,9 @@ bool isPortrait;
 
 - (void)getDatasource
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     // Initialise the data source we will use for the chart
     if (datasource == nil) 
@@ -372,7 +389,9 @@ bool isPortrait;
 
 - (void)setupGraph
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
@@ -405,6 +424,8 @@ bool isPortrait;
         
     }
     
+    chart.delegate = self;
+    
     // Set a different theme on the chart
     SChartMidnightTheme *midnight = [[SChartMidnightTheme alloc] init];
     [chart setTheme:midnight];
@@ -430,6 +451,7 @@ bool isPortrait;
     xAxis.enableMomentumZooming = YES;
     xAxis.axisPositionValue = [NSNumber numberWithInt: 0];
     xAxis.style.majorGridLineStyle.showMajorGridLines = YES;
+    xAxis.majorTickFrequency = @"bbb";
     
     chart.xAxis = xAxis;
     [xAxis release];
@@ -565,9 +587,21 @@ bool isPortrait;
 
 }
 
+- (void)sChartIsZooming:(ShinobiChart *)myChart
+{
+    double zoomLevel = myChart.xAxis.zoom;
+    if (zoomLevel > 3000.0) 
+    {
+        [chart.xAxis setZoom:3000];  
+    }
+    NSLog(@"zoomLevel: %f", zoomLevel);
+}
+
 - (void)showButtons:(int)howMany;
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     if (howMany == 1) 
     {
@@ -610,7 +644,9 @@ bool isPortrait;
 
 - (void)resetLegend
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     [legendView removeFromSuperview];
     int startWidth = 0;
@@ -717,7 +753,9 @@ bool isPortrait;
 
 - (void)showLegend
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
     int legendItemCount = 0;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *defaultsKey = @"";
@@ -881,7 +919,9 @@ bool isPortrait;
 
 - (void)resignLegend
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
@@ -977,7 +1017,9 @@ bool isPortrait;
 
 - (void)legendToggle
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	[self showButtons:2];
@@ -1033,7 +1075,9 @@ bool isPortrait;
 
 - (void)symbolToggle
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     double xMin, xMax, yMin, yMax;
     xMin = [chart.xAxis.axisRange.minimum doubleValue];
@@ -1061,7 +1105,9 @@ bool isPortrait;
 - (void)gradientToggle
 {
 
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     double xMin, xMax, yMin, yMax;
     xMin = [chart.xAxis.axisRange.minimum doubleValue];
@@ -1088,7 +1134,9 @@ bool isPortrait;
 
 -(void)switchSeriesType 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     double xMin, xMax, yMin, yMax;
     xMin = [chart.xAxis.axisRange.minimum doubleValue];
@@ -1121,7 +1169,9 @@ bool isPortrait;
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
 
@@ -1237,7 +1287,9 @@ bool isPortrait;
 
 -(void)createSwitches 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
 	if (self.switchDictionary == nil) {
 		self.switchDictionary = [NSMutableDictionary dictionary];
@@ -1276,7 +1328,9 @@ bool isPortrait;
 
 -(void)switchFlipped:(id)sender 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     [containerView bringSubviewToFront:loadingView];
     loadingLabel.text = @"";
@@ -1325,7 +1379,9 @@ bool isPortrait;
 #pragma mark ActionSheet
 -(void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
     {
@@ -1336,7 +1392,9 @@ bool isPortrait;
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
     
     
     if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
@@ -1366,7 +1424,9 @@ bool isPortrait;
 
 - (void)saveToGallery
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     UIImage *screenshot = [chart snapshot];
     UIImageWriteToSavedPhotosAlbum(screenshot,
@@ -1380,7 +1440,9 @@ bool isPortrait;
 
 - (void)shareClick
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     UIActionSheet *actionSheet = [[[UIActionSheet alloc]
                                    initWithTitle:@"" 
@@ -1395,7 +1457,9 @@ bool isPortrait;
 
 - (void)thisImage:(UIImage *)image hasBeenSavedInPhotoAlbumWithError:(NSError *)error usingContextInfo:(void*)ctxInf
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     if (error) 
     {
@@ -1414,7 +1478,9 @@ bool isPortrait;
 // Main chart options button 
 - (void)optionButtonClicked
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     if (!menuShowing) 
     {
@@ -1474,7 +1540,9 @@ bool isPortrait;
 
 - (void)switchProcess
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
     // Change series type
     double xMin, xMax, yMin, yMax;
     xMin = [chart.xAxis.axisRange.minimum doubleValue];
@@ -1509,7 +1577,9 @@ bool isPortrait;
 
 - (void)fillGroupsDictionary 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
 	if (self.groupsDictionary == nil) {
 		NSMutableDictionary *groups = [NSMutableDictionary dictionary];
@@ -1555,7 +1625,9 @@ bool isPortrait;
 
 -(UIColor *)UIColorForIndex:(NSInteger)index 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
 	NSArray *colorsArray = [NSArray arrayWithObjects:[UIColor blueColor], [UIColor greenColor], [UIColor orangeColor], [UIColor redColor], [UIColor purpleColor], [UIColor grayColor], [UIColor brownColor], [UIColor cyanColor], [UIColor magentaColor], [UIColor lightGrayColor], nil];
 	
@@ -1591,7 +1663,9 @@ bool isPortrait;
 
 - (void)fillColors 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
 	if (self.ledgendColorsDictionary == nil) {
 		self.ledgendColorsDictionary = [NSMutableDictionary dictionary];
@@ -1611,7 +1685,9 @@ bool isPortrait;
 
 -(UIImage *)UIImageForIndex:(NSInteger)index 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
 	NSArray *imageArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"Symbol_Clover.png"], [UIImage imageNamed:@"Symbol_Club.png"], [UIImage imageNamed:@"Symbol_Cross.png"], [UIImage imageNamed:@"Symbol_Davidstar.png"], [UIImage imageNamed:@"Symbol_Diamondclassic.png"], [UIImage imageNamed:@"Symbol_Diamondring.png"], [UIImage imageNamed:@"Symbol_Doublehook.png"], [UIImage imageNamed:@"Symbol_Fivestar.png"], [UIImage imageNamed:@"Symbol_Heart.png"], [UIImage imageNamed:@"Symbol_Triangle.png"], [UIImage imageNamed:@"Symbol_Circle.png"], [UIImage imageNamed:@"Symbol_Hourglass.png"], [UIImage imageNamed:@"Symbol_Moon.png"], [UIImage imageNamed:@"Symbol_Skew.png"], [UIImage imageNamed:@"Symbol_Pentagon.png"], [UIImage imageNamed:@"Symbol_Spade.png"], nil];	
 	UIImage *image = nil;
@@ -1647,7 +1723,9 @@ bool isPortrait;
 
 - (void)fillOptions
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     BOOL storedVal;
@@ -1671,7 +1749,9 @@ bool isPortrait;
 #pragma mark Symbols Dictionary
 - (void)fillSymbols
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
 	if (self.symbolsDictionary == nil) {
 		self.symbolsDictionary = [NSMutableDictionary dictionary];
@@ -1693,7 +1773,9 @@ bool isPortrait;
 #pragma mark Segment Menu
 - (IBAction)segmentIndexChanged 
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     switch (segmentButton.selectedSegmentIndex) {
 		case 0:
@@ -1732,7 +1814,9 @@ bool isPortrait;
 #pragma mark Range Picker
 - (void)resignPicker
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
@@ -1784,7 +1868,9 @@ bool isPortrait;
 
 - (void)slideDownDidStop
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
 	// the date picker has finished sliding downwards, so remove it
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
@@ -1798,7 +1884,9 @@ bool isPortrait;
 }
 - (IBAction)doneAction:(id)sender
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     [self resignPicker];
 }
@@ -1808,7 +1896,9 @@ bool isPortrait;
       inComponent:(NSInteger)component
 {
     
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     NSString *pickedRange = [pickerArray objectAtIndex:row];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -1849,7 +1939,9 @@ numberOfRowsInComponent:(NSInteger)component
 
 - (void) showPicker
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif    
     
     int startWeight = 0;
 
@@ -2096,8 +2188,8 @@ numberOfRowsInComponent:(NSInteger)component
     NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"]];
     NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]];
     
-    NSLog(@"tSymbolDict: %@", tSymbolDict);
-    NSLog(@"tColorDict: %@", tColorDict);
+    //NSLog(@"tSymbolDict: %@", tSymbolDict);
+ //   NSLog(@"tColorDict: %@", tColorDict);
     
     // the image
     UIImage *image = [self UIImageForIndex:[[tSymbolDict objectForKey:group.title] intValue]];
@@ -2175,7 +2267,9 @@ numberOfRowsInComponent:(NSInteger)component
 
 - (void)emailResults
 {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
 
     // Fetch filtered data
     
@@ -2296,12 +2390,14 @@ numberOfRowsInComponent:(NSInteger)component
 
 -(void) didReceiveMemoryWarning
 {
-    NSLog(@"MEMORY WARNING");
+   // NSLog(@"MEMORY WARNING");
     
 }
 
 -(void)dealloc {
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
    // dispatch_release(backgroundQueue);
     [chart release];
     [datasource release];

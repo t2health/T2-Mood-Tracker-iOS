@@ -333,6 +333,42 @@
 	return sectionName;
 }
 
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
+    
+    // create the parent view that will hold header Label
+	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
+	
+	// create the button object
+	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+	headerLabel.backgroundColor = [UIColor clearColor];
+	headerLabel.opaque = NO;
+	headerLabel.textColor = [UIColor whiteColor];
+	headerLabel.highlightedTextColor = [UIColor whiteColor];
+	headerLabel.font = [UIFont boldSystemFontOfSize:20];
+	headerLabel.frame = CGRectMake(10.0, 0.0, 300.0, 44.0);
+    
+	// If you want to align the header text as centered
+	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
+    
+    NSString *sectionName = @"";
+    if (section == 1) 
+    {
+        sectionName = @"Days(s)";
+    }
+    else
+    {
+        sectionName = @"Time(s)";
+    }
+    
+    headerLabel.text = sectionName;
+    
+	[customView addSubview:headerLabel];
+    [headerLabel release];
+	return customView;
+}
+
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {    
     static NSString *CellIdentifier = @"Cell";
@@ -766,6 +802,8 @@
 - (void)addNotificationForDate:(NSDate *)date andMessage:(NSString *)message {
     Class notificationClass = (NSClassFromString(@"UILocalNotification"));
 	if (notificationClass != nil) {
+        
+        
 		UILocalNotification *localNotification = [[UILocalNotification alloc] init];
         
 		localNotification.fireDate = date;

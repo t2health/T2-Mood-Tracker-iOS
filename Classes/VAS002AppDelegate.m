@@ -69,6 +69,10 @@
 	
 	[self setFirstLauchPreferences];
     
+    // Clear Reminders
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+    [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    
     
     return YES;
 }
@@ -78,11 +82,21 @@
     [self.managedObjectContext performSelectorOnMainThread:@selector(mergeChangesFromContextDidSaveNotification:) withObject:notification waitUntilDone:NO];
 }
 
-- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification 
+{
+        
 	UIAlertView *immutableAlert = [[[UIAlertView alloc]initWithTitle:@"Reminder:" message:notification.alertBody delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
 	[immutableAlert show];
 	
     application.applicationIconBadgeNumber = 0;
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+    // Clear Reminders
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+    [[UIApplication sharedApplication] cancelAllLocalNotifications];
 }
 
 - (void)setFirstLauchPreferences {

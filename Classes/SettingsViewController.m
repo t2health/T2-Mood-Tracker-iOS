@@ -233,22 +233,6 @@
     return cell;
 }
 
-- (void)switchFlipped:(id)sender {
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	
-	UISwitch *theSwitch = (UISwitch *)sender;
-	
-	BOOL val = theSwitch.on;
-	[defaults setBool:val forKey:@"SHOW_TIPS_ON_STARTUP"];
-	[defaults synchronize];
-	if (val == YES) {
-		[FlurryUtility report:EVENT_SETTING_TIPS_ENABLED];		
-	}
-	else {
-		[FlurryUtility report:EVENT_SETTING_TIPS_DISABLED];
-	}
-}
-
 
 #pragma mark Table view delegate
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
@@ -310,6 +294,22 @@
 			break;
 		default:
 			break;
+	}
+}
+
+- (void)switchFlipped:(id)sender {
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	
+	UISwitch *theSwitch = (UISwitch *)sender;
+	
+	BOOL val = theSwitch.on;
+	[defaults setBool:val forKey:@"SHOW_TIPS_ON_STARTUP"];
+	[defaults synchronize];
+	if (val == YES) {
+		[FlurryUtility report:EVENT_SETTING_TIPS_ENABLED];		
+	}
+	else {
+		[FlurryUtility report:EVENT_SETTING_TIPS_DISABLED];
 	}
 }
 

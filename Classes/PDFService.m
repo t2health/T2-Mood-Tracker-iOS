@@ -200,7 +200,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
                 }
                 else 
                 {
-                    catName = [NSString stringWithFormat:@"%@ (No Data)", [categoryNameArray objectAtIndex:i]];
+                    catName = [NSString stringWithFormat:@"%@ (More data needed to graph results)", [categoryNameArray objectAtIndex:i]];
                 }
                 
                 HPDF_Page_BeginText(page);

@@ -112,8 +112,8 @@ int seriesCount;
     
     
     
-    NSMutableArray *tempTotalArray = [[NSMutableArray alloc] init];
-    NSMutableArray *tempCountArray = [[NSMutableArray alloc] init];
+    NSMutableArray *tempTotalArray = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray *tempCountArray = [[[NSMutableArray alloc] init] autorelease];
     
 
     int value = 0;
@@ -126,7 +126,6 @@ int seriesCount;
     int totalValue = 0;
     bool initRun = YES;
     int avgValue = 0;
-    NSString *scale;
     int positiveDesc = 0;
     NSMutableArray *groupNames = [[NSMutableArray alloc] init];
 
@@ -145,7 +144,6 @@ int seriesCount;
             
             timeStamp = [NSString stringWithFormat:@"%@",[list objectAtIndex:0]];
             value = [[list objectAtIndex:3] intValue];
-            scale = [list objectAtIndex:2];
             nn = [list objectAtIndex:1];
             positiveDesc = [[list objectAtIndex:4] intValue];
             //  NSLog(@"positive: %@ - %@", nn,positiveDesc);
@@ -191,8 +189,7 @@ int seriesCount;
                     [tempCountArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
                     [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
                     [tempCountArray addObject:[NSString stringWithFormat:@"%i",positiveDesc]];
-
-                    avgValue = 0;
+                    [dateFormatter release];  
                 }
             }
             else 
@@ -229,7 +226,8 @@ int seriesCount;
                     [tempCountArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
                     [tempCountArray addObject:[NSString stringWithFormat:@"%@",lastGroupName]];
                     [tempCountArray addObject:[NSString stringWithFormat:@"%i",positiveDesc]];
-                    
+                    [dateFormatter release];  
+
                     count = 1;
                     totalValue = value;
                     

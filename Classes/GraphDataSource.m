@@ -37,6 +37,7 @@
 int seriesCount;
 bool gradientOn;
 bool symbolOn;
+bool isToggle;
 
 - (id)init
 {
@@ -81,7 +82,7 @@ bool symbolOn;
        // NSLog(@"dataDictCopy: %@",dataDictCopy);
         
        // NSLog(@"seriesCount: %i", seriesCount);
-
+        isToggle = NO;
         [self printData];
         
     }
@@ -103,14 +104,15 @@ bool symbolOn;
 - (void)toggleGradient
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-
+    
     gradientMode = !gradientMode;
+    isToggle = YES;
 }
 
 - (void)toggleSymbol
 {
     symbolMode = !symbolMode;
-    
+    isToggle = YES;
 }
 
 
@@ -426,7 +428,8 @@ bool symbolOn;
     NSPredicate *timePredicate;
 	NSArray *finalPredicateArray;
 	NSPredicate *finalPredicate;
-        
+    NSLog(@"dates %@ - %@", fromDate, today);    
+
 	for (NSString *groupTitle in self.groupsDictionary) 
     {
         groupPredicateString = [NSString stringWithFormat:@"group.title like %%@"];
@@ -445,7 +448,7 @@ bool symbolOn;
         
         NSError *error = nil;
         results = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-        
+      //  NSLog(@"results: %@", results);
         if (error) {
             [Error showErrorByAppendingString:@"could not get result data for graph" withError:error];
         } 
@@ -482,7 +485,7 @@ bool symbolOn;
                    // year = [groupResult.year intValue]; 
                     nn = groupResult.group.title;
                     positiveDesc = groupResult.group.positiveDescription;
-                  //  NSLog(@"positive: %@ - %@", nn,positiveDesc);
+                  //  NSLog(@"timeStamp: %i - %@", value,timeStamp);
 
                     
                     if ([lastTimeStamp isEqualToString:timeStamp]) 
@@ -518,6 +521,30 @@ bool symbolOn;
                     {
                         if (initRun) 
                         {
+                            
+                            //End of common timestamps; Do Average
+                            avgValue = value;       
+                            
+                            // Format DateTime
+                            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                            [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
+                            NSDate *date  = [dateFormatter dateFromString:timeStamp];
+                            
+                            // Convert Date 
+                            [dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss ZZZ"];
+                            NSString *newDate = [dateFormatter stringFromDate:date];
+                            
+                            // Add to array
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%@",newDate]];
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
+                            [tempTotalArray addObject:[NSString stringWithFormat:@"%@",nn]];
+                            
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%@",newDate]];
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%i",avgValue]];
+                            [tempCountArray addObject:[NSString stringWithFormat:@"%@",nn]];
+                            
+                            
+                            
                             initRun = NO; 
                             totalValue = value;
                         }
@@ -591,7 +618,8 @@ bool symbolOn;
 	
     
     // Raw Data rawValuesArray
-    
+  //  NSLog(@"arrayByDate: %@", arrayByDate);
+
     
     NSArray *objects = [self.groupsDictionary allKeys];
     NSMutableDictionary *chartDictionary = [[[NSMutableDictionary alloc] init] autorelease];
@@ -604,7 +632,6 @@ bool symbolOn;
         NSMutableArray *dateArray = [[[NSMutableArray alloc] init] autorelease];
         NSMutableDictionary *valueDict = [[[NSMutableDictionary alloc] init] autorelease];
         int averageValue = 0;
-        NSString *tempDate = @"";
         
         for (int i = 1; i < [arrayByDate count]; i+=5) 
         {
@@ -649,7 +676,7 @@ bool symbolOn;
 	[sortDescriptors release];
 	[fetchRequest release];
     [arrayByDate release];
-    
+    NSLog(@"chartDictionary: %@", chartDictionary);
     
 	return chartDictionary;
 }
@@ -756,6 +783,26 @@ bool symbolOn;
     UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     UIImage *image = [self UIImageForIndex:[[tSymbolDict objectForKey:grpName] intValue]];
     
+    if (!isToggle)
+    {
+        if (![defaults objectForKey:@"SWITCH_OPTION_STATE_SYMBOL"]) {
+            symbolMode = NO;
+        }
+        else 
+        {
+            symbolMode = YES;				
+        }
+        
+        if (![defaults objectForKey:@"SWITCH_OPTION_STATE_GRADIENT"]) {
+            gradientMode = NO;
+        }
+        else 
+        {
+            gradientMode = YES;				
+        }
+    
+    }
+    
     // Symbol
     lineSeries.style.pointStyle.texture = image;
     lineSeries.style.pointStyle.radius = symbolSize;
@@ -811,12 +858,13 @@ bool symbolOn;
     NSString *grpName = [[groupsArray objectAtIndex:seriesIndex] title];
     NSDictionary *tempGrpDict = [NSDictionary dictionaryWithDictionary:[dataDict objectForKey:grpName]];
     
-   // NSLog(@"grp: %@  - seriesInex: %i", grpName, seriesIndex);
     
     seriesData = [NSArray arrayWithArray:[tempGrpDict objectForKey:@"data"]]; 
     seriesDates = [NSArray arrayWithArray:[tempGrpDict objectForKey:@"date"]]; 
     
-    
+    NSLog(@"seriesData: %@", seriesData);
+    NSLog(@"seriesDates: %@", seriesDates);
+
     
     // Construct a data point to return
     SChartDataPoint *datapoint = [[[SChartDataPoint alloc] init] autorelease];

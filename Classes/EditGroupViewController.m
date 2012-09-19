@@ -68,12 +68,12 @@ BOOL isPortrait;
         [filterViewItems addObject:scaleDict];
         
         
-        NSLog(@"filterViewItems: %@", filterViewItems);
+       // NSLog(@"filterViewItems: %@", filterViewItems);
 
         
 		self.title = group.title;
 		groupTextField.text = self.group.title;
-        NSLog(@"group: %@  switch: %i", group.title, [group.positiveDescription intValue]);
+      //  NSLog(@"group: %@  switch: %i", group.title, [group.positiveDescription intValue]);
         if ([group.positiveDescription intValue] == 0) 
         {
             isPositveSwitch.on = NO;
@@ -120,7 +120,7 @@ BOOL isPortrait;
     
     // Fill Picker Array
     [self fillValues];
-    NSLog(@"pickerArray: %@", pickerArray);
+   // NSLog(@"pickerArray: %@", pickerArray);
    // self.pickerArray = [[[NSArray alloc] initWithObjects:
                    //      @"30 days", @"90 days", @"180 days", @"1 year", nil] autorelease];
 
@@ -315,7 +315,7 @@ BOOL isPortrait;
     
     self.title = group.title;
     groupTextField.text = self.group.title;
-    NSLog(@"filterViewItems: %@ ", filterViewItems);
+    //NSLog(@"filterViewItems: %@ ", filterViewItems);
     if ([group.positiveDescription intValue] == 0) 
     {
         isPositveSwitch.on = NO;
@@ -337,7 +337,7 @@ BOOL isPortrait;
 
 #pragma mark Text Editing
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    NSLog(@"text field return: %i", textField.tag);
+   // NSLog(@"text field return: %i", textField.tag);
 	if (textField == groupTextField) {
 		[groupTextField resignFirstResponder];
 		self.title = groupTextField.text;
@@ -349,7 +349,7 @@ BOOL isPortrait;
             [self reloadAfterCreate];
 
 		}
-		else {
+		else { 
 			[self saveEdit];
 		}
 	}
@@ -360,13 +360,12 @@ BOOL isPortrait;
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
 	BOOL shouldChangeText = YES;
 	
-    NSMutableCharacterSet *charactersToKeep = [NSMutableCharacterSet alphanumericCharacterSet];
-    [charactersToKeep addCharactersInString:@" "];
-    
-    NSCharacterSet *charactersToRemove = [charactersToKeep invertedSet];
-    
-    NSString *trimmedReplacement = [[string componentsSeparatedByCharactersInSet:charactersToRemove] componentsJoinedByString:@"" ];
-    
+	//NSCharacterSet *charactersToRemove = [[NSCharacterSet alphanumericCharacterSet] invertedSet];
+	NSCharacterSet *punctuation = [NSCharacterSet punctuationCharacterSet];
+	
+	//NSString *trimmedReplacement = [string stringByTrimmingCharactersInSet:charactersToRemove ];
+	
+	NSString *trimmedReplacement = [string stringByTrimmingCharactersInSet:punctuation];
 	
 	if (![trimmedReplacement isEqual:string]) {
 		shouldChangeText = NO;
@@ -571,16 +570,16 @@ BOOL isPortrait;
 
     if (self.scale == nil) 
     {        
-        NSLog(@"Scale is nil");
+      //  NSLog(@"Scale is nil");
         if (scalesArray.count == 0) 
         {
             curScale = 0;
-            NSLog(@"allScalesArray.count == 0");
+           // NSLog(@"allScalesArray.count == 0");
 
         }
         else 
         {
-            NSLog(@"allScalesArray.count != 0");
+           // NSLog(@"allScalesArray.count != 0");
             NSMutableDictionary *scalesUsedDict = [[NSMutableDictionary alloc] init];
             for (int i = 0; i < scalesArray.count; i++) 
             {
@@ -606,16 +605,16 @@ BOOL isPortrait;
 
                 }
             }
-            NSLog(@"whichUsed: %@", whichUsed);
+          //  NSLog(@"whichUsed: %@", whichUsed);
 
-            NSLog(@"notUsed: %@", notUsed);
+           // NSLog(@"notUsed: %@", notUsed);
             curScale = [[notUsed objectAtIndex:0] intValue];
         }
     }
     else 
     {
        // scale
-        NSLog(@"Scale is NOT nil");
+     //   NSLog(@"Scale is NOT nil");
 
         curScale = [self.scale.index intValue];
     }
@@ -623,7 +622,7 @@ BOOL isPortrait;
     
     
     self.scale = [allScalesArray objectAtIndex:curScale];
-    NSLog(@"*****curScale: %@", scale);
+   // NSLog(@"*****curScale: %@", scale);
 
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     
@@ -798,7 +797,7 @@ BOOL isPortrait;
 }
 
 - (IBAction)switchFlipped:(id)sender {
-    NSLog(@"switched to: %i", isPositveSwitch.on);
+   // NSLog(@"switched to: %i", isPositveSwitch.on);
 
 	if (self.group != nil) {
         if (isPositveSwitch.on) 
@@ -811,13 +810,15 @@ BOOL isPortrait;
         }
 		self.group.positiveDescription = [NSNumber numberWithBool:isPositveSwitch.on];
         
-		NSLog(@"switched to: %i", isPositveSwitch.on);
+		//NSLog(@"switched to: %i", isPositveSwitch.on);
 		NSError *error = nil;
 		if (![self.managedObjectContext save:&error]) {
 			[Error showErrorByAppendingString:@"Error saving Scale in Category" withError:error];
 		}
 	}
 }
+
+
 
 #pragma mark PickerView Delegate
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row
@@ -889,13 +890,12 @@ numberOfRowsInComponent:(NSInteger)component
     // Change Nav Title
     self.title = @"Manage Scale";
 
-    NSLog(@"scale: %@", scale);
+   // NSLog(@"scale: %@", scale);
 
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);    
     
     int startHeight = 0;
     int startWeight = 0;
-    int headerSpace = 44;
         
     // check if our rangePicker is already on screen
     if (self.manageScaleView.superview == nil)
@@ -1139,7 +1139,7 @@ numberOfRowsInComponent:(NSInteger)component
     self.title = group.title;
     self.scale = nil;
     
-    NSLog(@"scale: %@", scale);
+   // NSLog(@"scale: %@", scale);
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 
@@ -1150,7 +1150,7 @@ numberOfRowsInComponent:(NSInteger)component
     
     if (UIDeviceOrientationIsValidInterfaceOrientation(interfaceOrientation) && (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown)) 
     {
-        NSLog(@"***** Orientation: Portrait");
+       // NSLog(@"***** Orientation: Portrait");
         if (!isPortrait) {
             [manageScaleView removeFromSuperview];
         }
@@ -1159,7 +1159,7 @@ numberOfRowsInComponent:(NSInteger)component
     }
     else if (UIDeviceOrientationIsValidInterfaceOrientation(interfaceOrientation) && (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight))  
     {
-        NSLog(@"***** Orientation: Landscape");
+     ///   NSLog(@"***** Orientation: Landscape");
         
         if (isPortrait) {
             [manageScaleView_landscape removeFromSuperview];
@@ -1169,11 +1169,11 @@ numberOfRowsInComponent:(NSInteger)component
     }
     else if (interfaceOrientation == UIDeviceOrientationFaceUp || interfaceOrientation == UIDeviceOrientationFaceDown)
     {
-        NSLog(@"***** Orientation: Other");
+      // NSLog(@"***** Orientation: Other");
         
     }
     else {
-        NSLog(@"***** Orientation: Unknown");
+      //  NSLog(@"***** Orientation: Unknown");
         
     }
 }
@@ -1196,7 +1196,7 @@ numberOfRowsInComponent:(NSInteger)component
     
     NSDictionary *dictionary = [filterViewItems objectAtIndex:section];
     NSArray *array = [dictionary objectForKey:@"Groups"];
-    NSLog(@"arraycount: %i", [array count]);
+   // NSLog(@"arraycount: %i", [array count]);
     
     return [array count];
     
@@ -1286,17 +1286,17 @@ numberOfRowsInComponent:(NSInteger)component
             UICustomSwitch *switchView = [[UICustomSwitch alloc] initWithFrame:CGRectZero];
             switchView = [UICustomSwitch switchWithLeftText:@"YES" andRight:@"NO"];
 
-            NSLog(@"Creating Cell Positive: %i", isPositveSwitch.on);
+           // NSLog(@"Creating Cell Positive: %i", isPositveSwitch.on);
             
             if (isPositveSwitch.on) 
             {
-                NSLog(@"IS ON");
+               // NSLog(@"IS ON");
                 switchView.on = YES;
                 switchView.value = 1.0;
             }
             else 
             {
-                NSLog(@"IS OFF");
+               // NSLog(@"IS OFF");
                 switchView.on = NO;
                 switchView.value = 0.0;
 
@@ -1459,8 +1459,8 @@ numberOfRowsInComponent:(NSInteger)component
             
         
         
-        NSLog(@"scale: %@", scale);
-        NSLog(@"scalesArray: %@", scalesArray);
+      //  NSLog(@"scale: %@", scale);
+      //  NSLog(@"scalesArray: %@", scalesArray);
 
         [self showManager];
     }

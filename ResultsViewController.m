@@ -971,8 +971,9 @@ int pickerShow;
     
     [defaults setObject:myFromDate forKey:@"PDF_FromDate"];
     [defaults setObject:newToDate forKey:@"PDF_ToDate"];
+    NSLog(@"myFromDate: %@",myFromDate);
 
-
+    NSLog(@"newToDate: %@",newToDate);
     
     
     NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(timestamp >= %@) AND (timestamp <= %@)", myFromDate, newToDate];
@@ -1058,8 +1059,16 @@ int pickerShow;
     NSDate *myToDate = [df dateFromString: rawToDate];
     [df release];
 
+    NSDateComponents *components = [[[NSDateComponents alloc] init] autorelease];
+    [components setDay:1];
     
-    NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(timestamp >= %@) AND (timestamp <= %@)", myFromDate, myToDate];
+    NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+    
+    NSDate *newToDate = [gregorian dateByAddingComponents:components toDate:myToDate options:0];
+
+    
+    
+    NSPredicate *datePredicate = [NSPredicate predicateWithFormat:@"(timestamp >= %@) AND (timestamp <= %@)", myFromDate, newToDate];
     
     NSArray *finalPredicateArray = [NSArray arrayWithObjects:datePredicate, nil];
     NSPredicate *finalPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:finalPredicateArray];

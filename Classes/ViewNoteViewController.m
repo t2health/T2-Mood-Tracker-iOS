@@ -41,9 +41,10 @@
 	[cancelButton release];
     
     self.prevNote = noteView.text;
-    
-    NSLog(@"prevNote: %@", prevNote);
-    NSLog(@"noteView.text: %@", noteView.text);
+    noteView.returnKeyType = UIReturnKeyDefault;
+
+//    NSLog(@"prevNote: %@", prevNote);
+  //  NSLog(@"noteView.text: %@", noteView.text);
 }
 
 // Override to allow orientations other than the default portrait orientation.
@@ -69,6 +70,14 @@
         
         [notesController.tableView reloadData];
     }
+}
+
+#pragma mark TextView Delegate Methods
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+{
+    NSUInteger newLength = [textView.text length] + [text length] - range.length;
+    return  (newLength > 360) ? NO : YES;
 }
 
 #pragma mark ActionSheet
@@ -134,7 +143,12 @@
 	[self.navigationController popViewControllerAnimated:YES];
     
 }
-
+/*
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {	
+	[self.noteView resignFirstResponder];
+	return YES;	
+}
+*/
 - (void)save:(id)sender 
 {
     [self save];

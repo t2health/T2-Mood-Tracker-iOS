@@ -27,7 +27,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
-	for (UIView* subview in datePicker.subviews) {
+	for (UIView* subview in datePicker.subviews) 
+    {
 		subview.frame = datePicker.bounds;
 	}
 	
@@ -44,6 +45,9 @@
 	self.navigationItem.leftBarButtonItem = cancelButton;
 	[cancelButton release];
     
+    
+    noteTextView.returnKeyType = UIReturnKeyDefault;
+
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -106,6 +110,14 @@
     
 }
 
+#pragma mark TextView Delegate Methods
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+{
+    NSUInteger newLength = [textView.text length] + [text length] - range.length;
+    return  (newLength > 360) ? NO : YES;
+}
+
 #pragma mark ActionSheet
 -(void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
@@ -139,6 +151,7 @@
     // [appDelegate cancelNote];
 }
 
+/*
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range 
  replacementText:(NSString *)text
 {
@@ -152,7 +165,7 @@
     // For any other character return TRUE so that the text gets added to the view
     return YES;
 }
-
+*/
 - (IBAction)editDate:(id)sender
 {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
@@ -286,13 +299,13 @@
     // e.g. self.myOutlet = nil;
 	self.noteTextView = nil;
 }
-
+/*
 #pragma mark Text Editing
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {	
 	[self.noteTextView resignFirstResponder];
 	return YES;	
 }
-
+*/
 #pragma mark Date Picker
 -(IBAction)dateAction:(id)sender {
 	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];

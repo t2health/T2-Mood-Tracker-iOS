@@ -171,22 +171,37 @@
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
-	NSInteger numberOfRows = [sectionInfo numberOfObjects];
+    NSInteger numRows;
 	
-	return numberOfRows;
+	switch (section) {
+		case 0: //Number of sections
+			numRows = 7;
+			break;
+		default:
+			numRows = 0;
+			break;
+	}
+	
+    return numRows;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
 	
-	NSArray *sections = [self.fetchedResultsController sections];
-	NSString *sectionName = [[sections objectAtIndex:section] name];
+	NSString *sectionName;
+	
+	switch (section) {
+		case 0: //Settings
+			sectionName = nil;
+			break;
+		default:
+			sectionName = nil;
+			break;
+	}
 	return sectionName;
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    
     // create the parent view that will hold header Label
 	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
 	
@@ -201,8 +216,7 @@
     
 	// If you want to align the header text as centered
 	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
-    NSArray *sections = [self.fetchedResultsController sections];
-	headerLabel.text = [[sections objectAtIndex:section] name];
+	headerLabel.text = @"Support";
 	[customView addSubview:headerLabel];
     [headerLabel release];
 	return customView;
@@ -214,35 +228,42 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {	
-	// Configure the cell to show the Categories title
-	Group *group = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	cell.textLabel.text = group.title;
-	if (self.reminderArray != nil && [group.rateable boolValue] == YES) {
-		if ([self.reminderArray containsObject:group.title]) {
-			cell.imageView.image = [UIImage imageNamed:@"warning.png"];		
-		}
-		else {
-			cell.imageView.image = [UIImage imageNamed:@"check.png"];
-		}
+    NSInteger section = [indexPath indexAtPosition:0];
+	NSInteger row = [indexPath indexAtPosition:1];
+    
+	switch (section) {
+		case 0: //Settings
+			switch (row) {
+				case 0: //About
+					cell.textLabel.text = @"About T2 Mood Tracker";
+					break; 
+				case 1: //Help
+					cell.textLabel.text = @"Help";
+					break;
+				case 2: //Feedback
+					cell.textLabel.text = @"Feedback";
+					break;
+				case 3: //Rate App
+					cell.textLabel.text = @"Rate App";
+					break;
+                case 4: //Tell A Friend
+					cell.textLabel.text = @"Tell A Friend";
+					break;
+                case 5: //Local Resources/ Help
+					cell.textLabel.text = @"Local Resources/Help";
+					break;
+                #ifdef DEBUG
+                case 6: //Create Data
+					cell.textLabel.text = @"Create Data";
+					break;
+                #endif
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
 	}
-	else {
-		cell.imageView.image = nil;
-	}
-	
-	if ([group.visible boolValue] == NO) {
-		cell.userInteractionEnabled = NO;
-		cell.hidden = YES;
-	}
-	else {
-		cell.userInteractionEnabled = YES;
-		cell.hidden = NO;
-	}
-	
-	
-	cell.backgroundColor = [UIColor whiteColor];
-	cell.accessoryView.backgroundColor = [UIColor clearColor];
-	cell.contentView.backgroundColor = [UIColor clearColor];
-	cell.backgroundView.backgroundColor = [UIColor clearColor];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {

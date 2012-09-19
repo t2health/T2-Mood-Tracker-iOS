@@ -49,9 +49,9 @@
 
 - (void) viewWillDisappear:(BOOL)animated
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:NO forKey:@"SWITCH_OPTION_STATE_SYMBOL"];
-    [defaults setBool:NO forKey:@"SWITCH_OPTION_STATE_GRADIENT"];
+  //  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  //  [defaults setBool:NO forKey:@"SWITCH_OPTION_STATE_SYMBOL"];
+  //  [defaults setBool:NO forKey:@"SWITCH_OPTION_STATE_GRADIENT"];
 
 }
 
@@ -168,7 +168,7 @@
             storedVal = NO;
         }
         else {
-            storedVal = NO;				
+            storedVal = YES;				
         }
         aSwitch.on = storedVal;
         aSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin + UIViewAutoresizingFlexibleBottomMargin; 
@@ -192,7 +192,7 @@
         }
         else 
         {
-            storedVal = NO;				
+            storedVal = YES;				
         }
         
         aSwitch.on = storedVal;
