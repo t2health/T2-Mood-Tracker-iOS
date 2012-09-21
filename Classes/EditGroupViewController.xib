@@ -85,6 +85,7 @@
 								<int key="NSID">2</int>
 							</object>
 						</object>
+						<bool key="IBUIClearsOnBeginEditing">YES</bool>
 						<bool key="IBUIAdjustsFontSizeToFit">YES</bool>
 						<float key="IBUIMinimumFontSize">17</float>
 						<object class="IBUITextInputTraits" key="IBUITextInputTraits">
@@ -229,7 +230,6 @@
 						<int key="IBUIStyle">1</int>
 						<int key="IBUISeparatorStyle">2</int>
 						<int key="IBUISectionIndexMinimumDisplayRowCount">0</int>
-						<bool key="IBUIAllowsSelection">NO</bool>
 						<float key="IBUIRowHeight">44</float>
 						<float key="IBUISectionHeaderHeight">10</float>
 						<float key="IBUISectionFooterHeight">10</float>
@@ -675,14 +675,6 @@
 					<int key="connectionID">109</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="785392485"/>
-						<reference key="destination" ref="372490531"/>
-					</object>
-					<int key="connectionID">49</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">deleteGroupPressed:</string>
 						<reference key="source" ref="1034778502"/>
@@ -1030,7 +1022,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">113</int>
+			<int key="maxID">114</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1089,6 +1081,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>deleteGroup</string>
+							<string>groupTextField</string>
 							<string>isPositveSwitch</string>
 							<string>manageScaleView</string>
 							<string>manageScaleView_landscape</string>
@@ -1105,6 +1098,7 @@
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>UIButton</string>
+							<string>UITextField</string>
 							<string>UISwitch</string>
 							<string>UIView</string>
 							<string>UIView</string>
@@ -1124,6 +1118,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>deleteGroup</string>
+							<string>groupTextField</string>
 							<string>isPositveSwitch</string>
 							<string>manageScaleView</string>
 							<string>manageScaleView_landscape</string>
@@ -1142,6 +1137,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">deleteGroup</string>
 								<string key="candidateClassName">UIButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">groupTextField</string>
+								<string key="candidateClassName">UITextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">isPositveSwitch</string>

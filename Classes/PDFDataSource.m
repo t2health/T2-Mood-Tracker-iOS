@@ -294,18 +294,12 @@ int seriesCount;
                     totalValue = value;
                     
                 }
-                
             }
-            
-            
-            
         }
         totalCount++;
         lastTimeStamp = timeStamp;
         lastGroupName = nn;
-        
     }
-    
     
     bool doesExist = NO;
     
@@ -336,7 +330,6 @@ int seriesCount;
             [arrayByDate addObject:[tempTotalArray objectAtIndex:i + 2]];
             [arrayByDate addObject:[tempTotalArray objectAtIndex:i + 3
                                     ]];
-            
             
         }
     }

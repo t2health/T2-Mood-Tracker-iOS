@@ -23,16 +23,18 @@ BOOL isPortrait;
 
 @synthesize group, tableView, scalesArray, scale, allScalesArray;
 @synthesize managedObjectContext;
-@synthesize positiveLabel, scalePicker_landscape;
+@synthesize positiveLabel, scalePicker_landscape, groupTextField;
 @synthesize filterViewItems, topFieldArray, scalesDictionary;
 @synthesize manageScaleView, scalePicker, minTextField, maxTextField, pickerArray, manageScaleView_landscape, minTextField_landscape, maxTextField_landscape;
 
+int isFirstRun;
 
 #pragma mark -
 #pragma mark View lifecycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    isFirstRun = 0;
     tableView.backgroundView = nil;
 
 	UIApplication *app = [UIApplication sharedApplication];
@@ -313,8 +315,8 @@ BOOL isPortrait;
     [filterViewItems addObject:scaleDict];
     
     
-    self.title = group.title;
-    groupTextField.text = self.group.title;
+   // self.title = group.title;
+   // groupTextField.text = self.group.title;
     //NSLog(@"filterViewItems: %@ ", filterViewItems);
     if ([group.positiveDescription intValue] == 0) 
     {
@@ -329,7 +331,7 @@ BOOL isPortrait;
     UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteGroupPressed:)];
     self.navigationItem.rightBarButtonItem = deleteButton;
     [deleteButton release];
-    
+    isFirstRun = 1;
     [tableView reloadData];
 
     
@@ -1345,12 +1347,15 @@ numberOfRowsInComponent:(NSInteger)component
             
             UIButton *myButton = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
             [myButton setTitle:@"+ Add Scale" forState:UIControlStateNormal];
-            myButton.frame = CGRectMake(startX, 5.0, 150, 30);
+            myButton.frame = CGRectMake(startX, 5.0, 250, 30);
             [myButton addTarget:self action:@selector(addScale) forControlEvents:(UIControlEventTouchUpInside)];
             
             if (scalesArray.count == 10) 
             {
                 myButton.enabled = NO;
+                [myButton setTitle:@"10 scale limit reached." forState:UIControlStateNormal];
+
+            
             }
             
             cell.accessoryView = myButton;
@@ -1396,27 +1401,53 @@ numberOfRowsInComponent:(NSInteger)component
                 }
                 
             }
-            UITextField *cField = [[UITextField alloc] initWithFrame:CGRectMake(startX, 10, widthX, 30)];
+            
+
 
             
-            cField.adjustsFontSizeToFitWidth = YES;
-            cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
+
             if (group.title) 
             {
-                cField.text = group.title;
+                if (isFirstRun == 1) 
+                {
+                     groupTextField.text = group.title;
+                }
+                else 
+                {
+                    
+                
+                    UITextField *cField = [[UITextField alloc] initWithFrame:CGRectMake(startX, 10, widthX, 30)];
+                    cField.adjustsFontSizeToFitWidth = YES;
+                    cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
+                    cField.placeholder = @"Enter a Category Name (No Punctuation)";
+                    cField.keyboardType = UIKeyboardTypeDefault;
+                    cField.returnKeyType = UIReturnKeyDone;
+                    cField.tag = 0;
+                    [cField setEnabled:YES];
+                    groupTextField = cField;
+                    groupTextField.delegate = self;
+                    groupTextField.text = group.title;
+                    [cell addSubview:groupTextField];
+                    [cField release];   
+                
+                }
             }
-            cField.placeholder = @"Enter a Category Name (No Punctuation)";
+            else 
+            {
+                UITextField *cField = [[UITextField alloc] initWithFrame:CGRectMake(startX, 10, widthX, 30)];
+                cField.adjustsFontSizeToFitWidth = YES;
+                cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
+                cField.placeholder = @"Enter a Category Name (No Punctuation)";
+                cField.keyboardType = UIKeyboardTypeDefault;
+                cField.returnKeyType = UIReturnKeyDone;
+                cField.tag = 0;
+                [cField setEnabled:YES];
+                groupTextField = cField;
+                groupTextField.delegate = self;
+                [cell addSubview:groupTextField];
+                [cField release];    
+            }
             
-            cField.keyboardType = UIKeyboardTypeDefault;
-            cField.returnKeyType = UIReturnKeyDone;
-            cField.tag = 0;
-            [cField setEnabled:YES];
-            groupTextField = cField;
-            groupTextField.delegate = self;
-            [cell addSubview:groupTextField];
-            [cField release];
-
-
         }
     }
     else

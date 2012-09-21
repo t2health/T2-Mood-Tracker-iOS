@@ -12,7 +12,7 @@
 
 @interface EditGroupViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate, UIActionSheetDelegate, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource>{	
 	NSManagedObjectContext *managedObjectContext;
-	UITextField *groupTextField;
+	IBOutlet UITextField *groupTextField;
 	IBOutlet UIButton *deleteGroup;
 	IBOutlet UIButton *manageScalesButton;
 	IBOutlet UISwitch *isPositveSwitch;
@@ -66,6 +66,7 @@
 @property (nonatomic, retain) IBOutlet UITextField *minTextField_landscape;
 @property (nonatomic, retain) IBOutlet UITextField *maxTextField_landscape;
 @property (nonatomic, retain) NSArray *pickerArray;
+@property (nonatomic, retain) IBOutlet UITextField *groupTextField;
 
 
 
