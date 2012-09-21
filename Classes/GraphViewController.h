@@ -165,7 +165,7 @@
 - (void)legendToggle;
 - (void)symbolToggle;
 - (void)gradientToggle;
-
+- (void) showPicker;
 - (void)sendMenuToBack;
 - (void)emailResults;
 - (void)deviceOrientationChanged:(NSNotification *)notification;
@@ -174,5 +174,6 @@
 - (IBAction)doneAction:(id)sender;
 - (void)resignPicker;
 - (void)slideDownDidStop;
+- (IBAction)segmentIndexChanged;
 
 @end

@@ -54,13 +54,14 @@ bool isRefreshTable;
 bool isMyLegend;
 bool isPortrait;
 
+
 #pragma mark - Load/Init
 - (void)viewDidLoad
 {
         #ifdef DEBUG
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
     #endif
-
+    //myID = @"There is a problem";
     [super viewDidLoad];
     
     _notesTableView.backgroundView = nil;
@@ -112,7 +113,7 @@ bool isPortrait;
     [self fillOptions];
     
     // Orientation
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    
     
     // NOTIFICATIONS----------------------------------------------//
     // Listen for Actions from Option UITableViewController
@@ -128,13 +129,53 @@ bool isPortrait;
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
+
         isPortrait = YES;
     }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
     {
+        int chartHeight = 0;
+        int menuHeight = 0;
+        int menuStart = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            chartHeight = 700;
+            menuStart = 0;
+            menuHeight = 700;
+        } 
+        else 
+        {
+            // iPhone
+            chartHeight = 260;
+            menuStart = 0;
+            menuHeight = 320;
+        } 
+        chart.alpha = 0.0f;
+        //            [chart removeFromSuperview];
+        
+        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+        CGRect startRect = CGRectMake(0.0,
+                                      0.0,
+                                      chartViewSize.width, chartHeight); 
+        
+        chart.frame = startRect;
+        [self showButtons:1];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     menuStart,
+                                     menuViewSize.width, menuHeight);
+        self.menuView.frame = menuRect;
+        
+        chart.alpha = 1.0f;
+        //            [containerView addSubview:chart];
+        //            [containerView bringSubviewToFront:legendView];
+        //            [containerView bringSubviewToFront:menuView];
+        menuView.hidden = YES;
+        menuShowing = NO;
+
         isPortrait = NO;
     }
-    
     backgroundQueue = dispatch_queue_create("org.t2health.moodtracker.bgqueue", NULL);        
     [containerView bringSubviewToFront:loadingView];
 
@@ -147,7 +188,7 @@ bool isPortrait;
         #ifdef DEBUG
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
     #endif
-
+    menuView = nil;
     switchDictionary = nil;
 	ledgendColorsDictionary = nil;
 	groupsDictionary = nil;
@@ -166,56 +207,16 @@ bool isPortrait;
     #ifdef DEBUG
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
     #endif 
-    // Capture initial orientation
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+
+    
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
         
-        int chartHeight = 0;
-        int menuHeight = 0;
-        int menuStart = 0;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-        {
-            chartHeight = 512;
-            menuStart = 512;
-            menuHeight = 512;
-        } 
-        else 
-        {
-            // iPhone
-            chartHeight = 211;
-            menuStart = 211;
-            menuHeight = 215;
-        }
-        chart.alpha = 0.0f;
-        //            [chart removeFromSuperview];
-        
-        
-        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-        CGRect chartRect = CGRectMake(0.0,
-                                      0.0,
-                                      chartViewSize.width, chartHeight); 
-        
-        chart.frame = chartRect;
-       // [self showButtons:1];
-        
-        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
-        CGRect menuRect = CGRectMake(0.0,
-                                     menuStart,
-                                     menuViewSize.width, menuHeight);
-        self.menuView.frame = menuRect;
-        
-       // menuView.hidden = NO;
-       // [menuView setAlpha:1.0];
-        chart.alpha = 1.0f;
-        //            [containerView addSubview:chart];
-        //            [containerView bringSubviewToFront:legendView];
-        //            [containerView bringSubviewToFront:menuView];
-        
-        [self slideDownDidStop];
-        // [self resetLegend];
-        
-        isPortrait = YES;    }
+        isPortrait = YES;
+    }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
     {
         int chartHeight = 0;
@@ -258,20 +259,12 @@ bool isPortrait;
         menuView.hidden = YES;
         menuShowing = NO;
         
-        [self slideDownDidStop];
-        //  [self resetLegend];
         isPortrait = NO;
     }
+
     
-    /*
-    [NSTimer scheduledTimerWithTimeInterval:0.01
-                                     target:self 
-                                   selector:@selector(switchProcess) 
-                                   userInfo:nil 
-                                    repeats:NO];
-    */
+    // Capture initial orientation
     [_tableView reloadData];    
-    //[_legendTableView reloadData];
 }
 
 -(void) viewWillDisappear:(BOOL)animated 
@@ -286,7 +279,9 @@ bool isPortrait;
         // in the navigation stack. 
 
     }
-    
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name: UIDeviceOrientationDidChangeNotification object:nil];
+
     [super viewWillDisappear:animated];
 }
 
@@ -507,6 +502,7 @@ bool isPortrait;
 
     t2LogoImageView.hidden = YES;
 
+    ////*
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
@@ -582,6 +578,7 @@ bool isPortrait;
         menuShowing = NO;
     }
     
+    
 
    // [self resetLegend];
 
@@ -596,6 +593,8 @@ bool isPortrait;
     }
     NSLog(@"zoomLevel: %f", zoomLevel);
 }
+
+#pragma mark Buttons
 
 - (void)showButtons:(int)howMany;
 {
@@ -641,6 +640,7 @@ bool isPortrait;
     }
 }
 
+#pragma mark Legend
 
 - (void)resetLegend
 {
@@ -993,6 +993,8 @@ bool isPortrait;
     
 }
 
+#pragma mark Loading Options
+
 - (void) loadingSymbol
 {
     [containerView bringSubviewToFront:loadingView];
@@ -1132,33 +1134,6 @@ bool isPortrait;
 
 }
 
--(void)switchSeriesType 
-{
-        #ifdef DEBUG
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
-    #endif
-
-    double xMin, xMax, yMin, yMax;
-    xMin = [chart.xAxis.axisRange.minimum doubleValue];
-    xMax = [chart.xAxis.axisRange.maximum doubleValue];
-    yMin = [chart.yAxis.axisRange.minimum doubleValue];
-    yMax = [chart.yAxis.axisRange.maximum doubleValue];
-    
-    // Change series type
-    [datasource toggleSeriesType];
-    
-    chart.legend.hidden = NO;
-    // Reload data
-    [chart reloadData];
-    [chart layoutSubviews];
-    
-    // Restore axes' ranges
-    [chart.xAxis setRangeWithMinimum:[NSNumber numberWithDouble: xMin] andMaximum:[NSNumber numberWithDouble: xMax] withAnimation:NO];
-    [chart.yAxis setRangeWithMinimum:[NSNumber numberWithDouble: yMin] andMaximum:[NSNumber numberWithDouble: yMax] withAnimation:NO];
-    
-    // Redraw chart
-    [chart redrawChartAndGL: YES];
-}
 
 #pragma mark Rotation
 
@@ -1169,17 +1144,22 @@ bool isPortrait;
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 
 {
+    
+
         #ifdef DEBUG
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+ //   NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
     #endif
 
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-
+    NSLog(@"isPortrait: %i",isPortrait);
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
         if (!isPortrait) 
         {
-
+            NSLog(@"portrait show     menu");
+            
+            
+            
             int chartHeight = 0;
             int menuHeight = 0;
             int menuStart = 0;
@@ -1196,6 +1176,8 @@ bool isPortrait;
                 menuStart = 211;
                 menuHeight = 205;
             }
+            
+            
             chart.alpha = 0.0f;
 //            [chart removeFromSuperview];
             
@@ -1221,9 +1203,10 @@ bool isPortrait;
 //            [containerView bringSubviewToFront:legendView];
 //            [containerView bringSubviewToFront:menuView];
             
-            [self slideDownDidStop];
+           // menuView.hidden = NO;
+           // [self slideDownDidStop];
            // [self resetLegend];
-            
+    
             isPortrait = YES;
         }        
     }
@@ -1231,6 +1214,8 @@ bool isPortrait;
     {
         if (isPortrait) 
         {
+            NSLog(@"landscape hide menu");
+            
             int chartHeight = 0;
             int menuHeight = 0;
             int menuStart = 0;
@@ -1271,7 +1256,10 @@ bool isPortrait;
             menuView.hidden = YES;
             menuShowing = NO;
             
-            [self slideDownDidStop];
+            
+
+            
+           // [self slideDownDidStop];
           //  [self resetLegend];
             isPortrait = NO;
         }
@@ -1866,85 +1854,14 @@ bool isPortrait;
 
 }
 
-- (void)slideDownDidStop
-{
-        #ifdef DEBUG
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
-    #endif
-
-	// the date picker has finished sliding downwards, so remove it
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-    {
-        [self.pickerView_iPad removeFromSuperview];
-    }
-    else 
-    {
-        [self.pickerView removeFromSuperview];
-    }
-}
-- (IBAction)doneAction:(id)sender
-{
-        #ifdef DEBUG
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
-    #endif
-
-    [self resignPicker];
-}
-
-#pragma mark PickerView Delegate
--(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row
-      inComponent:(NSInteger)component
-{
-    
-        #ifdef DEBUG
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
-    #endif
-
-    NSString *pickedRange = [pickerArray objectAtIndex:row];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *defaultsKey;
-    
-    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
-    NSString *oldRange = [defaults objectForKey:defaultsKey];
-    
-    [defaults setObject:pickedRange forKey:defaultsKey];
-    [defaults synchronize];
-    
-    // Set to UPDATE if selection changed
-    if (![pickedRange isEqualToString:oldRange]) 
-    {
-        doUpdate = YES;
-    }
-    
-}
-
-#pragma mark -
-#pragma mark PickerView DataSource
-
-- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
-{
-    return 1;
-}
-- (NSInteger)pickerView:(UIPickerView *)pickerView
-numberOfRowsInComponent:(NSInteger)component
-{
-    return [pickerArray count];
-}
-- (NSString *)pickerView:(UIPickerView *)pickerView
-             titleForRow:(NSInteger)row
-            forComponent:(NSInteger)component
-{
-    return [pickerArray objectAtIndex:row];
-} 
-
 - (void) showPicker
 {
-        #ifdef DEBUG
+#ifdef DEBUG
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
-    #endif    
+#endif    
     
     int startWeight = 0;
-
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
     {
         startWeight = 768;
@@ -2022,7 +1939,7 @@ numberOfRowsInComponent:(NSInteger)component
     {
         //iPhone
         startWeight = 320;
-
+        
         
         // check if our rangePicker is already on screen
         if (self.pickerView.superview == nil)
@@ -2093,8 +2010,8 @@ numberOfRowsInComponent:(NSInteger)component
             // self.navigationItem.rightBarButtonItem = self.doneButton;
         }
     }
-
-
+    
+    
 }
 
 
@@ -2139,6 +2056,79 @@ numberOfRowsInComponent:(NSInteger)component
     
     return coloredImage;
 }
+
+
+- (void)slideDownDidStop
+{
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
+
+	// the date picker has finished sliding downwards, so remove it
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        [self.pickerView_iPad removeFromSuperview];
+    }
+    else 
+    {
+        [self.pickerView removeFromSuperview];
+    }
+}
+- (IBAction)doneAction:(id)sender
+{
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
+
+    [self resignPicker];
+}
+
+#pragma mark PickerView Delegate
+-(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row
+      inComponent:(NSInteger)component
+{
+    
+        #ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+    #endif
+
+    NSString *pickedRange = [pickerArray objectAtIndex:row];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *defaultsKey;
+    
+    defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
+    NSString *oldRange = [defaults objectForKey:defaultsKey];
+    
+    [defaults setObject:pickedRange forKey:defaultsKey];
+    [defaults synchronize];
+    
+    // Set to UPDATE if selection changed
+    if (![pickedRange isEqualToString:oldRange]) 
+    {
+        doUpdate = YES;
+    }
+    
+}
+
+#pragma mark -
+#pragma mark PickerView DataSource
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+{
+    return 1;
+}
+- (NSInteger)pickerView:(UIPickerView *)pickerView
+numberOfRowsInComponent:(NSInteger)component
+{
+    return [pickerArray count];
+}
+- (NSString *)pickerView:(UIPickerView *)pickerView
+             titleForRow:(NSInteger)row
+            forComponent:(NSInteger)component
+{
+    return [pickerArray objectAtIndex:row];
+} 
+
 
 #pragma mark tableView
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -2223,7 +2213,7 @@ numberOfRowsInComponent:(NSInteger)component
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
 	NSInteger row = [indexPath indexAtPosition:1];
-    
+
     Group *group = [self.groupsArray objectAtIndex:row];
     NSString *groupName = group.title;
     SGraphViewController *sGraphViewController = [[SGraphViewController alloc] initWithNibName:@"SGraphViewController" bundle:nil];
@@ -2388,11 +2378,6 @@ numberOfRowsInComponent:(NSInteger)component
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:email]];
 }
 
--(void) didReceiveMemoryWarning
-{
-   // NSLog(@"MEMORY WARNING");
-    
-}
 
 -(void)dealloc {
         #ifdef DEBUG
@@ -2414,7 +2399,7 @@ numberOfRowsInComponent:(NSInteger)component
 	[legendSwipeLeft release];
     [legendTap release];
     
-    
+    /*
     switchDictionary = nil;
     menuBar = nil;
     loadingLabel = nil;
@@ -2443,9 +2428,9 @@ numberOfRowsInComponent:(NSInteger)component
     rangePicker = nil;
     pickerArray = nil;
     pickerView = nil;
-    
-    
-    
+    menuView = nil;
+    containerView = nil;
+    */
     [super dealloc];
 }
 

@@ -77,7 +77,7 @@ bool isToggle;
         {
             self.dataDictCopy = [NSMutableDictionary dictionaryWithDictionary:dataDict];
         }
-        seriesCount = [[dataDictCopy allKeys] count];
+        seriesCount = [[dataDict allKeys] count];
         
        // NSLog(@"dataDictCopy: %@",dataDictCopy);
         
@@ -428,7 +428,7 @@ bool isToggle;
     NSPredicate *timePredicate;
 	NSArray *finalPredicateArray;
 	NSPredicate *finalPredicate;
-    NSLog(@"dates %@ - %@", fromDate, today);    
+ //   NSLog(@"dates %@ - %@", fromDate, today);    
 
 	for (NSString *groupTitle in self.groupsDictionary) 
     {
@@ -676,7 +676,7 @@ bool isToggle;
 	[sortDescriptors release];
 	[fetchRequest release];
     [arrayByDate release];
-    NSLog(@"chartDictionary: %@", chartDictionary);
+   // NSLog(@"chartDictionary: %@", chartDictionary);
     
 	return chartDictionary;
 }
@@ -848,7 +848,7 @@ bool isToggle;
 // Returns the number of series in the specified chart
 - (int)numberOfSeriesInSChart:(ShinobiChart *)chart 
 {
-    return seriesCount - 1;
+    return seriesCount;
 }
 
 // Returns the data point at the specified index for the given series/chart.
@@ -857,13 +857,14 @@ bool isToggle;
     
     NSString *grpName = [[groupsArray objectAtIndex:seriesIndex] title];
     NSDictionary *tempGrpDict = [NSDictionary dictionaryWithDictionary:[dataDict objectForKey:grpName]];
-    
+   // NSLog(@"groupsArray: %@", groupsArray);
+
     
     seriesData = [NSArray arrayWithArray:[tempGrpDict objectForKey:@"data"]]; 
     seriesDates = [NSArray arrayWithArray:[tempGrpDict objectForKey:@"date"]]; 
     
-    NSLog(@"seriesData: %@", seriesData);
-    NSLog(@"seriesDates: %@", seriesDates);
+   // NSLog(@"%@ - seriesData: %@", grpName, seriesData);
+   // NSLog(@"%@ - seriesDates: %@", grpName, seriesDates);
 
     
     // Construct a data point to return

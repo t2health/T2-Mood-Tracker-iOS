@@ -115,9 +115,7 @@ bool isLoading;
 	[self fillColors];
 	[self createSwitches];
     [self fillOptions];
-    
-    // Orientation
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+
     
     // NOTIFICATIONS----------------------------------------------//
     // Listen for Actions from Option UITableViewController
@@ -134,8 +132,6 @@ bool isLoading;
     
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
-        isPortrait = YES;
-        
         int chartHeight = 0;
         int menuHeight = 0;
         int menuStart = 0;
@@ -155,14 +151,13 @@ bool isLoading;
         chart.alpha = 0.0f;
         //            [chart removeFromSuperview];
         
-        
         CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-        CGRect chartRect = CGRectMake(0.0,
+        CGRect startRect = CGRectMake(0.0,
                                       0.0,
                                       chartViewSize.width, chartHeight); 
         
-        chart.frame = chartRect;
-       // [self showButtons:1];
+        chart.frame = startRect;
+        [self showButtons:1];
         
         CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
         CGRect menuRect = CGRectMake(0.0,
@@ -170,14 +165,59 @@ bool isLoading;
                                      menuViewSize.width, menuHeight);
         self.menuView.frame = menuRect;
         
-        menuView.hidden = YES;
-        [menuView setAlpha:0.0];
+        chart.alpha = 1.0f;
+        //            [containerView addSubview:chart];
+        //            [containerView bringSubviewToFront:legendView];
+        //            [containerView bringSubviewToFront:menuView];
+        menuView.hidden = NO;
+        menuShowing = NO;
+
+        isPortrait = NO;
         
     }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
     {
-        isPortrait = NO;
+        int chartHeight = 0;
+        int menuHeight = 0;
+        int menuStart = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+        {
+            chartHeight = 700;
+            menuStart = 0;
+            menuHeight = 700;
+        } 
+        else 
+        {
+            // iPhone
+            chartHeight = 260;
+            menuStart = 0;
+            menuHeight = 320;
+        } 
+        chart.alpha = 0.0f;
+        //            [chart removeFromSuperview];
+        
+        CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+        CGRect startRect = CGRectMake(0.0,
+                                      0.0,
+                                      chartViewSize.width, chartHeight); 
+        
+        chart.frame = startRect;
+        [self showButtons:1];
+        
+        CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+        CGRect menuRect = CGRectMake(0.0,
+                                     menuStart,
+                                     menuViewSize.width, menuHeight);
+        self.menuView.frame = menuRect;
+        
+        chart.alpha = 1.0f;
+        //            [containerView addSubview:chart];
+        //            [containerView bringSubviewToFront:legendView];
+        //            [containerView bringSubviewToFront:menuView];
+        menuView.hidden = YES;
+        menuShowing = NO;
 
+        isPortrait = YES;
     }
     
     backgroundQueue = dispatch_queue_create("org.t2health.moodtracker.bgqueue", NULL);        
@@ -189,6 +229,10 @@ bool isLoading;
 }
 
 -(void) viewWillAppear:(BOOL)animated {
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    // Orientation
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+
 /*
     if (isPortrait) 
     {
@@ -249,6 +293,9 @@ bool isLoading;
         // in the navigation stack. 
         
     }
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
     [super viewWillDisappear:animated];
 }
 
@@ -1074,102 +1121,110 @@ bool isLoading;
 {
     if (!isLoading)
     {
-        
+        NSLog(@"isPortrait: %i",isPortrait);
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
+        {
     
-        if (isPortrait) 
-        {
+            if (isPortrait) 
+            {
 
-            int chartHeight = 0;
-            int menuHeight = 0;
-            int menuStart = 0;
-            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-            {
-                chartHeight = 512;
-                menuStart = 512;
-                menuHeight = 512;
-            } 
-            else 
-            {
-                // iPhone
-                chartHeight = 211;
-                menuStart = 211;
-                menuHeight = 205;
-            }
-            chart.alpha = 0.0f;
-            //            [chart removeFromSuperview];
-            
-            
-            CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-            CGRect chartRect = CGRectMake(0.0,
-                                          0.0,
-                                          chartViewSize.width, chartHeight); 
-            
-            chart.frame = chartRect;
-            [self showButtons:1];
-            
-            CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
-            CGRect menuRect = CGRectMake(0.0,
-                                         menuStart,
-                                         menuViewSize.width, menuHeight);
-            self.menuView.frame = menuRect;
-            
-            menuView.hidden = NO;
-            [menuView setAlpha:1.0];
-            chart.alpha = 1.0f;
-            //            [containerView addSubview:chart];
-            //            [containerView bringSubviewToFront:legendView];
-            //            [containerView bringSubviewToFront:menuView];
-            
-            [self slideDownDidStop];
-            // [self resetLegend];
-            
-            isPortrait = YES;
+                int chartHeight = 0;
+                int menuHeight = 0;
+                int menuStart = 0;
+                if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+                {
+                    chartHeight = 512;
+                    menuStart = 512;
+                    menuHeight = 512;
+                } 
+                else 
+                {
+                    // iPhone
+                    chartHeight = 211;
+                    menuStart = 211;
+                    menuHeight = 205;
+                }
+
+                chart.alpha = 0.0f;
+                //            [chart removeFromSuperview];
+                
+                
+                CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+                CGRect chartRect = CGRectMake(0.0,
+                                              0.0,
+                                              chartViewSize.width, chartHeight); 
+                
+                chart.frame = chartRect;
+                [self showButtons:1];
+                
+                CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+                CGRect menuRect = CGRectMake(0.0,
+                                             menuStart,
+                                             menuViewSize.width, menuHeight);
+                self.menuView.frame = menuRect;
+                
+                menuView.hidden = NO;
+                [menuView setAlpha:1.0];
+                chart.alpha = 1.0f;
+                //            [containerView addSubview:chart];
+                //            [containerView bringSubviewToFront:legendView];
+                //            [containerView bringSubviewToFront:menuView];
+                
+                [self slideDownDidStop];
+                // [self resetLegend];
+                
+                isPortrait = NO;
+            }   
         }        
-        else 
+        else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
         {
-            int chartHeight = 0;
-            int menuHeight = 0;
-            int menuStart = 0;
-            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+            if (!isPortrait) 
             {
-                chartHeight = 700;
-                menuStart = 0;
-                menuHeight = 700;
-            } 
-            else 
-            {
-                // iPhone
-                chartHeight = 260;
-                menuStart = 0;
-                menuHeight = 320;
-            } 
-            chart.alpha = 0.0f;
-            //            [chart removeFromSuperview];
-            
-            CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
-            CGRect startRect = CGRectMake(0.0,
-                                          0.0,
-                                          chartViewSize.width, chartHeight); 
-            
-            chart.frame = startRect;
-            [self showButtons:1];
-            
-            CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
-            CGRect menuRect = CGRectMake(0.0,
-                                         menuStart,
-                                         menuViewSize.width, menuHeight);
-            self.menuView.frame = menuRect;
-            
-            chart.alpha = 1.0f;
-            //            [containerView addSubview:chart];
-            //            [containerView bringSubviewToFront:legendView];
-            //            [containerView bringSubviewToFront:menuView];
-            menuView.hidden = YES;
-            menuShowing = NO;
-            
-            [self slideDownDidStop];
-            //  [self resetLegend];
-            isPortrait = NO;
+                int chartHeight = 0;
+                int menuHeight = 0;
+                int menuStart = 0;
+                if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+                {
+                    chartHeight = 700;
+                    menuStart = 0;
+                    menuHeight = 700;
+                } 
+                else 
+                {
+                    // iPhone
+                    chartHeight = 260;
+                    menuStart = 0;
+                    menuHeight = 320;
+                } 
+                chart.alpha = 0.0f;
+                //            [chart removeFromSuperview];
+                
+                CGSize chartViewSize = [chart sizeThatFits:CGSizeZero];
+                CGRect startRect = CGRectMake(0.0,
+                                              0.0,
+                                              chartViewSize.width, chartHeight); 
+                
+                chart.frame = startRect;
+                [self showButtons:1];
+                
+                CGSize menuViewSize = [self.menuView sizeThatFits:CGSizeZero];
+                CGRect menuRect = CGRectMake(0.0,
+                                             menuStart,
+                                             menuViewSize.width, menuHeight);
+                self.menuView.frame = menuRect;
+                
+                chart.alpha = 1.0f;
+                //            [containerView addSubview:chart];
+                //            [containerView bringSubviewToFront:legendView];
+                //            [containerView bringSubviewToFront:menuView];
+                menuView.hidden = YES;
+                menuShowing = NO;
+                
+                [self slideDownDidStop];
+                //  [self resetLegend];
+                isPortrait = YES;
+            }
         }
         
     }
@@ -1584,6 +1639,7 @@ bool isLoading;
 		for (NSString *groupTitle in objects) {
 			UIColor *color = [self UIColorForIndex:index];
 			[self.ledgendColorsDictionary setObject:color forKey:groupTitle];
+            [color release];
 			index++;
 		}
 	}
@@ -2182,6 +2238,9 @@ numberOfRowsInComponent:(NSInteger)component
 
 
 -(void)dealloc {
+#ifdef DEBUG
+    NSLog(@"***** FUNCTION %s *****", __FUNCTION__); 
+#endif
     [chart release];
     [datasource release];
     [pickerArray release];
