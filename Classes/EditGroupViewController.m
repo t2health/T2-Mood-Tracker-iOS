@@ -137,15 +137,33 @@ int isFirstRun;
 }
 
 - (void)saveEdit {
-	self.group.title = groupTextField.text;
-	
-	NSError *error = nil;
-	
-	if ([self.managedObjectContext hasChanges] ) {
-		if(![self.managedObjectContext save:&error]) {
-			[Error showErrorByAppendingString:@"Unable to save group edit." withError:error];
-		}
+    //NSLog(@"groupTextField: '%@'",groupTextField.text);
+    if (![groupTextField.text isEqualToString:@""]) 
+    {
+        self.group.title = groupTextField.text;
+        
+        NSError *error = nil;
+        
+        if ([self.managedObjectContext hasChanges] ) {
+            if(![self.managedObjectContext save:&error]) {
+                [Error showErrorByAppendingString:@"Unable to save group edit." withError:error];
+            }
+        }
 	}
+    else 
+    {
+        NSString *messageString = [NSString stringWithFormat:@"A Category must contain at least one character."];
+        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:messageString
+                                                                 delegate:self 
+                                                        cancelButtonTitle:@"Ok" 
+                                                   destructiveButtonTitle:nil 
+                                                        otherButtonTitles:nil];
+        [actionSheet showFromTabBar:self.tabBarController.tabBar];
+        [actionSheet release];
+        [groupTextField becomeFirstResponder];
+
+    }
+
 	
 	//[self.navigationController popViewControllerAnimated:YES];
 }
@@ -361,17 +379,18 @@ int isFirstRun;
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
 	BOOL shouldChangeText = YES;
-	
-	//NSCharacterSet *charactersToRemove = [[NSCharacterSet alphanumericCharacterSet] invertedSet];
+    
+	NSCharacterSet *charactersToRemove = [[NSCharacterSet alphanumericCharacterSet] invertedSet];
 	NSCharacterSet *punctuation = [NSCharacterSet punctuationCharacterSet];
 	
-	//NSString *trimmedReplacement = [string stringByTrimmingCharactersInSet:charactersToRemove ];
+	NSString *trimmedReplacement = [string stringByTrimmingCharactersInSet:charactersToRemove ];
 	
-	NSString *trimmedReplacement = [string stringByTrimmingCharactersInSet:punctuation];
+	trimmedReplacement = [trimmedReplacement stringByTrimmingCharactersInSet:punctuation];
 	
 	if (![trimmedReplacement isEqual:string]) {
 		shouldChangeText = NO;
 	}
+    
 	
 	return shouldChangeText;
 }
@@ -479,47 +498,50 @@ int isFirstRun;
         [actionSheet release];
 		[groupTextField becomeFirstResponder];
 	}
-	else {
-		Group *newGroup = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
-		newGroup.section = @"Rate";
-		newGroup.title = groupTextField.text;
-		newGroup.groupDescription = @"Lorem ipsum dolor sit amet";
-		newGroup.visible = [NSNumber numberWithBool:YES];
-		newGroup.rateable = [NSNumber numberWithBool:YES];
-		newGroup.immutable = [NSNumber numberWithBool:NO];
-		newGroup.showGraph = [NSNumber numberWithBool:YES];
-		newGroup.menuIndex = [self getNextMenuIndex];
-		newGroup.positiveDescription = [NSNumber numberWithBool:isPositveSwitch.on];
-		
-		NSError *error = nil;
+	else 
+    {
+
+        Group *newGroup = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
+        newGroup.section = @"Rate";
+        newGroup.title = groupTextField.text;
+        newGroup.groupDescription = @"Lorem ipsum dolor sit amet";
+        newGroup.visible = [NSNumber numberWithBool:YES];
+        newGroup.rateable = [NSNumber numberWithBool:YES];
+        newGroup.immutable = [NSNumber numberWithBool:NO];
+        newGroup.showGraph = [NSNumber numberWithBool:YES];
+        newGroup.menuIndex = [self getNextMenuIndex];
+        newGroup.positiveDescription = [NSNumber numberWithBool:isPositveSwitch.on];
+        
+        NSError *error = nil;
         
 
-		if (![self.managedObjectContext save:&error]) {
-			[Error showErrorByAppendingString:@"Error saving new Category" withError:error];
-		}
+        if (![self.managedObjectContext save:&error]) {
+            [Error showErrorByAppendingString:@"Error saving new Category" withError:error];
+        }
         
-		Scale *newScale;
-		for (NSInteger i = 0; i<10; i++) {
-			newScale = [NSEntityDescription insertNewObjectForEntityForName:@"Scale" inManagedObjectContext:self.managedObjectContext];
-			
-			newScale.maxLabel = @"";
-			newScale.minLabel = @"";			
-			
-			newScale.weight = [NSNumber numberWithInt:50];
-			newScale.group = newGroup;
-			newScale.index = [NSNumber numberWithInt:i];
-			
-			error = nil;
-			if (![self.managedObjectContext save:&error]) {
-				[Error showErrorByAppendingString:@"Error saving Scale in Category" withError:error];
-			}
+        Scale *newScale;
+        for (NSInteger i = 0; i<10; i++) {
+            newScale = [NSEntityDescription insertNewObjectForEntityForName:@"Scale" inManagedObjectContext:self.managedObjectContext];
+            
+            newScale.maxLabel = @"";
+            newScale.minLabel = @"";			
+            
+            newScale.weight = [NSNumber numberWithInt:50];
+            newScale.group = newGroup;
+            newScale.index = [NSNumber numberWithInt:i];
+            
+            error = nil;
+            if (![self.managedObjectContext save:&error]) {
+                [Error showErrorByAppendingString:@"Error saving Scale in Category" withError:error];
+            }
 
 
             
-		}
-		
-		self.group = newGroup;
+        }
+        
+        self.group = newGroup;
         [self addLegendInfo];
+
 	}
 }
 
@@ -630,25 +652,44 @@ int isFirstRun;
     
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
-        self.scale.minLabel = minTextField.text;
-        self.scale.maxLabel = maxTextField.text;
+        if (![minTextField.text isEqualToString:@""] && ![maxTextField.text isEqualToString:@""]) 
+        {
+            self.scale.minLabel = minTextField.text;
+            self.scale.maxLabel = maxTextField.text;
+        }
+
         
     }
     else if (interfaceOrientation == UIDeviceOrientationLandscapeLeft ||interfaceOrientation == UIDeviceOrientationLandscapeRight)  
     {
-        self.scale.minLabel = minTextField_landscape.text;
-        self.scale.maxLabel = maxTextField_landscape.text;
-        
+        if (![minTextField.text isEqualToString:@""] && ![maxTextField.text isEqualToString:@""]) 
+        {
+            self.scale.minLabel = minTextField_landscape.text;
+            self.scale.maxLabel = maxTextField_landscape.text;
+        }
     }
     
     
     NSError *error = nil;
-    
-    if ([self.managedObjectContext hasChanges] ) {
-        if(![self.managedObjectContext save:&error]) {
-            [Error showErrorByAppendingString:@"Unable to save scale edit." withError:error];
-        }
-    }    
+    if (![minTextField.text isEqualToString:@""] && ![maxTextField.text isEqualToString:@""]) 
+    {
+        if ([self.managedObjectContext hasChanges] ) {
+            if(![self.managedObjectContext save:&error]) {
+                [Error showErrorByAppendingString:@"Unable to save scale edit." withError:error];
+            }
+        }    
+    }
+    else
+    {
+        NSString *messageString = [NSString stringWithFormat:@"Scales must contain at least one character."];
+        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:messageString
+                                                                 delegate:self 
+                                                        cancelButtonTitle:@"Ok" 
+                                                   destructiveButtonTitle:nil 
+                                                        otherButtonTitles:nil];
+        [actionSheet showFromTabBar:self.tabBarController.tabBar];
+        [actionSheet release];
+    }
      
     // Add Color and Symbol
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -1402,10 +1443,6 @@ numberOfRowsInComponent:(NSInteger)component
                 
             }
             
-
-
-            
-
             if (group.title) 
             {
                 if (isFirstRun == 1) 
@@ -1414,8 +1451,6 @@ numberOfRowsInComponent:(NSInteger)component
                 }
                 else 
                 {
-                    
-                
                     UITextField *cField = [[UITextField alloc] initWithFrame:CGRectMake(startX, 10, widthX, 30)];
                     cField.adjustsFontSizeToFitWidth = YES;
                     cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
@@ -1470,8 +1505,46 @@ numberOfRowsInComponent:(NSInteger)component
 - (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
     NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    return UITableViewCellEditingStyleNone;
+    
+    if (indexPath.section == 0) 
+    {
+        return UITableViewCellEditingStyleNone;
+    }
+    else 
+    {
+        return UITableViewCellEditingStyleDelete;
+    }
+    
 }
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+    
+    if (editingStyle == UITableViewCellEditingStyleDelete) 
+    {
+        
+        self.scale = [scalesArray objectAtIndex:[indexPath row]];
+
+        self.scale.minLabel = @"";
+        self.scale.maxLabel = @"";
+        NSError *error = nil;
+
+        if ([self.managedObjectContext hasChanges] ) 
+        {
+            if(![self.managedObjectContext save:&error]) 
+            {
+                [Error showErrorByAppendingString:@"Unable to save scale edit." withError:error];
+            }
+        } 
+        
+        [self reloadAfterCreate];
+        
+
+    }
+  
+}
+
+
 
 #pragma mark Table view delegate
 
