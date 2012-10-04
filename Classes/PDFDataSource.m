@@ -123,12 +123,12 @@ int seriesCount;
                 NSMutableArray *dataTempArray = [NSMutableArray arrayWithArray:[tempDataDictionary objectForKey:@"data"]];
                 NSMutableArray *dateTempArray = [NSMutableArray arrayWithArray:[tempDataDictionary objectForKey:@"date"]];
                 
-                
+                /*
                 if ([[list objectAtIndex:4] intValue] == 0) 
                 {
                     value = 100 - value;
                 }
-                
+                */
                 [dataTempArray addObject:[NSString stringWithFormat:@"%i",value]];
                 [dateTempArray addObject:[NSString stringWithFormat:@"%@",newDate]];
                 [tempDataDictionary setObject:dataTempArray forKey:@"data"];

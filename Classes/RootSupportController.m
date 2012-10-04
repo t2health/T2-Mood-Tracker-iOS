@@ -175,7 +175,7 @@
 	
 	switch (section) {
 		case 0: //Number of sections
-			numRows = 7;
+			numRows = 6;
 			break;
 		default:
 			numRows = 0;
@@ -253,9 +253,9 @@
 					cell.textLabel.text = @"Local Resources/Help";
 					break;
                 #ifdef DEBUG
-                case 6: //Create Data
-					cell.textLabel.text = @"Create Data";
-					break;
+               // case 6: //Create Data
+				//	cell.textLabel.text = @"Create Data";
+					//break;
                 #endif
 				default:
 					break;
@@ -330,9 +330,9 @@
 					[self.navigationController pushViewController:outReachViewController animated:YES];
 					[outReachViewController release];
 					break;
-                case 6: //Create Data
-					[self createData];
-					break;
+               // case 6: //Create Data
+					//[self createData];
+					//break;
 				default:
 					break;
 			}

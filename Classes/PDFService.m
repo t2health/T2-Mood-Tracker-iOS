@@ -111,7 +111,6 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
     // Get Notes
     NSMutableDictionary *notesDictionary = [NSMutableDictionary dictionaryWithDictionary:[self parseNotes:[rawDataArray objectAtIndex:1]]];
     NSArray *noteKeys = [notesDictionary allKeys];
-    // NSLog(@"myObjects: %@", myObjects);
     
     
     // Today Date
@@ -369,7 +368,7 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
         }
         
         ////////////////////////////------------------- GRAPH CATEGORY SCALES
-        
+        NSLog(@"myObjects: %@", myObjects);
         // Scale Details
         for (int i = 0; i < categoryNameArray.count; i++) 
         {
@@ -550,8 +549,10 @@ void PDFService_defaultErrorHandler(HPDF_STATUS   error_no,
             NSString *noteTime = [noteKeys objectAtIndex:b];
             NSString *noteData = [notesDictionary objectForKey:noteTime];
             NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-            [dateFormat setDateFormat:@"yyyy-mm-dd HH:mm:ss ZZZ"];
+            [dateFormat setDateFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
             NSDate *noteDate = [dateFormat dateFromString:noteTime];
+           // NSLog(@"noteDate: %@", noteDate);
+            
             [dateFormat setDateFormat:@"MMM d, yyyy h:mm:ss aaa"];
             noteTime = [dateFormat stringFromDate:noteDate];
             [dateFormat release];

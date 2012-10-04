@@ -591,7 +591,7 @@ bool isPortrait;
     {
         [chart.xAxis setZoom:3000];  
     }
-    NSLog(@"zoomLevel: %f", zoomLevel);
+    //NSLog(@"zoomLevel: %f", zoomLevel);
 }
 
 #pragma mark Buttons
@@ -1151,12 +1151,12 @@ bool isPortrait;
     #endif
 
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-    NSLog(@"isPortrait: %i",isPortrait);
+   // NSLog(@"isPortrait: %i",isPortrait);
     if (interfaceOrientation == UIDeviceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) 
     {
         if (!isPortrait) 
         {
-            NSLog(@"portrait show     menu");
+          //  NSLog(@"portrait show     menu");
             
             
             
@@ -1214,7 +1214,7 @@ bool isPortrait;
     {
         if (isPortrait) 
         {
-            NSLog(@"landscape hide menu");
+           // NSLog(@"landscape hide menu");
             
             int chartHeight = 0;
             int menuHeight = 0;
@@ -1908,7 +1908,7 @@ bool isPortrait;
             
             defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
             NSString *theRange = [defaults objectForKey:defaultsKey];
-            int whatRow = 3;
+            int whatRow = 1;
             if ([theRange isEqualToString:@"30 days"]) 
             {
                 whatRow = 0;
@@ -1927,10 +1927,11 @@ bool isPortrait;
             }
             else 
             {
-                whatRow = 0;
+                whatRow = 1;
             }
             
-            
+          //  NSLog(@"theRange: %i", theRange);
+
             [self.rangePicker selectRow:whatRow inComponent:0 animated:YES];
             // self.navigationItem.rightBarButtonItem = self.doneButton;
         }
@@ -1983,7 +1984,7 @@ bool isPortrait;
             
             defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_RANGE"];
             NSString *theRange = [defaults objectForKey:defaultsKey];
-            int whatRow = 3;
+            int whatRow = 1;
             if ([theRange isEqualToString:@"30 days"]) 
             {
                 whatRow = 0;
@@ -2002,10 +2003,10 @@ bool isPortrait;
             }
             else 
             {
-                whatRow = 0;
+                whatRow = 1;
             }
             
-            
+          //  NSLog(@"whatRow: %i", whatRow);
             [self.rangePicker selectRow:whatRow inComponent:0 animated:YES];
             // self.navigationItem.rightBarButtonItem = self.doneButton;
         }

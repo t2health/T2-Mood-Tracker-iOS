@@ -88,6 +88,8 @@
     defaultsKey = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_SYMBOL"];
     BOOL val = symbolSwitch.on;
     [defaults setBool:val forKey:defaultsKey];
+    NSLog(@"val: %i", val);
+
     [defaults synchronize];
     
     
@@ -164,7 +166,7 @@
         UISwitch *aSwitch = [[UISwitch alloc] init];
         // Fetch User Defaults for Symbol
         key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_SYMBOL"];
-        if (![defaults objectForKey:key]) {
+        if (![defaults boolForKey:key]) {
             storedVal = NO;
         }
         else {
@@ -187,7 +189,7 @@
         UISwitch *aSwitch = [[UISwitch alloc] init];
         // Fetch User Defaults for Legend
         key = [NSString stringWithFormat:@"SWITCH_OPTION_STATE_GRADIENT"];
-        if (![defaults objectForKey:key]) {
+        if (![defaults boolForKey:key]) {
             storedVal = NO;
         }
         else 
@@ -215,7 +217,7 @@
         NSString *rangeString = [defaults objectForKey:defaultsKey];
         if (rangeString==nil) 
         {
-            cell.detailTextLabel.text = @"30 days";
+            cell.detailTextLabel.text = @"90 days";
         }
         else 
         {

@@ -412,7 +412,7 @@ bool isToggle;
     else // All and anything else
     {
         components = [cal components:NSWeekdayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:theFromDate];
-        [components setMonth:([components month] - 1)]; 
+        [components setMonth:([components month] - 3)]; 
         fromDate = [cal dateFromComponents:components];
     }
     [theFromDate release];
@@ -732,7 +732,7 @@ bool isToggle;
     
     if (!isToggle)
     {
-        if (![defaults objectForKey:@"SWITCH_OPTION_STATE_SYMBOL"]) {
+        if (![defaults boolForKey:@"SWITCH_OPTION_STATE_SYMBOL"]) {
             symbolMode = NO;
         }
         else 
@@ -740,7 +740,7 @@ bool isToggle;
             symbolMode = YES;				
         }
         
-        if (![defaults objectForKey:@"SWITCH_OPTION_STATE_GRADIENT"]) {
+        if (![defaults boolForKey:@"SWITCH_OPTION_STATE_GRADIENT"]) {
             gradientMode = NO;
         }
         else 

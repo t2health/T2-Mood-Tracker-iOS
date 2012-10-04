@@ -16,6 +16,7 @@
 #import "ViewNotesViewController.h"
 #import "ResultsViewController.h"
 #import "TipViewController.h"
+#import "eulaViewController.h"
 #import "Group.h"
 #import "Result.h"
 #import "Scale.h"
@@ -48,20 +49,50 @@
     [super viewDidLoad];
     // Initial CheckPin 
     //  [self chkPin];
-    
-    
-	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
+
     
+    NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
+
+
+    BOOL showTips = [defaults boolForKey:@"SHOW_TIPS_ON_STARTUP"];
+    if (showTips == YES) {
+        UIViewController *tipViewController = [[TipViewController alloc] initWithNibName:@"TipViewController" bundle:nil];
+        tipViewController.hidesBottomBarWhenPushed = YES;
+        [appDelegate.navigationController pushViewController:tipViewController animated:YES];
+        [tipViewController release];
+    }
+    else 
+    {
+        NSLog(@"no tips");
+        
+    }
     
-    // Check if color/symbol legends exists in user settings
+    if (pinString != nil && ![pinString isEqual:@""]) 
+    {
+        [self chkPin];
+        
+    }
+    
+    // On First Launch
     NSString *key;
     
     // If setting does not exist, create it
     key = [NSString stringWithFormat:@"LEGEND_COLOR_DICTIONARY"];
+    
+    
+    // Display EULA
+    if (![defaults objectForKey:@"EULA"]) 
+    {
+        UIViewController *eULAViewController = [[eulaViewController alloc] initWithNibName:@"eulaViewController" bundle:nil];
+        eULAViewController.hidesBottomBarWhenPushed = YES;
+        [appDelegate.navigationController pushViewController:eULAViewController animated:YES];
+        [eULAViewController release];
+    }
+    
+    // Create Settings
     if (![defaults objectForKey:key]) 
     {
         [self fillGroupsDictionary];
@@ -74,28 +105,7 @@
         [defaults setValue:[NSDictionary dictionaryWithDictionary:symbolsSubTempDictionary] forKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"];
     }
     
-	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
-    
-    
-    if (pinString != nil && ![pinString isEqual:@""]) 
-    {
-        [self chkPin];
-    }
-    else 
-    {
-        BOOL showTips = [defaults boolForKey:@"SHOW_TIPS_ON_STARTUP"];
-        if (showTips == YES) {
-            UIViewController *tipViewController = [[TipViewController alloc] initWithNibName:@"TipViewController" bundle:nil];
-            tipViewController.hidesBottomBarWhenPushed = YES;
-            [appDelegate.navigationController pushViewController:tipViewController animated:YES];
-            [tipViewController release];
-        }
-        else 
-        {
-            NSLog(@"no tips");
-            
-        }
-    }
+
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleUnusualEntryNotification:) name:@"UnusualEntryAdded" object:nil];
 	[FlurryUtility report:EVENT_MAIN_ACTIVITY];
@@ -123,6 +133,8 @@
     
     
     if (pinString != nil && ![pinString isEqual:@""]) {
+        
+        
 		[self.navigationController setNavigationBarHidden:YES];
         self.tabBarController.tabBar.hidden = YES;  
 		UIViewController *passwordViewController = [[PasswordViewController alloc] initWithNibName:@"PasswordViewController" bundle:nil];
@@ -132,9 +144,19 @@
 }
 - (void)rsnPin
 {
-    [self.navigationController setNavigationBarHidden:NO];
-    [self.navigationController popViewControllerAnimated:YES];
-    self.tabBarController.tabBar.hidden = NO;  
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
+    
+    
+    if (pinString != nil && ![pinString isEqual:@""]) {
+        
+        [self.navigationController setNavigationBarHidden:NO];
+        [self.navigationController popViewControllerAnimated:YES];
+        self.tabBarController.tabBar.hidden = NO;  
+	}
+    
+    
+
 }
 
 
