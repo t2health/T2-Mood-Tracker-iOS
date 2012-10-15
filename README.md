@@ -31,6 +31,8 @@ Detailed instructions can be found at [BSPAN Patching](https://gist.github.com/1
 
 Getting Started with T2 Mood Tracker
 ==============================================
+NOTE MoodTracker for iOS uses the Shinobi commercial chart library.  It is not included with this repository.  Shinobi charts can be found at: [http://www.shinobicontrols.com/shinobicharts/](http://www.shinobicontrols.com/shinobicharts/)
+
 Clone the repo on your computer
 
 Instructions for using Eclipse:
