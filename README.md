@@ -49,6 +49,6 @@ Instructions for using Eclipse:
 
 License
 ==============================================
-Copyright 2011 The National Center for Telehealth and Technology
+Copyright 2012 The National Center for Telehealth and Technology
 
 T2 Mood Tracker is Licensed under the NASA Open Source License: [https://github.com/t2health/T2-Mood-Tracker-iOS/blob/master/NASA-LICENSE.txt](https://github.com/t2health/T2-Mood-Tracker-iOS/blob/master/NASA-LICENSE.txt)
