@@ -31,21 +31,9 @@ Detailed instructions can be found at [BSPAN Patching](https://gist.github.com/1
 
 Getting Started with T2 Mood Tracker
 ==============================================
-NOTE MoodTracker for iOS uses the Shinobi commercial chart library.  It is not included with this repository.  Shinobi charts can be found at: [http://www.shinobicontrols.com/shinobicharts/](http://www.shinobicontrols.com/shinobicharts/)
+Note: MoodTracker for iOS uses the Shinobi commercial chart library.  It is not included with this repository.  Shinobi charts can be found at: [http://www.shinobicontrols.com/shinobicharts/](http://www.shinobicontrols.com/shinobicharts/)
 
-Clone the repo on your computer
-
-Instructions for using Eclipse:
-
-1. Click Help > Eclipse Marketplace
-2. Download Egit
-3. Window > Show View > Other
-4. Open Git Highlight Git Repositories
-5. Click OK
-6. Copy our Git url https://github.com/t2health/T2-Mood-Tracker-iOS.git
-7. Right click in the Git Repositories view in Eclipse
-8. Click Paste Repository Path or URI and follow the steps
-9. Right click on the project and Import it into your workspace.
+Note: Requires Xcode 4.3 to build.
 
 License
 ==============================================
