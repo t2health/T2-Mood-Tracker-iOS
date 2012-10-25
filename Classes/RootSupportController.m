@@ -3,8 +3,35 @@
 //  VAS002
 //
 //  Created by Melvin Manzano on 4/3/12.
-//  Copyright (c) 2012 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "RootSupportController.h"
 #import "VAS002AppDelegate.h"
@@ -63,7 +90,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
-    
+
     
 }
 
@@ -171,39 +198,24 @@
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSInteger numRows;
+	id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
+	NSInteger numberOfRows = [sectionInfo numberOfObjects];
 	
-	switch (section) {
-		case 0: //Number of sections
-			numRows = 6;
-			break;
-		default:
-			numRows = 0;
-			break;
-	}
-	
-    return numRows;
+	return numberOfRows;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
 	
-	NSString *sectionName;
-	
-	switch (section) {
-		case 0: //Settings
-			sectionName = nil;
-			break;
-		default:
-			sectionName = nil;
-			break;
-	}
+	NSArray *sections = [self.fetchedResultsController sections];
+	NSString *sectionName = [[sections objectAtIndex:section] name];
 	return sectionName;
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
+    
     // create the parent view that will hold header Label
-	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
+	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -216,9 +228,10 @@
     
 	// If you want to align the header text as centered
 	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
-	headerLabel.text = @"Support";
+    NSArray *sections = [self.fetchedResultsController sections];
+	headerLabel.text = [[sections objectAtIndex:section] name];
 	[customView addSubview:headerLabel];
-    [headerLabel release];
+    
 	return customView;
 }
 
@@ -228,42 +241,35 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {	
-    NSInteger section = [indexPath indexAtPosition:0];
-	NSInteger row = [indexPath indexAtPosition:1];
-    
-	switch (section) {
-		case 0: //Settings
-			switch (row) {
-				case 0: //About
-					cell.textLabel.text = @"About T2 Mood Tracker";
-					break; 
-				case 1: //Help
-					cell.textLabel.text = @"Help";
-					break;
-				case 2: //Feedback
-					cell.textLabel.text = @"Feedback";
-					break;
-				case 3: //Rate App
-					cell.textLabel.text = @"Rate App";
-					break;
-                case 4: //Tell A Friend
-					cell.textLabel.text = @"Tell A Friend";
-					break;
-                case 5: //Local Resources/ Help
-					cell.textLabel.text = @"Local Resources/Help";
-					break;
-                #ifdef DEBUG
-               // case 6: //Create Data
-				//	cell.textLabel.text = @"Create Data";
-					//break;
-                #endif
-				default:
-					break;
-			}
-			break;
-		default:
-			break;
+	// Configure the cell to show the Categories title
+	Group *group = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	cell.textLabel.text = group.title;
+	if (self.reminderArray != nil && [group.rateable boolValue] == YES) {
+		if ([self.reminderArray containsObject:group.title]) {
+			cell.imageView.image = [UIImage imageNamed:@"warning.png"];		
+		}
+		else {
+			cell.imageView.image = [UIImage imageNamed:@"check.png"];
+		}
 	}
+	else {
+		cell.imageView.image = nil;
+	}
+	
+	if ([group.visible boolValue] == NO) {
+		cell.userInteractionEnabled = NO;
+		cell.hidden = YES;
+	}
+	else {
+		cell.userInteractionEnabled = YES;
+		cell.hidden = NO;
+	}
+	
+	
+	cell.backgroundColor = [UIColor whiteColor];
+	cell.accessoryView.backgroundColor = [UIColor clearColor];
+	cell.contentView.backgroundColor = [UIColor clearColor];
+	cell.backgroundView.backgroundColor = [UIColor clearColor];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -288,7 +294,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {		
 	NSInteger row = [indexPath row];
 	NSInteger section = [indexPath section];
-    
+
 	AboutViewController *aboutViewController;
     HelpViewController *helpViewController;
     OutReachViewController *outReachViewController;
@@ -301,15 +307,11 @@
 			switch (row) {
 				case 0: //About
 					aboutViewController = [[AboutViewController alloc] initWithNibName:@"AboutViewController" bundle:nil];
-                    aboutViewController.hidesBottomBarWhenPushed = YES;
-
 					[self.navigationController pushViewController:aboutViewController animated:YES];
 					[aboutViewController release];
 					break;
 				case 1: //Help
 					helpViewController = [[HelpViewController alloc] initWithNibName:@"HelpViewController" bundle:nil];
-                    helpViewController.hidesBottomBarWhenPushed = YES;
-
 					[self.navigationController pushViewController:helpViewController animated:YES];
 					[helpViewController release];
 					break;
@@ -325,14 +327,12 @@
 					break;
 				case 5: //Outreach
 					outReachViewController = [[OutReachViewController alloc] initWithNibName:@"OutReachViewController" bundle:nil];
-                    outReachViewController.hidesBottomBarWhenPushed = YES;
-
 					[self.navigationController pushViewController:outReachViewController animated:YES];
 					[outReachViewController release];
 					break;
-               // case 6: //Create Data
-					//[self createData];
-					//break;
+                case 6: //Create Data
+					[self createData];
+					break;
 				default:
 					break;
 			}
@@ -558,12 +558,12 @@
 	[fetchRequest setFetchBatchSize:20];
 	
 	// Create and initialize the fetch results controller.
-	fetchedResultsController = 
+	self.fetchedResultsController = 
 	[[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 										  managedObjectContext:self.managedObjectContext 
 											sectionNameKeyPath:@"section" 
 													 cacheName:@"Support"];
-	fetchedResultsController.safeDelegate = self;
+	self.fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
     //	[titleDescriptor autorelease];
@@ -576,7 +576,7 @@
 		[Error showErrorByAppendingString:@"Unable to fetch data for main menu." withError:error];
 	}
 	
-	return fetchedResultsController;
+	return self.fetchedResultsController;
 }
 
 - (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
@@ -813,10 +813,10 @@
 }
 
 - (void)dealloc {
-	[fetchedResultsController release];
-	[managedObjectContext release];
-	[reminderArray release];
-	[tableView release];
+	[self.fetchedResultsController release];
+	[self.managedObjectContext release];
+	[self.reminderArray release];
+	[self.tableView release];
 	
 	[super dealloc];
 }

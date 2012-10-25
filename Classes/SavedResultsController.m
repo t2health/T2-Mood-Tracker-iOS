@@ -3,9 +3,35 @@
 //  VAS002
 //
 //  Created by Melvin Manzano on 3/22/12.
-//  Copyright (c) 2012 GDIT. All rights reserved.
-//
-
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 #import "SavedResultsController.h"
 #import "Error.h"
 #import "Saved.h"
@@ -19,25 +45,19 @@
 
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController;
-@synthesize selectedIndex;
 
 id viewToDelete;
-int whichActionMenu;
-// Keeps track of each ActionSheet
-// 0 = Delete
-// 1 = PDF
-// 2 = CSV
 
 /*
- - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
- {
- self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
- if (self) {
- // Custom initialization
- }
- return self;
- }
- */
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
@@ -53,8 +73,9 @@ int whichActionMenu;
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     resultsTableView.backgroundView = nil;
+
     
-	self.title = @"Saved Reports";
+	self.title = @"Saved Results";
     
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
@@ -65,7 +86,7 @@ int whichActionMenu;
 	//self.navigationItem.rightBarButtonItem = plusButton;
 	
 	//[FlurryUtility report:EVENT_NOTES_ACTIVITY];	
-    
+
 	NSError *error = nil;
 	if (![[self fetchedResultsController] performFetch:&error]) {
 		[Error showErrorByAppendingString:@"Unable to fetch results." withError:error];
@@ -109,7 +130,7 @@ int whichActionMenu;
  Returns the fetched results controller. Creates and configures the controller if necessary.
  */
 - (SafeFetchedResultsController *)fetchedResultsController {
-    //   NSLog(@"fetched");
+ //   NSLog(@"fetched");
     if (fetchedResultsController != nil) {
         return fetchedResultsController;
     }
@@ -139,18 +160,18 @@ int whichActionMenu;
     
     if (recognizer.state == UIGestureRecognizerStateBegan) 
     {    
-        
+
         UIActionSheet *actionSheet = [[[UIActionSheet alloc]
                                        initWithTitle:@"" 
                                        delegate:self 
                                        cancelButtonTitle:@"Cancel" 
                                        destructiveButtonTitle:nil 
-                                       otherButtonTitles:@"Delete Report", nil] autorelease];
+                                       otherButtonTitles:@"Delete Results", nil] autorelease];
         [actionSheet showFromTabBar:self.tabBarController.tabBar];  
+
         
-        whichActionMenu = 0;
         viewToDelete = recognizer.view;
-        
+
     } 
     else if (recognizer.state == UIGestureRecognizerStateEnded) 
     {
@@ -170,71 +191,43 @@ int whichActionMenu;
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     
-    if (whichActionMenu == 0) 
+    //NSLog(@"button press: %i", buttonIndex);
+    
+    if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
     {
-        // Delete Action Sheet
-        if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
-        {
-            id view = viewToDelete;
-            while (view && ![view isKindOfClass:[UITableViewCell class]]) {
-                view = [view superview];
-            }
-            UITableViewCell *cell = view;
-            NSIndexPath *indexPath = [resultsTableView indexPathForCell:cell];
-            NSManagedObject *task = [fetchedResultsController objectAtIndexPath:indexPath];
-            
-            [self.managedObjectContext deleteObject:task];
-            
-            [self.managedObjectContext save:nil];
-            
-            
-            // Delete file
-            NSFileManager *fileMgr = [NSFileManager defaultManager];
-            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
-            NSString *documentsDir = [paths objectAtIndex:0];
-            NSString *finalPath = [NSString stringWithFormat:@"%@%@",documentsDir, cell.textLabel.text];
-            NSString *nextStr = [finalPath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
-            
-            //NSString *finalPNGPath = [NSString stringWithFormat:@"%@%@.pdf",documentsDir, cell.textLabel.text];
-            if ([fileMgr removeItemAtPath:finalPath error:nil] != YES)
-                NSLog(@"Unable to delete file");
-            if ([fileMgr removeItemAtPath:nextStr error:nil] != YES)
-                NSLog(@"Unable to delete PNG");
-            
-            
-            [resultsTableView reloadData];
+        id view = viewToDelete;
+        while (view && ![view isKindOfClass:[UITableViewCell class]]) {
+            view = [view superview];
         }
+        UITableViewCell *cell = view;
+        NSIndexPath *indexPath = [resultsTableView indexPathForCell:cell];
+        NSManagedObject *task = [fetchedResultsController objectAtIndexPath:indexPath];
+
+        [self.managedObjectContext deleteObject:task];
+
+        [self.managedObjectContext save:nil];
+        
+                
+        // Delete file
+        NSFileManager *fileMgr = [NSFileManager defaultManager];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
+        NSString *documentsDir = [paths objectAtIndex:0];
+        NSString *finalPath = [NSString stringWithFormat:@"%@%@",documentsDir, cell.detailTextLabel.text];
+        NSString *finalPNGPath = [NSString stringWithFormat:@"%@%@.png",documentsDir, cell.detailTextLabel.text];
+        if ([fileMgr removeItemAtPath:finalPath error:nil] != YES)
+            NSLog(@"Unable to delete file");
+        if ([fileMgr removeItemAtPath:finalPNGPath error:nil] != YES)
+            NSLog(@"Unable to delete PNG");
+
+        
+        [resultsTableView reloadData];
     }
-    else if (whichActionMenu == 1) 
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
     {
-        // PDF
-        if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
-        {
-            // View
-            
-         ViewSavedController *vsc = [[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil];
-         vsc.saved = selectedIndex;
-         vsc.fileAction = @"view";
-         [self.navigationController pushViewController:vsc animated:YES];
-         [vsc release];
-             
-        }
-        else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
-        {
-            // Email
-            [self emailResults];
-        }
         
     }
-    else if (whichActionMenu == 2) 
-    {
-        // CSV
-        if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
-        {
-            // Email
-            [self emailResults];
-        }
-    }
+    
+    
 }
 
 #pragma mark Table view data source
@@ -277,18 +270,24 @@ int whichActionMenu;
 	[dateFormat setDateStyle:NSDateFormatterMediumStyle];
 	[dateFormat setTimeStyle:NSDateFormatterShortStyle];
 	NSString *dateString = [NSString stringWithFormat:@"%@", saved.title];
-    cell.textLabel.text = saved.filename;
-	cell.textLabel.textColor = [UIColor clearColor];
-	cell.textLabel.font = [UIFont systemFontOfSize:1];
+	cell.textLabel.text = saved.filename;
+	cell.textLabel.textColor = [UIColor lightGrayColor];
+	cell.textLabel.font = [UIFont systemFontOfSize:14];
 	
 	cell.detailTextLabel.text = dateString;
     cell.detailTextLabel.textColor = [UIColor blackColor];
-    cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:12];
-
+    cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:18];
+    
+    UIButton *accessory = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+    accessory.frame = CGRectMake(0, 0, 15, 15);
+    accessory.userInteractionEnabled = YES;
+    [accessory addTarget:self action:@selector(emailResults) forControlEvents:UIControlEventTouchUpInside];
+    cell.accessoryView = accessory;
+    
     UILongPressGestureRecognizer* gestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
     [cell addGestureRecognizer:gestureRecognizer];
+
     
-    [gestureRecognizer release];
 }
 
 
@@ -299,21 +298,21 @@ int whichActionMenu;
     
     if (editingStyle == UITableViewCellEditingStyleDelete) {
 		NSFileManager *fileMgr = [NSFileManager defaultManager];
-        
+
 		// Delete the managed object.
 		NSManagedObjectContext *context = [fetchedResultsController managedObjectContext];
 		[context deleteObject:[fetchedResultsController objectAtIndexPath:indexPath]];
         Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
-        // NSLog(@"Edit-indexPath: %@", indexPath);
-        
+        NSLog(@"Edit-indexPath: %@", indexPath);
+
+      //  NSLog(@"clicked: %@", saved.filename);
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
         NSString *documentsDir = [paths objectAtIndex:0];
         NSString *finalPath = [NSString stringWithFormat:@"%@%@",documentsDir, saved.filename];
-        NSString *nextStr = [finalPath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
-        // NSString *finalPNGPath = [NSString stringWithFormat:@"%@%@.pdf",documentsDir, saved.filename];
+        NSString *finalPNGPath = [NSString stringWithFormat:@"%@%@.png",documentsDir, saved.filename];
         if ([fileMgr removeItemAtPath:finalPath error:nil] != YES)
             NSLog(@"Unable to delete file");
-        if ([fileMgr removeItemAtPath:nextStr error:nil] != YES)
+        if ([fileMgr removeItemAtPath:finalPNGPath error:nil] != YES)
             NSLog(@"Unable to delete PNG");
 		
 		NSError *error;
@@ -325,39 +324,13 @@ int whichActionMenu;
     }   
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath 
-{
-    Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    selectedIndex = saved;
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	ViewSavedController *vsc = [[ViewSavedController alloc] initWithNibName:@"ViewSavedController" bundle:nil];
+	Saved *saved = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	vsc.saved = saved;
+	[self.navigationController pushViewController:vsc animated:YES];
+	[vsc release];
     
-    NSString *fileString = saved.title;
-    
-    if ([fileString rangeOfString:@"CSV"].location == NSNotFound) 
-    {
-        // PDF
-        whichActionMenu = 1;
-
-        UIActionSheet *actionSheet = [[[UIActionSheet alloc]
-                                       initWithTitle:fileString 
-                                       delegate:self 
-                                       cancelButtonTitle:@"Cancel" 
-                                       destructiveButtonTitle:nil 
-                                       otherButtonTitles:@"View", @"Email", nil] autorelease];
-        [actionSheet showFromTabBar:self.tabBarController.tabBar];  
-    }
-    else 
-    {
-        // CSV
-        whichActionMenu = 2;
-
-        UIActionSheet *actionSheet = [[[UIActionSheet alloc]
-                                       initWithTitle:fileString 
-                                       delegate:self 
-                                       cancelButtonTitle:@"Cancel" 
-                                       destructiveButtonTitle:nil 
-                                       otherButtonTitles:@"Email", nil] autorelease];
-        [actionSheet showFromTabBar:self.tabBarController.tabBar];  
-    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -373,19 +346,19 @@ int whichActionMenu;
 - (void)emailResults
 {
     // Fetch filtered data
-    //  NSLog(@"Fetching data...");
+  //  NSLog(@"Fetching data...");
     
     // Open mail view
     MailData *data = [[MailData alloc] init];
     data.mailRecipients = nil;
-    NSString *subjectString = @"My T2 Mood Tracker Results";
+    NSString *subjectString = @"T2 Mood Tracker App Results";
     data.mailSubject = subjectString;
     NSString *filteredResults = @"";
-    NSString *bodyString = @"My T2 Mood Tracker Results:<p>";
+    NSString *bodyString = @"T2 Mood Tracker App Results:<p>";
     
     data.mailBody = [NSString stringWithFormat:@"%@%@", bodyString, filteredResults];
     
-    // [FlurryUtility report:EVENT_EMAIL_RESULTS_PRESSED];
+   // [FlurryUtility report:EVENT_EMAIL_RESULTS_PRESSED];
     
     [self sendMail:data];
     [data release];
@@ -442,21 +415,15 @@ int whichActionMenu;
 		[picker setToRecipients:data.mailRecipients];
 	}
     
-
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES); 
     NSString *documentsDir = [paths objectAtIndex:0];
-    NSString *myPath = selectedIndex.filename;
-
     
-    if (whichActionMenu == 1) 
-    {
-        myPath = [myPath stringByReplacingOccurrencesOfString:@".csv" withString:@".pdf"];
-    }
-    NSString *pdfFileName = [NSString stringWithFormat:@"%@%@",documentsDir, myPath];
-    [picker addAttachmentData:[NSData dataWithContentsOfFile:pdfFileName]
-                     mimeType:@"application/pdf" fileName:myPath];
+    NSString *Path = [documentsDir stringByAppendingString:@"/results.csv"];
     
-    
+    NSData *myData = [NSData dataWithContentsOfFile:Path];
+	[picker addAttachmentData:myData mimeType:@"text/plain" fileName:@"results"];
+  //  NSLog(@"Path: %@", Path);
+	//NSLog(@"myData: %@", myData);
     
 	if (data.mailBody != nil) {
 		[picker setMessageBody:data.mailBody isHTML:YES];
@@ -504,8 +471,8 @@ int whichActionMenu;
 
 - (void)dealloc {	
 	self.fetchedResultsController.delegate = nil;
-	[fetchedResultsController release];
-	[managedObjectContext release];
+	[self.fetchedResultsController release];
+	[self.managedObjectContext release];
 	
     [super dealloc];
 }

@@ -1,10 +1,32 @@
-//
-//  GraphViewController.h
-//  VAS002
-//
-//  Created by Melvin Manzano on 4/24/12.
-//  Copyright (c) 2012 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
@@ -16,8 +38,6 @@
 #import "ShinobiCharts/ShinobiChart+Screenshot.h"
 #import <MessageUI/MFMailComposeViewController.h>
 #import <dispatch/dispatch.h>
-#import "HRColorPickerViewController.h"
-
 
 @class ViewNotesViewController;
 @class LegendTableViewController;
@@ -25,12 +45,13 @@
 @class OptionsTableViewController;
 
 
-@interface GraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource,HRColorPickerViewControllerDelegate> 
+@interface GraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource> 
 {
     
     ShinobiChart            *chart;
     GraphDataSource         *datasource;    
-
+    UISwitch                *stepSwitch;
+    UILabel                 *stepLabel;
     
     IBOutlet UIView *menuView;
     IBOutlet UIView *containerView;
@@ -51,6 +72,7 @@
     NSArray *pickerArray;
     IBOutlet UIButton *legendButton;
     
+    NSMutableArray *chartChangeArray;
     
     IBOutlet ViewNotesViewController *notesTable;
     IBOutlet LegendTableViewController *legendTableViewController;
@@ -76,8 +98,6 @@
     
     IBOutlet UIBarButtonItem *doneButton;	// this button appears only when the date picker is open
     IBOutlet UIPickerView *rangePicker;
-    IBOutlet UIView *pickerView;
-    IBOutlet UIView *pickerView_iPad;
 
 
     
@@ -85,8 +105,6 @@
 
 @property (nonatomic, retain) IBOutlet UIButton *legendButton;
 @property (nonatomic, retain) IBOutlet UIPickerView *rangePicker;
-@property (nonatomic, retain) IBOutlet UIView *pickerView;
-@property (nonatomic, retain) IBOutlet UIView *pickerView_iPad;
 
 @property (nonatomic, retain) IBOutlet UIView *menuView;
 @property (nonatomic, retain) IBOutlet UIView *containerView;
@@ -151,21 +169,19 @@
 
 - (void)saveToGallery;
 
+- (void)legendButtonClicked;
 - (void)showLegend;
 - (void)resetLegend;
 
 - (void)resignLegend;
 - (void)showButtons:(int)howMany;
 
-- (void) loadingSymbol;
-- (void) loadingGradient;
-
-- (void) imageTapped:(UITapGestureRecognizer *)gesture;
 
 - (void)legendToggle;
 - (void)symbolToggle;
 - (void)gradientToggle;
-- (void) showPicker;
+- (IBAction) legendButtonClicked:(id)sender;
+
 - (void)sendMenuToBack;
 - (void)emailResults;
 - (void)deviceOrientationChanged:(NSNotification *)notification;
@@ -174,6 +190,5 @@
 - (IBAction)doneAction:(id)sender;
 - (void)resignPicker;
 - (void)slideDownDidStop;
-- (IBAction)segmentIndexChanged;
 
 @end

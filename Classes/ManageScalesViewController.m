@@ -1,10 +1,32 @@
-//
-//  ManageScalesViewController.m
-//  VAS002
-//
-//  Created by Hasan Edain on 2/16/11.
-//  Copyright 2011 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "ManageScalesViewController.h"
 #import "Group.h"
@@ -25,26 +47,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
 	self.title = [NSString stringWithFormat:@"Edit %@ Scales",self.group.title];
 	
 	[FlurryUtility report:EVENT_MANAGE_SCALE_ACTIVITY];
 	
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
-    // Delete Button
-    UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(reloadData)];
-    self.navigationItem.rightBarButtonItem = deleteButton;
-    [deleteButton release];
-    NSLog(@"self.group: %@", self.group);
-
-    NSError *error;
-    if (![[self fetchedResultsController] performFetch:&error]) 
-    {
-        NSLog(@"unresolved error: %@", error);
-    }
-
 }
 
 - (void)viewDidUnload {
@@ -57,13 +66,6 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return YES;
-}
-
-- (void)reloadData
-{
-    [self.scalesTableView reloadData];
-    NSLog(@"Reload Button Click");
-
 }
 
 #pragma mark Table view data source
@@ -100,8 +102,7 @@
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {	
 	// Configure the cell to show the book's title
-    NSLog(@"configureCell: %i", indexPath.row);
-
+	
 	Scale *aScale = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	if (![aScale.minLabel isEqual:@""]) {
 		cell.textLabel.text = aScale.minLabel;
@@ -134,10 +135,9 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	NSArray	*objects = [self.fetchedResultsController fetchedObjects];
 	Scale *scale = [objects objectAtIndex:[indexPath row]];
-    
+
 	EditScaleViewController *editScaleViewController = [[EditScaleViewController alloc] initWithNibName:@"EditScaleViewController" bundle:nil];
 	editScaleViewController.scale = scale;
-    editScaleViewController.groupName = group.title;
 	[self.navigationController pushViewController:editScaleViewController animated:YES];
 	[editScaleViewController release];
 }
@@ -176,7 +176,7 @@
 	// Create and initialize the fetch results controller.
 	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"EditGroups"];
 	fetchedResultsController.safeDelegate = self;
-    
+
 	
 	NSError *error = nil;
 	if (![[self fetchedResultsController] performFetch:&error]) {
@@ -200,20 +200,20 @@
 - (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
 	switch(type) {
 		case NSFetchedResultsChangeInsert:
-			[self.scalesTableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+			[self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
 			break;
 			
 		case NSFetchedResultsChangeDelete:
-			[self.scalesTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
 			break;
 			
 		case NSFetchedResultsChangeUpdate:
-			[self configureCell:[self.scalesTableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
+			[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
 			break;
 			
 		case NSFetchedResultsChangeMove:
-			[self.scalesTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [self.scalesTableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
 			break;
 	}	
 }

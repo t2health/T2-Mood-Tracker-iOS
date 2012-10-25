@@ -1,3 +1,32 @@
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 //
 //  VAS002AppDelegate.m
 //  VAS002
@@ -38,13 +67,14 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	// Override point for customization after application launch.
 	NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler); 
-    
+	   
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Defaults" ofType:@"plist"]]];
 	
 	[FlurryAPI startSession:@"61LDTFTR6XGJZA437D5W"];
 	
-    
+
 	if (![self doesDatabaseHaveData]) {
+        NSLog(@"dsfd");
 		[self fillDefaultGroups];
 		DAL *dal = [[[DAL alloc] init] autorelease];
 		dal.managedObjectContext = self.managedObjectContext;
@@ -52,51 +82,33 @@
 		dal.persistentStoreCoordinator = self.persistentStoreCoordinator;
 		[dal loadXMLByFile:@"data.xml"];
 	}
-    
+	NSLog(@"5555");
+
 	RootViewController *rootViewController = (RootViewController *)[navigationController topViewController];
 	rootViewController.managedObjectContext = self.managedObjectContext;
 	
 	// Add the navigation controller's view to the window and display.
-    //  [self.window addSubview:navigationController.view];
-    //  [self.window makeKeyAndVisible];
-    
+  //  [self.window addSubview:navigationController.view];
+  //  [self.window makeKeyAndVisible];
+
     // Add the tabbar controller's view to the window and display.
-    
+
     [self.window addSubview:tabBarController.view];
-    [self.window makeKeyAndVisible];
+     [self.window makeKeyAndVisible];
 	
     application.applicationIconBadgeNumber = 0;
 	
 	[self setFirstLauchPreferences];
     
-    // Clear Reminders
-    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-    [[UIApplication sharedApplication] cancelAllLocalNotifications];
-    
-    
     return YES;
 }
 
-- (void)myManagedObjectContextDidSaveNotificationHandler:(NSNotification *)notification
-{
-    [self.managedObjectContext performSelectorOnMainThread:@selector(mergeChangesFromContextDidSaveNotification:) withObject:notification waitUntilDone:NO];
-}
 
-- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification 
-{
-        
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
 	UIAlertView *immutableAlert = [[[UIAlertView alloc]initWithTitle:@"Reminder:" message:notification.alertBody delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
 	[immutableAlert show];
 	
     application.applicationIconBadgeNumber = 0;
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
-{
-    // Clear Reminders
-    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
-    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-    [[UIApplication sharedApplication] cancelAllLocalNotifications];
 }
 
 - (void)setFirstLauchPreferences {
@@ -137,19 +149,23 @@ void uncaughtExceptionHandler(NSException *exception) {
 
 - (BOOL)doesDatabaseHaveData {
 	BOOL hasData = NO;
+	NSLog(@"pop");
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
 	[fetchRequest setEntity:entity];
+	NSLog(@"pop1");
 	NSError *error = nil;
 	NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
 	if (error) {
 		[Error showErrorByAppendingString:@"Unable to load Category data." withError:error];
 	}
+	NSLog(@"pop2");
 	if (fetchedObjects != nil) {
 		if ([fetchedObjects count] > 0) {
 			hasData = YES;			
 		}
 	}
+	NSLog(@"pop3");
 	[fetchRequest release];
 	
 	return hasData;
@@ -159,15 +175,11 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     NSError *error = nil;
 	NSManagedObjectContext *localManagedObjectContext = self.managedObjectContext;
-    // Register
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(myManagedObjectContextDidSaveNotificationHandler:) name:NSManagedObjectContextDidSaveNotification object:self.managedObjectContext];
     if (localManagedObjectContext != nil) {
         if ([localManagedObjectContext hasChanges] && ![localManagedObjectContext save:&error]) {
 			[Error showErrorByAppendingString:@"Unable to save changes." withError:error];
         } 
     }
-    // Unregister
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:self.managedObjectContext];
 }    
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -179,10 +191,6 @@ void uncaughtExceptionHandler(NSException *exception) {
      Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
      Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
      */
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ResignPin" object: nil];
-
-    
 	[self saveContext];
 }
 
@@ -233,7 +241,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     if (managedObjectContext == nil) {
 		NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
 		if (coordinator != nil) {
-			managedObjectContext = [[[NSManagedObjectContext alloc] init] retain];
+			managedObjectContext = [[NSManagedObjectContext alloc] init];
 			[managedObjectContext setPersistentStoreCoordinator: coordinator];
 			managedObjectContext.undoManager = nil;
 		}
@@ -277,7 +285,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 		NSLog(@"Error: %@",error);
 		[Error showErrorByAppendingString:@"Unable to find database file." withError:error];
     }    
-    
+
     return persistentStoreCoordinator;
 }
 
@@ -299,6 +307,18 @@ void uncaughtExceptionHandler(NSException *exception) {
 	NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
 	
 	return storeUrl;
+}
+
+#pragma mark Add Notes Methods
+- (void)addNote
+{
+
+    NSString *nibName = @"AddNoteViewController";
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
+    {
+        // ipad
+        nibName = @"AddNoteViewController-iPad";
+    }
 }
 
 
@@ -385,7 +405,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     Group *results = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
 	results.section = @"Results";
-	results.title = @"Create Reports";
+	results.title = @"Export Results";
 	results.groupDescription = @"Lorem ipsum dolor sit amet";
 	results.visible = [NSNumber numberWithBool:YES];
 	results.rateable = [NSNumber numberWithBool:NO];
@@ -396,7 +416,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     Group *savedresults = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
 	savedresults.section = @"Results";
-	savedresults.title = @"Saved Reports";
+	savedresults.title = @"Saved Results";
 	savedresults.groupDescription = @"Lorem ipsum dolor sit amet";
 	savedresults.visible = [NSNumber numberWithBool:YES];
 	savedresults.rateable = [NSNumber numberWithBool:NO];
@@ -481,7 +501,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 	local.showGraph = [NSNumber numberWithBool:NO];
 	local.menuIndex = [NSNumber numberWithInt:6];
 	local.positiveDescription = [NSNumber numberWithBool:NO];
-    
+
 	
 #ifdef DEBUG
 	Group *data = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
@@ -525,13 +545,13 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (void)dealloc {
-	[managedObjectContext release],self.managedObjectContext = nil;
-    [managedObjectModel release], self.managedObjectModel = nil;
-    [persistentStoreCoordinator release], self.persistentStoreCoordinator = nil;
-	[persistentStore release], self.persistentStore = nil;
+	[self.managedObjectContext release],self.managedObjectContext = nil;
+    [self.managedObjectModel release], self.managedObjectModel = nil;
+    [self.persistentStoreCoordinator release], self.persistentStoreCoordinator = nil;
+	[self.persistentStore release], self.persistentStore = nil;
 	
-	[navigationController release],navigationController = nil;
-	[window release], self.window = nil;
+	[self.navigationController release],self.navigationController = nil;
+	[self.window release], self.window = nil;
 	
 	[super dealloc];
 }

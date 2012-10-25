@@ -1,10 +1,32 @@
-//
-//  AddNoteViewController.m
-//  VAS002
-//
-//  Created by Hasan Edain on 12/20/10.
-//  Copyright 2010 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import <CoreData/CoreData.h>
 
@@ -27,8 +49,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
-	for (UIView* subview in datePicker.subviews) 
-    {
+	for (UIView* subview in datePicker.subviews) {
 		subview.frame = datePicker.bounds;
 	}
 	
@@ -45,13 +66,10 @@
 	self.navigationItem.leftBarButtonItem = cancelButton;
 	[cancelButton release];
     
-    
-    noteTextView.returnKeyType = UIReturnKeyDefault;
-
 }
 
 -(void)viewWillAppear:(BOOL)animated {
-    
+
     
     [self deviceOrientationChanged:nil];
     
@@ -99,7 +117,7 @@
         [dateFormat release];
         
     }
-    
+
     
 }
 
@@ -107,15 +125,7 @@
 {
     [super viewWillDisappear:animated];
     
-    
-}
 
-#pragma mark TextView Delegate Methods
-
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
-{
-    NSUInteger newLength = [textView.text length] + [text length] - range.length;
-    return  (newLength > 360) ? NO : YES;
 }
 
 #pragma mark ActionSheet
@@ -139,19 +149,18 @@
     if (buttonIndex == actionSheet.firstOtherButtonIndex + 1) 
     {
         [self.navigationController popViewControllerAnimated:YES];
-        
+
     } 
 }
 
 - (IBAction)cancelNoteClicked:(id)sender
 {
-    // UIApplication *app = [UIApplication sharedApplication];
+   // UIApplication *app = [UIApplication sharedApplication];
 	//VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
     [noteTextView resignFirstResponder];
-    // [appDelegate cancelNote];
+   // [appDelegate cancelNote];
 }
 
-/*
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range 
  replacementText:(NSString *)text
 {
@@ -165,12 +174,12 @@
     // For any other character return TRUE so that the text gets added to the view
     return YES;
 }
-*/
+
 - (IBAction)editDate:(id)sender
 {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs setObject:dateLabel.text forKey:@"landscapeDate"];
-    
+
     NSLog(@"date: %@", dateLabel.text);
     DatePickerController *datePickerController = [[DatePickerController alloc] initWithNibName:@"DatePickerController" bundle:nil];
     [self.navigationController pushViewController:datePickerController animated:YES];
@@ -249,7 +258,7 @@
 - (IBAction)save:(id)sender 
 {
     [self save];
-    
+
 }
 
 // Override to allow orientations other than the default portrait orientation.
@@ -271,18 +280,18 @@
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
-    
+
 	UIDevice *device = [UIDevice currentDevice];
 	if (device.orientation == UIDeviceOrientationPortrait || device.orientation == UIDeviceOrientationPortraitUpsideDown) {
         pickerContainer.hidden = NO;
         pickerButton.hidden = YES;
 		
-        
+
 	}
 	else if(device.orientation == UIDeviceOrientationLandscapeLeft || device.orientation == UIDeviceOrientationLandscapeRight){
         pickerContainer.hidden = YES;
         pickerButton.hidden = NO;
-        
+
 	}
 }
 
@@ -299,13 +308,13 @@
     // e.g. self.myOutlet = nil;
 	self.noteTextView = nil;
 }
-/*
+
 #pragma mark Text Editing
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {	
 	[self.noteTextView resignFirstResponder];
 	return YES;	
 }
-*/
+
 #pragma mark Date Picker
 -(IBAction)dateAction:(id)sender {
 	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -318,11 +327,11 @@
 
 #pragma mark Memory
 - (void)dealloc {
-	[dateLabel release];
-	[noteTextView release];
+	[self.dateLabel release];
+	[self.noteTextView release];
 	
-    [timeStamp release];
-	[noteDate release];
+    [self.timeStamp release];
+	[self.noteDate release];
 	
 	[super dealloc];
 }

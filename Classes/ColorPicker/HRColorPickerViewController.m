@@ -194,7 +194,7 @@
     {
         symbolViewController.subName = subName;
     }
-    else    
+    else 
     {
         symbolViewController.subName = @"";
         

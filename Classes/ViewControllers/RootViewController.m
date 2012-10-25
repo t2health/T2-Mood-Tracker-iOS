@@ -1,11 +1,32 @@
-//
-//  RootViewController.m
-//  VAS002
-//
-//  Created by Hasan Edain on 12/20/10.
-//  Copyright 2010 GDIT. All rights reserved.
-//
-
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 #import "RootViewController.h"
 #import "VAS002AppDelegate.h"
 #import "AddNoteViewController.h"
@@ -16,7 +37,6 @@
 #import "ViewNotesViewController.h"
 #import "ResultsViewController.h"
 #import "TipViewController.h"
-#import "eulaViewController.h"
 #import "Group.h"
 #import "Result.h"
 #import "Scale.h"
@@ -48,64 +68,62 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Initial CheckPin 
-    //  [self chkPin];
+  //  [self chkPin];
+
+
+	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
-
     
-    NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
-
-
-    BOOL showTips = [defaults boolForKey:@"SHOW_TIPS_ON_STARTUP"];
-    if (showTips == YES) {
-        UIViewController *tipViewController = [[TipViewController alloc] initWithNibName:@"TipViewController" bundle:nil];
-        tipViewController.hidesBottomBarWhenPushed = YES;
-        [appDelegate.navigationController pushViewController:tipViewController animated:YES];
-        [tipViewController release];
-    }
-    else 
-    {
-        NSLog(@"no tips");
-        
-    }
     
-    if (pinString != nil && ![pinString isEqual:@""]) 
-    {
-        [self chkPin];
-        
-    }
-    
-    // On First Launch
+    // Check if color/symbol legends exists in user settings
     NSString *key;
     
     // If setting does not exist, create it
     key = [NSString stringWithFormat:@"LEGEND_COLOR_DICTIONARY"];
-    
-    
-    // Display EULA
-    if (![defaults objectForKey:@"EULA"]) 
-    {
-        UIViewController *eULAViewController = [[eulaViewController alloc] initWithNibName:@"eulaViewController" bundle:nil];
-        eULAViewController.hidesBottomBarWhenPushed = YES;
-        [appDelegate.navigationController pushViewController:eULAViewController animated:YES];
-        [eULAViewController release];
-    }
-    
-    // Create Settings
     if (![defaults objectForKey:key]) 
     {
+        NSLog(@"initial not exist");
         [self fillGroupsDictionary];
         [self fillColors];
         [self fillSymbols];
+        //  [self fillSubColors];
+        // [self fillSubSymbols];
+        
         
         [defaults setValue:[NSDictionary dictionaryWithDictionary:colorsDictionary] forKey:@"LEGEND_COLOR_DICTIONARY"];
         [defaults setValue:[NSDictionary dictionaryWithDictionary:symbolsDictionary] forKey:@"LEGEND_SYMBOL_DICTIONARY"];
         [defaults setValue:[NSDictionary dictionaryWithDictionary:colorsSubTempDictionary] forKey:@"LEGEND_SUB_COLOR_DICTIONARY"];
         [defaults setValue:[NSDictionary dictionaryWithDictionary:symbolsSubTempDictionary] forKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"];
+        
+        
+        NSLog(@"color: %@", [defaults objectForKey:@"LEGEND_COLOR_DICTIONARY"]);
+        //   NSLog(@"symbol: %@", [defaults objectForKey:@"LEGEND_SYMBOL_DICTIONARY"]);
+        NSLog(@"subcolor: %@", [defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]);
+        // NSLog(@"subsymbol: %@", [defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]);
+        
     }
-    
 
+	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
+    
+    
+    if (pinString != nil && ![pinString isEqual:@""]) 
+    {
+        [self chkPin];
+    }
+    else 
+    {
+        BOOL showTips = [defaults boolForKey:@"SHOW_TIPS_ON_STARTUP"];
+        
+        if (showTips == YES) {
+            UIViewController *tipViewController = [[TipViewController alloc] initWithNibName:@"TipViewController" bundle:nil];
+            tipViewController.hidesBottomBarWhenPushed = YES;
+            [appDelegate.navigationController pushViewController:tipViewController animated:YES];
+            [tipViewController release];
+        }
+    }
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleUnusualEntryNotification:) name:@"UnusualEntryAdded" object:nil];
 	[FlurryUtility report:EVENT_MAIN_ACTIVITY];
@@ -122,19 +140,19 @@
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
-    
+
     
 }
 
 - (void)chkPin
-{    
+{
+    NSLog(@"rootview:");
+
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
-    
+
     
     if (pinString != nil && ![pinString isEqual:@""]) {
-        
-        
 		[self.navigationController setNavigationBarHidden:YES];
         self.tabBarController.tabBar.hidden = YES;  
 		UIViewController *passwordViewController = [[PasswordViewController alloc] initWithNibName:@"PasswordViewController" bundle:nil];
@@ -144,19 +162,9 @@
 }
 - (void)rsnPin
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSString *pinString = [defaults valueForKey:SECURITY_PIN_SETTING];
-    
-    
-    if (pinString != nil && ![pinString isEqual:@""]) {
-        
-        [self.navigationController setNavigationBarHidden:NO];
-        [self.navigationController popViewControllerAnimated:YES];
-        self.tabBarController.tabBar.hidden = NO;  
-	}
-    
-    
-
+    [self.navigationController setNavigationBarHidden:NO];
+    [self.navigationController popViewControllerAnimated:YES];
+    self.tabBarController.tabBar.hidden = NO;  
 }
 
 
@@ -190,7 +198,7 @@
         int overCount = [[digits objectAtIndex:lastDigit] intValue];
         color = [colorsArray objectAtIndex:overCount];
     }
-    NSLog(@"color: %@", color);
+    
 	return color;
 }
 
@@ -214,6 +222,7 @@
 		}
 	}
     
+    // NSLog(@"colorDict: %@", ledgendColorsDictionary);
 }
 
 - (void)fillSubColors {
@@ -235,6 +244,7 @@
 		}
 	}
     
+    // NSLog(@"colorDict: %@", ledgendColorsDictionary);
 }
 
 #pragma mark Symbols Dictionary
@@ -246,12 +256,17 @@
 		NSArray *objects = [self.groupsDictionary allKeys];
 		NSInteger index = 0;
 		
-		for (NSString *groupTitle in objects) 
-        {
+		for (NSString *groupTitle in objects) {
+            
+			//UIImage *image = [self UIImageForIndex:index];
+            
+			//[self.symbolsDictionary setObject:image forKey:groupTitle];
+            
             [self.symbolsDictionary setValue:[NSString stringWithFormat:@"%i", index] forKey:groupTitle];
 			index++;
 		}
 	}    
+    // NSLog(@"symbolsDictionary: %@", symbolsDictionary);
 }
 
 - (void)fillSubSymbols
@@ -266,17 +281,20 @@
             
 			UIImage *image = [self UIImageForIndex:index];
             
+			//[self.symbolsDictionary setObject:image forKey:groupTitle];
             NSData *data = [NSKeyedArchiver archivedDataWithRootObject:image];
             [self.symbolsSubDictionary setObject:data forKey:scaleTitle];
 			index++;
 		}
 	}    
+    //  NSLog(@"symbolsSubDictionary: %@", symbolsSubDictionary);
 }
 
 -(UIImage *)UIImageForIndex:(NSInteger)index {
 	NSArray *imageArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"Symbol_Circle.png"], [UIImage imageNamed:@"Symbol_Cross.png"], [UIImage imageNamed:@"Symbol_Diamondring.png"], [UIImage imageNamed:@"Symbol_Hourglass.png"], [UIImage imageNamed:@"Symbol_Pentagon.png"], [UIImage imageNamed:@"Symbol_Square.png"], [UIImage imageNamed:@"Symbol_Fivestar.png"], [UIImage imageNamed:@"Symbol_Triangle.png"], [UIImage imageNamed:@"Symbol_Spade.png"], [UIImage imageNamed:@"Symbol_Club.png"], [UIImage imageNamed:@"Symbol_Moon.png"], [UIImage imageNamed:@"Symbol_Diamondclassic.png"], [UIImage imageNamed:@"Symbol_Clover.png"], [UIImage imageNamed:@"Symbol_Skew.png"], [UIImage imageNamed:@"Symbol_Quadstar.png"], [UIImage imageNamed:@"Symbol_Octogon.png"], nil];
 	
 	UIImage *image = nil;
+	//NSLog(@"imageArray: %@", imageArray);
     // Perm fix for color bug from v2.0; 5/17/2012 Mel Manzano
 	if (index >=0 && index < [imageArray count]) {
 		image = [imageArray objectAtIndex:index];
@@ -395,11 +413,16 @@
             [subColors setObject:[NSDictionary dictionaryWithDictionary:[self fillScalesDictionary:aGroup.title:1]] forKey:aGroup.title];
             [subSymbols setObject:[NSDictionary dictionaryWithDictionary:[self fillScalesDictionary:aGroup.title:0]] forKey:aGroup.title];
             
+            // Fill Scales for each group
+            
+            
+            // NSLog(@"%@: %@",aGroup.title, [self scalesForGroup:aGroup]);
 		}			
 		self.groupsDictionary = [NSDictionary dictionaryWithDictionary:groups];
 		self.colorsSubTempDictionary = [NSDictionary dictionaryWithDictionary:subColors];
         self.symbolsSubTempDictionary = [NSDictionary dictionaryWithDictionary:subSymbols];
         
+        //  NSLog(@"scalesDictionary: %@", scalesDictionary);
 	}
 }
 
@@ -411,8 +434,6 @@
 
 - (IBAction)areasButtonClicked:(id)sender {
     EditGroupViewController *editGroupViewController = [[EditGroupViewController alloc] initWithNibName:@"EditGroupViewController" bundle:nil];
-    editGroupViewController.hidesBottomBarWhenPushed = YES;
-
     editGroupViewController.group = nil;
     [self.navigationController pushViewController:editGroupViewController animated:YES];
     [editGroupViewController release];
@@ -514,7 +535,7 @@
     
     
     // create the parent view that will hold header Label
-	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
+	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -530,7 +551,7 @@
     NSArray *sections = [self.fetchedResultsController sections];
 	headerLabel.text = [[sections objectAtIndex:section] name];
 	[customView addSubview:headerLabel];
-    [headerLabel release];
+    
 	return customView;
 }
 
@@ -605,8 +626,6 @@
 		case 0: // Rate
 			selectedGroup = (Group *)[self.fetchedResultsController objectAtIndexPath:indexPath];
 			rateMoodViewController = [[RateMoodViewController alloc] initWithNibName:@"RateMoodViewController" bundle:nil];
-            rateMoodViewController.hidesBottomBarWhenPushed = YES;
-
 			rateMoodViewController.currentGroup = selectedGroup;
 			[self.navigationController pushViewController:rateMoodViewController animated:YES];
 			[rateMoodViewController release];
@@ -835,12 +854,12 @@
 	[fetchRequest setFetchBatchSize:20];
 	
 	// Create and initialize the fetch results controller.
-	fetchedResultsController = 
+	self.fetchedResultsController = 
 	[[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 										  managedObjectContext:self.managedObjectContext 
 											sectionNameKeyPath:@"section" 
 													 cacheName:@"Root"];
-	fetchedResultsController.safeDelegate = self;
+	self.fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
     //	[titleDescriptor autorelease];
@@ -853,7 +872,7 @@
 		[Error showErrorByAppendingString:@"Unable to fetch data for main menu." withError:error];
 	}
 	
-	return fetchedResultsController;
+	return self.fetchedResultsController;
 }
 
 - (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
@@ -1095,10 +1114,10 @@
 }
 
 - (void)dealloc {
-	[fetchedResultsController release];
-	[managedObjectContext release];
-	[reminderArray release];
-	[tableView release];
+	[self.fetchedResultsController release];
+	[self.managedObjectContext release];
+	[self.reminderArray release];
+	[self.tableView release];
 	
 	[super dealloc];
 }

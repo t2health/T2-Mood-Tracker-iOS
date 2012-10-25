@@ -1,10 +1,32 @@
-//
-//  RootRateController.m
-//  VAS002
-//
-//  Created by Melvin Manzano on 4/3/12.
-//  Copyright (c) 2012 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "RootResultsController.h"
 #import "VAS002AppDelegate.h"
@@ -50,9 +72,9 @@
     if (managedObjectContext == nil) 
     { 
         managedObjectContext = [(VAS002AppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext]; 
-        
+
     }
-    
+
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleUnusualEntryNotification:) name:@"UnusualEntryAdded" object:nil];
 	[FlurryUtility report:EVENT_MAIN_ACTIVITY];
@@ -68,7 +90,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(chkPin) name:@"CheckPin" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(rsnPin) name:@"ResignPin" object: nil];
-    
+
 }
 
 - (void)chkPin
@@ -98,25 +120,10 @@
 }
 
 
-- (void)viewWillAppear:(BOOL)animated 
-{
-    // Reload Table
+- (void)viewWillAppear:(BOOL)animated {
+	//[self.tableView reloadData];
     self.tableView.backgroundView = nil;
-    
-    // Show Alert if CSV was saved
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *theAlert = [defaults objectForKey:@"csvSaved"];
-    if ([theAlert isEqualToString:@"csvSaved"]) 
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"CSV Saved" 
-                                                        message:@"Your CSV report has been created.  Please go to Saved Reports to email your report."
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];  
-        [alert show];  
-        [alert release];
-        [defaults setValue:@"" forKey:@"csvSaved"];
-    }
+	//self.reminderArray = [DateMath remindersDueForGroups];
 }
 
 - (void)handleUnusualEntryNotification:(NSNotification *)notification {
@@ -166,15 +173,9 @@
 
 // Customize the number of sections in the table view.
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    
-    /*
 	NSInteger numberOfSections = [[self.fetchedResultsController sections] count];
 	
 	return numberOfSections;
-    */
-    
-    return 1;
-     
 }
 
 // Customize the appearance of table view cells.
@@ -194,49 +195,24 @@
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSInteger numRows;
-	
-	switch (section) {
-		case 0: //Number of sections
-			numRows = 4;
-			break;
-		default:
-			numRows = 0;
-			break;
-	}
-	
-    return numRows;
-    
-    /*
 	id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
 	NSInteger numberOfRows = [sectionInfo numberOfObjects];
 	
 	return numberOfRows;
-     */
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-	/*
+	
 	NSArray *sections = [self.fetchedResultsController sections];
 	NSString *sectionName = [[sections objectAtIndex:section] name];
-     */
-	NSString *sectionName;
-	
-	switch (section) {
-		case 0: //Settings
-			sectionName = nil;
-			break;
-		default:
-			sectionName = nil;
-			break;
-	}
 	return sectionName;
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
+    
     // create the parent view that will hold header Label
-	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
+	UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)];
 	
 	// create the button object
 	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -249,9 +225,10 @@
     
 	// If you want to align the header text as centered
 	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
-	headerLabel.text = @"Results";
+    NSArray *sections = [self.fetchedResultsController sections];
+	headerLabel.text = [[sections objectAtIndex:section] name];
 	[customView addSubview:headerLabel];
-    [headerLabel release];
+    
 	return customView;
 }
 
@@ -261,35 +238,52 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {	
-    NSInteger section = [indexPath indexAtPosition:0];
-	NSInteger row = [indexPath indexAtPosition:1];
-		
-	switch (section) {
-		case 0: //Settings
-			switch (row) {
-				case 0: //Areas Of Interest
-					cell.textLabel.text = @"Graph Results";
-					break; 
-                    //  case 1: //Custom Charting
-                    //	cell.textLabel.text = @"Custom Charting";
-					//break;
-				case 1: //Reminders
-					cell.textLabel.text = @"Create Reports";
-					break;
-				case 2: //Security
-					cell.textLabel.text = @"Saved Reports";
-					break;
-				case 3: //Clear Data
-					cell.textLabel.text = @"View Notes";
-					break;
-				default:
-					break;
-			}
-			break;
-		default:
-			break;
+	// Configure the cell to show the Categories title
+	Group *group = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	cell.textLabel.text = group.title;
+	if (self.reminderArray != nil && [group.rateable boolValue] == YES) {
+		if ([self.reminderArray containsObject:group.title]) {
+			cell.imageView.image = [UIImage imageNamed:@"warning.png"];		
+		}
+		else {
+			cell.imageView.image = [UIImage imageNamed:@"check.png"];
+		}
 	}
+	else {
+		cell.imageView.image = nil;
+	}
+	
+	if ([group.visible boolValue] == NO) {
+		cell.userInteractionEnabled = NO;
+		cell.hidden = YES;
+	}
+	else {
+		cell.userInteractionEnabled = YES;
+		cell.hidden = NO;
+	}
+	
+	
+	cell.backgroundColor = [UIColor whiteColor];
+	cell.accessoryView.backgroundColor = [UIColor clearColor];
+	cell.contentView.backgroundColor = [UIColor clearColor];
+	cell.backgroundView.backgroundColor = [UIColor clearColor];
+}
 
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+		
+		// Delete the managed object.
+		[self.managedObjectContext deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
+		
+		NSError *error = nil;
+		if (![self.managedObjectContext save:&error]) {
+			[Error showErrorByAppendingString:@"Unable to delete Category." withError:error];
+		}
+    }   
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewCellEditingStyleNone;
 }
 
 #pragma mark Table view delegate
@@ -297,20 +291,25 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {		
 	NSInteger row = [indexPath row];
 	NSInteger section = [indexPath section];
-    
+
 	ResultsViewController *resultsViewController;
 	//GraphResultsViewController *graphResultsViewController;
 	ViewNotesViewController *viewNotesViewController;
 	GraphViewController *graphViewController;
-    
+
     SavedResultsController *savedResultsController;
 	
-    
+
 	
 	switch (section) {
 		case 0: //Results
 			switch (row) {
 				case 0: //Graph Results
+                    /*
+					graphResultsViewController = [[GraphResultsViewController alloc] initWithNibName:@"GraphResultsViewController" bundle:nil];
+					[self.navigationController pushViewController:graphResultsViewController animated:YES];
+					[graphResultsViewController release];
+                     */
                     graphViewController = [[GraphViewController alloc] initWithNibName:@"GraphViewController" bundle:nil];
                     graphViewController.hidesBottomBarWhenPushed = YES;
 					[self.navigationController pushViewController:graphViewController animated:YES];
@@ -318,22 +317,16 @@
 					break;
                 case 1: //Email Results
 					resultsViewController = [[ResultsViewController alloc] initWithNibName:@"ResultsViewController" bundle:nil];
-                    resultsViewController.hidesBottomBarWhenPushed = YES;
-
 					[self.navigationController pushViewController:resultsViewController animated:YES];
 					[resultsViewController release];
 					break;
                 case 2: //Saved Results
 					savedResultsController = [[SavedResultsController alloc] initWithNibName:@"SavedResultsController" bundle:nil];
-                    savedResultsController.hidesBottomBarWhenPushed = YES;
-
 					[self.navigationController pushViewController:savedResultsController animated:YES];
 					[savedResultsController release];
 					break;    
 				case 3: //View Notes
 					viewNotesViewController = [[ViewNotesViewController alloc] initWithNibName:@"ViewNotesViewController" bundle:nil];
-                    viewNotesViewController.hidesBottomBarWhenPushed = YES;
-
 					[self.navigationController pushViewController:viewNotesViewController animated:YES];
 					[viewNotesViewController release];
 					break;
@@ -546,6 +539,7 @@
 	[fetchRequest setEntity:entity];
 	
 	// Create the sort descriptors array.
+	
 	NSSortDescriptor *sectionTitleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"section" ascending:YES];
 	NSSortDescriptor *menuIndexDescriptor = [[NSSortDescriptor alloc] initWithKey:@"menuIndex" ascending:YES];
     //	NSSortDescriptor *titleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES];
@@ -561,12 +555,12 @@
 	[fetchRequest setFetchBatchSize:20];
 	
 	// Create and initialize the fetch results controller.
-	fetchedResultsController = 
+	self.fetchedResultsController = 
 	[[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 										  managedObjectContext:self.managedObjectContext 
 											sectionNameKeyPath:@"section" 
 													 cacheName:@"Results"];
-	fetchedResultsController.safeDelegate = self;
+	self.fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
     //	[titleDescriptor autorelease];
@@ -579,7 +573,7 @@
 		[Error showErrorByAppendingString:@"Unable to fetch data for main menu." withError:error];
 	}
 	
-	return fetchedResultsController;
+	return self.fetchedResultsController;
 }
 
 - (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
@@ -816,10 +810,10 @@
 }
 
 - (void)dealloc {
-	[fetchedResultsController release];
-	[managedObjectContext release];
-	[reminderArray release];
-	[tableView release];
+	[self.fetchedResultsController release];
+	[self.managedObjectContext release];
+	[self.reminderArray release];
+	[self.tableView release];
 	
 	[super dealloc];
 }

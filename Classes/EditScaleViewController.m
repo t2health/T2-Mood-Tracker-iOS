@@ -1,10 +1,32 @@
-//
-//  EditScaleViewController.m
-//  VAS002
-//
-//  Created by Hasan Edain on 2/17/11.
-//  Copyright 2011 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "EditScaleViewController.h"
 #import "Scale.h"
@@ -23,7 +45,7 @@
 
 @synthesize leftTextField;
 @synthesize rightTextField;
-@synthesize scale, groupName;
+@synthesize scale;
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
@@ -45,19 +67,10 @@
     
 }
 
-- (void)viewDidUnload
-{
-	self.fetchedResultsController.delegate = nil;
-}
-
 - (void)save:(id)sender {
-    [self addLegendInfo];
-    
-    
 	self.scale.minLabel = self.leftTextField.text;
 	self.scale.maxLabel = self.rightTextField.text;
-    
-    
+	
 	NSError *error = nil;
 	
 	if ([self.managedObjectContext hasChanges] ) {
@@ -65,112 +78,9 @@
 			[Error showErrorByAppendingString:@"Unable to save scale edit." withError:error];
 		}
 	}
-    
-    
 	
 	[self.navigationController popViewControllerAnimated:YES];	
 }
-
--(void) addLegendInfo
-{
-    // Add Color and Symbol
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableDictionary *colorSubDict = [NSMutableDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]];
-    NSMutableDictionary *symbolSubDict = [NSMutableDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]];
-    
-    NSLog(@"self.groupName: %@",self.groupName);
-    NSMutableDictionary *subColorDict = [NSMutableDictionary dictionaryWithDictionary:[colorSubDict objectForKey:self.groupName]];
-    NSMutableDictionary *subSymbolDict = [NSMutableDictionary dictionaryWithDictionary:[symbolSubDict objectForKey:self.groupName]];
-    
-    
-    int randomColor = arc4random_uniform(9);
-    int randomSymbol = arc4random_uniform(15);
-    UIColor *newGroupColor = [self UIColorForIndex:randomColor];
-    
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:newGroupColor];
-    
-    
-    [subColorDict setObject:data forKey:self.leftTextField.text];
-    [subSymbolDict setObject:[NSString stringWithFormat:@"%i",randomSymbol] forKey:self.leftTextField.text];
-    
-    
-    [colorSubDict setObject:subColorDict forKey:self.groupName];
-    [symbolSubDict setObject:subSymbolDict forKey:self.groupName];
-    
-    [defaults setValue:[NSDictionary dictionaryWithDictionary:colorSubDict] forKey:@"LEGEND_SUB_COLOR_DICTIONARY"];
-    [defaults setValue:[NSDictionary dictionaryWithDictionary:symbolSubDict] forKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"];
-    
-}
-
-#pragma mark symbols
-
--(UIImage *)UIImageForIndex:(NSInteger)index {
-	NSArray *imageArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"Symbol_Circle.png"], [UIImage imageNamed:@"Symbol_Cross.png"], [UIImage imageNamed:@"Symbol_Diamondring.png"], [UIImage imageNamed:@"Symbol_Hourglass.png"], [UIImage imageNamed:@"Symbol_Pentagon.png"], [UIImage imageNamed:@"Symbol_Square.png"], [UIImage imageNamed:@"Symbol_Fivestar.png"], [UIImage imageNamed:@"Symbol_Triangle.png"], [UIImage imageNamed:@"Symbol_Spade.png"], [UIImage imageNamed:@"Symbol_Club.png"], [UIImage imageNamed:@"Symbol_Moon.png"], [UIImage imageNamed:@"Symbol_Diamondclassic.png"], [UIImage imageNamed:@"Symbol_Clover.png"], [UIImage imageNamed:@"Symbol_Skew.png"], [UIImage imageNamed:@"Symbol_Quadstar.png"], [UIImage imageNamed:@"Symbol_Octogon.png"], nil];
-	
-	UIImage *image = nil;
-	//NSLog(@"imageArray: %@", imageArray);
-    // Perm fix for color bug from v2.0; 5/17/2012 Mel Manzano
-	if (index >=0 && index < [imageArray count]) {
-		image = [imageArray objectAtIndex:index];
-		[[image retain] autorelease];
-	}
-    else // If index is > color array count, then start over.
-    {
-        // Split index into digits via array
-        NSString *stringNumber = [NSString stringWithFormat:@"%i", index];
-        NSMutableArray *digits = [NSMutableArray arrayWithCapacity:[stringNumber length]];
-        const char *cstring = [stringNumber cStringUsingEncoding:NSASCIIStringEncoding];
-        while (*cstring) {
-            if (isdigit(*cstring)) {
-                [digits addObject:[NSString stringWithFormat:@"%c", *cstring]];
-            }
-            cstring++;
-        }
-        
-        // Take last digit in array and use for color selection
-        int lastDigit = [digits count] - 1;
-        int overCount = [[digits objectAtIndex:lastDigit] intValue];
-        image = [imageArray objectAtIndex:overCount];
-    }
-    
-	return image;
-}
-
-
-#pragma mark colors
-
--(UIColor *)UIColorForIndex:(NSInteger)index {
-	NSArray *colorsArray = [NSArray arrayWithObjects:[UIColor blueColor], [UIColor greenColor], [UIColor orangeColor], [UIColor redColor], [UIColor purpleColor], [UIColor grayColor], [UIColor brownColor], [UIColor cyanColor], [UIColor magentaColor], [UIColor lightGrayColor], nil];
-	
-	UIColor *color = nil;
-	
-    // Perm fix for color bug from v2.0; 5/17/2012 Mel Manzano
-	if (index >=0 && index < [colorsArray count]) {
-		color = [colorsArray objectAtIndex:index];
-		[[color retain] autorelease];
-	}
-    else // If index is > color array count, then start over.
-    {
-        // Split index into digits via array
-        NSString *stringNumber = [NSString stringWithFormat:@"%i", index];
-        NSMutableArray *digits = [NSMutableArray arrayWithCapacity:[stringNumber length]];
-        const char *cstring = [stringNumber cStringUsingEncoding:NSASCIIStringEncoding];
-        while (*cstring) {
-            if (isdigit(*cstring)) {
-                [digits addObject:[NSString stringWithFormat:@"%c", *cstring]];
-            }
-            cstring++;
-        }
-        
-        // Take Last digit in array and use for color selection
-        int lastDigit = [digits count] - 1;
-        int overCount = [[digits objectAtIndex:lastDigit] intValue];
-        color = [colorsArray objectAtIndex:overCount];
-    }
-    
-	return color;
-}
-
 
 // Override to allow orientations other than the default portrait orientation.
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -311,51 +221,7 @@
     fetchedResultsController;
 }    
 
-- (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
-{
-	[self.tableView reloadData];
-}
 
-/**
- Delegate methods of NSFetchedResultsController to respond to additions, removals and so on.
- */
-
-- (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
-	// The fetch controller is about to start sending change notifications, so prepare the table view for updates.
-	
-	[self.tableView beginUpdates];
-}
-
-- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {	
-	switch(type) {
-		case NSFetchedResultsChangeInsert:
-			[self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-			break;
-			
-		case NSFetchedResultsChangeDelete:
-			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-			break;
-			
-		case NSFetchedResultsChangeUpdate:
-			[self configureCell:[self.tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
-			break;
-			
-		case NSFetchedResultsChangeMove:
-			[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-			break;
-	}	
-}
-
-
-- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
-	// The fetch controller has sent all current change notifications, so tell the table view to process all updates.
-	if (!self.tableView.editing) {
-		[self.tableView reloadData];
-	}
-	
-	[self.tableView endUpdates];
-}
 
 #pragma mark Memory
 
@@ -366,16 +232,13 @@
     // Release any cached data, images, etc. that aren't in use.
 }
 
-
 - (void)dealloc {
 	[self.managedObjectContext release];
 	
 	[self.leftTextField release];
 	[self.rightTextField release];
 	[self.scale release], self.scale = nil;
-	self.fetchedResultsController.delegate = nil;
-	[self.fetchedResultsController release];
-    
+	
     [super dealloc];
 }
 

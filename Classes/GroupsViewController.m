@@ -1,10 +1,32 @@
-//
-//  GroupsViewController.m
-//  VAS002
-//
-//  Created by Hasan Edain on 1/14/11.
-//  Copyright 2011 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "GroupsViewController.h"
 #import "FlurryUtility.h"
@@ -28,7 +50,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     tableView.backgroundView = nil;
-    
+
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDelegate = (VAS002AppDelegate*)[app delegate];
 	self.managedObjectContext = appDelegate.managedObjectContext;
@@ -37,7 +59,7 @@
 	
 	UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addGroup:)];
 	self.navigationItem.rightBarButtonItem = plusButton;
-	[plusButton release];
+	
 	[FlurryUtility report:EVENT_EDIT_GROUP_ACTIVITY];
     
     [self.tableView reloadData];
@@ -46,13 +68,11 @@
 - (void)viewWillAppear:(BOOL)animated {
 	[self fillGroupsDictionary];
 	[self createSwitches];
-	[self.tableView reloadData];
+	//[self.tableView reloadData];
 }
 
 - (void)viewDidUnload {
-	self.fetchedResultsController.delegate = nil;
-    groupsDictionary = nil;
-    switchDictionary = nil;
+	self.fetchedResultsController = nil;
 }
 
 #pragma mark Create dictionaries
@@ -126,10 +146,10 @@
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    static NSString *CellIdentifier = @"Cell";
+    //static NSString *CellIdentifier = @"Cell";
     
     // Perm fix for tableview WEIRD Bug from v2.0; 5/15/2012 Mel Manzano
-    // NSString *CellIdentifier = [NSString stringWithFormat:@"Cell %d, %d", indexPath.row, indexPath.section];
+    NSString *CellIdentifier = [NSString stringWithFormat:@"Cell %d, %d", indexPath.row, indexPath.section];
     
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
@@ -297,9 +317,9 @@
 	[fetchRequest setPredicate:showGraphPredicate];
 	
 	// Create and initialize the fetch results controller.
-	fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
-                                managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
-	fetchedResultsController.safeDelegate = self;
+	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
+									 self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
+	self.fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
 	[menuIndexDescriptor autorelease];
@@ -311,7 +331,7 @@
 		[Error showErrorByAppendingString:@"Unable to fetch data for groups." withError:error];
 	}
     
-	return fetchedResultsController;
+	return self.fetchedResultsController;
 }    
 
 - (void)controllerDidMakeUnsafeChanges:(NSFetchedResultsController *)controller
@@ -365,12 +385,12 @@
 - (void)dealloc {
 	// Not sure why I have to explicitly set the delegate to nil, but if I don'tthe delegate will 
 	// persist even after the View Controller has been deallocated.
-	[tableView release];
-	fetchedResultsController.delegate = nil;
-	[fetchedResultsController release];
-	[managedObjectContext release];
-	[switchDictionary release];
-	[groupsDictionary release];
+	[self.tableView release];
+	self.fetchedResultsController.delegate = nil;
+	[self.fetchedResultsController release];
+	[self.managedObjectContext release];
+	[self.switchDictionary release];
+	[self.groupsDictionary release];
 	
     [super dealloc];
 }

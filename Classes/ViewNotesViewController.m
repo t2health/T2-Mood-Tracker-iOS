@@ -1,10 +1,32 @@
-//
-//  ViewNotesViewController.m
-//  VAS002
-//
-//  Created by Hasan Edain on 12/27/10.
-//  Copyright 2010 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "ViewNotesViewController.h"
 #import "VAS002AppDelegate.h"
@@ -22,23 +44,21 @@
 @synthesize managedObjectContext;
 @synthesize notesTableView;
 
-id viewToDelete;
-
 #pragma mark View lifecycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     notesTableView.backgroundView = nil;
-    
+
 	self.title = @"View Notes";
-    
+
 	UIApplication *app = [UIApplication sharedApplication];
 	VAS002AppDelegate *appDeleate = (VAS002AppDelegate *)[app delegate];
 	self.managedObjectContext = appDeleate.managedObjectContext;
 	
 	UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNote:)];
 	self.navigationItem.rightBarButtonItem = plusButton;
-	[plusButton release];
+	
 	[FlurryUtility report:EVENT_NOTES_ACTIVITY];	
 	
 	NSError *error = nil;
@@ -106,53 +126,6 @@ id viewToDelete;
     return YES;
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-
-    // Delete Action Sheet
-    if (buttonIndex == actionSheet.firstOtherButtonIndex + 0) 
-    {
-        id view = viewToDelete;
-        while (view && ![view isKindOfClass:[UITableViewCell class]]) {
-            view = [view superview];
-        }
-        UITableViewCell *cell = view;
-        NSIndexPath *indexPath = [notesTableView indexPathForCell:cell];
-        NSManagedObject *task = [fetchedResultsController objectAtIndexPath:indexPath];
-        
-        [self.managedObjectContext deleteObject:task];
-        
-        [self.managedObjectContext save:nil];
-        
-        
-        [notesTableView reloadData];
-    }
-
-
-}
-
-
-- (void)handleGesture:(UILongPressGestureRecognizer *)recognizer {
-    
-    if (recognizer.state == UIGestureRecognizerStateBegan) 
-    {    
-        
-        UIActionSheet *actionSheet = [[[UIActionSheet alloc]
-                                       initWithTitle:@"" 
-                                       delegate:self 
-                                       cancelButtonTitle:@"Cancel" 
-                                       destructiveButtonTitle:nil 
-                                       otherButtonTitles:@"Delete Note", nil] autorelease];
-        [actionSheet showFromTabBar:self.tabBarController.tabBar];  
-        
-        viewToDelete = recognizer.view;
-        
-    } 
-    else if (recognizer.state == UIGestureRecognizerStateEnded) 
-    {
-        
-    }
-}
-
 #pragma mark Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -198,11 +171,6 @@ id viewToDelete;
 	cell.detailTextLabel.text = note.note;
     cell.detailTextLabel.textColor = [UIColor blackColor];
     cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:18];
-    
-    UILongPressGestureRecognizer* gestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
-    [cell addGestureRecognizer:gestureRecognizer];
-    
-    [gestureRecognizer release];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {	
@@ -229,7 +197,7 @@ id viewToDelete;
 	NSString *titleString = [NSString stringWithFormat:@"%@ %d", [monthSymbols objectAtIndex:month-1], year];
 	
 	return titleString;	
-    
+
 }
 
 
@@ -271,15 +239,13 @@ id viewToDelete;
     
 	// If you want to align the header text as centered
 	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
-    
+
     
     NSString *titleString = [NSString stringWithFormat:@"%@ %d", [monthSymbols objectAtIndex:month-1], year];
 	headerLabel.text = titleString;
 	[customView addSubview:headerLabel];
-    [headerLabel release];
     
-	return [customView autorelease];
-    
+	return customView;
 }
 
 // return list of section titles to display in section index view (e.g. "ABCD...Z#")
@@ -313,7 +279,7 @@ id viewToDelete;
 		// Delete the managed object.
 		NSManagedObjectContext *context = [fetchedResultsController managedObjectContext];
 		[context deleteObject:[fetchedResultsController objectAtIndexPath:indexPath]];
-        
+
         NSLog(@"deleted");
         
 		NSError *error;
@@ -328,11 +294,11 @@ id viewToDelete;
 	Note *note = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	vnvc.note = note;
     NSLog(@"note: %@", note);
-    
+
 	[self.navigationController pushViewController:vnvc animated:YES];
 	[vnvc release];
-    
-    
+        
+
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -355,8 +321,8 @@ id viewToDelete;
 
 - (void)dealloc {	
 	self.fetchedResultsController.delegate = nil;
-	[fetchedResultsController release];
-	[managedObjectContext release];
+	[self.fetchedResultsController release];
+	[self.managedObjectContext release];
 	
     [super dealloc];
 }

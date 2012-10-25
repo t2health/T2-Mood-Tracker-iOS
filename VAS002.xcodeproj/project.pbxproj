@@ -15,8 +15,6 @@
 		1F5DE7EE15C8BCDC00F5FD5B /* WebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F5DE7EC15C8BCDC00F5FD5B /* WebViewController.xib */; };
 		1F5DE7F315C8BDE700F5FD5B /* Template_iPAD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F5DE7F115C8BDE700F5FD5B /* Template_iPAD.xib */; };
 		1F5DE7F515C8BE5800F5FD5B /* WebViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F5DE7F415C8BE5800F5FD5B /* WebViewController_iPad.xib */; };
-		1F5DE80015C8E64E00F5FD5B /* ShinobiCharts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5DE7FF15C8E64E00F5FD5B /* ShinobiCharts.framework */; };
-		1FA03B3A15CC384600DF7EE8 /* chart.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FA03B3915CC384600DF7EE8 /* chart.png */; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		FB2D7BD6152B549300DB9FC8 /* RootResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2D7BD4152B549300DB9FC8 /* RootResultsController.m */; };
 		FB2D7BD7152B549300DB9FC8 /* RootResultsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FB2D7BD5152B549300DB9FC8 /* RootResultsController.xib */; };
@@ -32,9 +30,6 @@
 		FB5AA8031588DF4700014B78 /* SymbolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5AA8011588DF4600014B78 /* SymbolViewController.m */; };
 		FB5AA8041588DF4700014B78 /* SymbolViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FB5AA8021588DF4600014B78 /* SymbolViewController.xib */; };
 		FB620C1515470EC400C45A30 /* GraphViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB620C1315470EC400C45A30 /* GraphViewController.m */; };
-		FB810C5816139D8B00081B75 /* icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = FB810C5716139D8A00081B75 /* icon-72.png */; };
-		FB810C5A16139DDB00081B75 /* icon-144.png in Resources */ = {isa = PBXBuildFile; fileRef = FB810C5916139DDB00081B75 /* icon-144.png */; };
-		FB810C5C16139DE500081B75 /* icon-144.png in Resources */ = {isa = PBXBuildFile; fileRef = FB810C5B16139DE200081B75 /* icon-144.png */; };
 		FB8EE93D153DFE45009BEE0E /* bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FB8EE93C153DFE45009BEE0E /* bg@2x.png */; };
 		FB8EE941153E24E9009BEE0E /* tab-rate-inactive.png in Resources */ = {isa = PBXBuildFile; fileRef = FB8EE93F153E24E9009BEE0E /* tab-rate-inactive.png */; };
 		FB8EE946153E2662009BEE0E /* tab-settings-inactive.png in Resources */ = {isa = PBXBuildFile; fileRef = FB8EE943153E2662009BEE0E /* tab-settings-inactive.png */; };
@@ -176,8 +171,6 @@
 		FBE9A69015C34683004BDAD1 /* PDFService.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE9A68F15C34683004BDAD1 /* PDFService.m */; };
 		FBF09552152BA7BD00B00AA6 /* RootSupportController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF09550152BA7BC00B00AA6 /* RootSupportController.m */; };
 		FBF09553152BA7BD00B00AA6 /* RootSupportController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBF09551152BA7BC00B00AA6 /* RootSupportController.xib */; };
-		FBF13A87161DF5ED007DB490 /* eulaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF13A85161DF5ED007DB490 /* eulaViewController.m */; };
-		FBF13A88161DF5ED007DB490 /* eulaViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBF13A86161DF5ED007DB490 /* eulaViewController.xib */; };
 		FBF4B6C7156D309D00D6FAF5 /* SGraphViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF4B6C6156D309C00D6FAF5 /* SGraphViewController.m */; };
 		FBF4B6C9156D31A400D6FAF5 /* SGraphViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBF4B6C8156D31A400D6FAF5 /* SGraphViewController.xib */; };
 		FBF4B6CA156D340200D6FAF5 /* SGraphDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF4B6C0156D2CE800D6FAF5 /* SGraphDataSource.m */; };
@@ -203,7 +196,6 @@
 		FBF4B79B157D031C00D6FAF5 /* Symbol_Square.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF4B787157D031C00D6FAF5 /* Symbol_Square.png */; };
 		FBF4B79C157D031C00D6FAF5 /* Symbol_Triangle.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF4B788157D031C00D6FAF5 /* Symbol_Triangle.png */; };
 		FBF4B7B1157E517900D6FAF5 /* ChartOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FBF4B7B0157E517900D6FAF5 /* ChartOptionsViewController.xib */; };
-		FBF6CD4615D56AED00B51908 /* PDFDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF6CD4515D56AED00B51908 /* PDFDataSource.m */; };
 		FBF710221592598D004728D9 /* NotesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF710211592598D004728D9 /* NotesTableViewController.m */; };
 		FBF7103215936B80004728D9 /* tab-legend.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF7103115936B80004728D9 /* tab-legend.png */; };
 		FBF7103415936BC1004728D9 /* tab-legend@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF7103315936BC1004728D9 /* tab-legend@2x.png */; };
@@ -341,11 +333,10 @@
 		1F5DE7EC15C8BCDC00F5FD5B /* WebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebViewController.xib; sourceTree = "<group>"; };
 		1F5DE7F115C8BDE700F5FD5B /* Template_iPAD.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Template_iPAD.xib; sourceTree = "<group>"; };
 		1F5DE7F415C8BE5800F5FD5B /* WebViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebViewController_iPad.xib; sourceTree = "<group>"; };
-		1F5DE7FF15C8E64E00F5FD5B /* ShinobiCharts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShinobiCharts.framework; sourceTree = "<group>"; };
-		1FA03B3915CC384600DF7EE8 /* chart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chart.png; sourceTree = "<group>"; };
 		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		28A0AAE50D9B0CCF005BE974 /* VAS002_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VAS002_Prefix.pch; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		62B09AF5162C626000E89A9D /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* VAS002-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "VAS002-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		FB2D7BD3152B549300DB9FC8 /* RootResultsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootResultsController.h; sourceTree = "<group>"; };
 		FB2D7BD4152B549300DB9FC8 /* RootResultsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootResultsController.m; sourceTree = "<group>"; };
@@ -371,9 +362,6 @@
 		FB5AA8021588DF4600014B78 /* SymbolViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SymbolViewController.xib; sourceTree = "<group>"; };
 		FB620C1215470EC400C45A30 /* GraphViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphViewController.h; sourceTree = "<group>"; };
 		FB620C1315470EC400C45A30 /* GraphViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GraphViewController.m; sourceTree = "<group>"; };
-		FB810C5716139D8A00081B75 /* icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-72.png"; sourceTree = "<group>"; };
-		FB810C5916139DDB00081B75 /* icon-144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-144.png"; sourceTree = "<group>"; };
-		FB810C5B16139DE200081B75 /* icon-144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-144.png"; sourceTree = "<group>"; };
 		FB8EE93C153DFE45009BEE0E /* bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bg@2x.png"; sourceTree = "<group>"; };
 		FB8EE93F153E24E9009BEE0E /* tab-rate-inactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tab-rate-inactive.png"; sourceTree = "<group>"; };
 		FB8EE943153E2662009BEE0E /* tab-settings-inactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tab-settings-inactive.png"; sourceTree = "<group>"; };
@@ -533,9 +521,6 @@
 		FBF0954F152BA7BC00B00AA6 /* RootSupportController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootSupportController.h; sourceTree = "<group>"; };
 		FBF09550152BA7BC00B00AA6 /* RootSupportController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootSupportController.m; sourceTree = "<group>"; };
 		FBF09551152BA7BC00B00AA6 /* RootSupportController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootSupportController.xib; sourceTree = "<group>"; };
-		FBF13A84161DF5ED007DB490 /* eulaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eulaViewController.h; sourceTree = "<group>"; };
-		FBF13A85161DF5ED007DB490 /* eulaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = eulaViewController.m; sourceTree = "<group>"; };
-		FBF13A86161DF5ED007DB490 /* eulaViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = eulaViewController.xib; sourceTree = "<group>"; };
 		FBF4B6BF156D2CE800D6FAF5 /* SGraphDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGraphDataSource.h; sourceTree = "<group>"; };
 		FBF4B6C0156D2CE800D6FAF5 /* SGraphDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SGraphDataSource.m; sourceTree = "<group>"; };
 		FBF4B6C5156D309C00D6FAF5 /* SGraphViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGraphViewController.h; sourceTree = "<group>"; };
@@ -564,8 +549,6 @@
 		FBF4B787157D031C00D6FAF5 /* Symbol_Square.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Symbol_Square.png; sourceTree = "<group>"; };
 		FBF4B788157D031C00D6FAF5 /* Symbol_Triangle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Symbol_Triangle.png; sourceTree = "<group>"; };
 		FBF4B7B0157E517900D6FAF5 /* ChartOptionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ChartOptionsViewController.xib; path = ../ChartOptionsViewController.xib; sourceTree = "<group>"; };
-		FBF6CD4415D56AED00B51908 /* PDFDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDFDataSource.h; sourceTree = "<group>"; };
-		FBF6CD4515D56AED00B51908 /* PDFDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDFDataSource.m; sourceTree = "<group>"; };
 		FBF710201592598C004728D9 /* NotesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotesTableViewController.h; sourceTree = "<group>"; };
 		FBF710211592598D004728D9 /* NotesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotesTableViewController.m; sourceTree = "<group>"; };
 		FBF7103115936B80004728D9 /* tab-legend.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tab-legend.png"; sourceTree = "<group>"; };
@@ -724,7 +707,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F5DE80015C8E64E00F5FD5B /* ShinobiCharts.framework in Frameworks */,
 				FBE9A68C15C34600004BDAD1 /* libFlurry.a in Frameworks */,
 				FBE9A60315C2FBE4004BDAD1 /* libz.dylib in Frameworks */,
 				FBE9A60115C2FBDC004BDAD1 /* libharu.a in Frameworks */,
@@ -797,9 +779,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				FB810C5B16139DE200081B75 /* icon-144.png */,
-				FB810C5716139D8A00081B75 /* icon-72.png */,
-				1FA03B3915CC384600DF7EE8 /* chart.png */,
+				62B09AF5162C626000E89A9D /* Default-568h@2x.png */,
 				FBFDA47115B4B55D00C20E18 /* icon-mt-114x114.png */,
 				FBFDA47015B4943800C20E18 /* T2 Mood Tracker.entitlements */,
 				FE8F1130133CF8FB000022D0 /* iconx2.png */,
@@ -842,7 +822,6 @@
 				FBE9A0C415C1FEA7004BDAD1 /* libz.dylib */,
 				FEE9B2CD12CA608D000AD5EF /* libCorePlot.a */,
 				FE7F645712CBE3B8001AB494 /* libFlurry.a */,
-				1F5DE7FF15C8E64E00F5FD5B /* ShinobiCharts.framework */,
 				FBD06A53159BC32400FD28A9 /* QuickLook.framework */,
 				FB965472155182C900F80E27 /* OpenGLES.framework */,
 				FE6F3CC812C109FF00357BEF /* CoreData.framework */,
@@ -924,7 +903,6 @@
 		FBDF39E3157FC28100E74F12 /* About */ = {
 			isa = PBXGroup;
 			children = (
-				FBF09551152BA7BC00B00AA6 /* RootSupportController.xib */,
 				FE2CB65412C8E813009E418B /* AboutViewController.h */,
 				FE2CB65512C8E813009E418B /* AboutViewController.m */,
 				FE2CB65612C8E813009E418B /* AboutViewController.xib */,
@@ -1025,8 +1003,6 @@
 				FBD06A40159B7FE900FD28A9 /* PDFImageConverter.m */,
 				FBD06A5A159CC26900FD28A9 /* ChartPrintDataSource.h */,
 				FBD06A5B159CC26900FD28A9 /* ChartPrintDataSource.m */,
-				FBF6CD4415D56AED00B51908 /* PDFDataSource.h */,
-				FBF6CD4515D56AED00B51908 /* PDFDataSource.m */,
 			);
 			name = ViewDetails;
 			sourceTree = "<group>";
@@ -1072,6 +1048,7 @@
 				1F5DE7E915C8BC9C00F5FD5B /* WebView */,
 				FBF0954F152BA7BC00B00AA6 /* RootSupportController.h */,
 				FBF09550152BA7BC00B00AA6 /* RootSupportController.m */,
+				FBF09551152BA7BC00B00AA6 /* RootSupportController.xib */,
 				FBDF39FE157FCE6C00E74F12 /* OutReach */,
 				FBDF39E3157FC28100E74F12 /* About */,
 				FBDF39E6157FC2BC00E74F12 /* Help */,
@@ -1378,16 +1355,6 @@
 			path = libpng;
 			sourceTree = "<group>";
 		};
-		FBF13A80161DF56D007DB490 /* EULA */ = {
-			isa = PBXGroup;
-			children = (
-				FBF13A84161DF5ED007DB490 /* eulaViewController.h */,
-				FBF13A85161DF5ED007DB490 /* eulaViewController.m */,
-				FBF13A86161DF5ED007DB490 /* eulaViewController.xib */,
-			);
-			name = EULA;
-			sourceTree = "<group>";
-		};
 		FBF4B72C1577DEAF00D6FAF5 /* Symbols */ = {
 			isa = PBXGroup;
 			children = (
@@ -1449,7 +1416,6 @@
 		FE6F393E12BFE6E100357BEF /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				FB810C5916139DDB00081B75 /* icon-144.png */,
 				FBF4B72C1577DEAF00D6FAF5 /* Symbols */,
 				FB9654791554367100F80E27 /* moodtracker-logo-sm.png */,
 				FB965477155434D300F80E27 /* Default@2x.png */,
@@ -1520,7 +1486,6 @@
 		FE6F3C8912C1056500357BEF /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				FBF13A80161DF56D007DB490 /* EULA */,
 				FBE99E7B15C1F245004BDAD1 /* PDFGeneration */,
 				FBDF39EF157FC43E00E74F12 /* Rate */,
 				FBDF39ED157FC3AA00E74F12 /* Results */,
@@ -1870,11 +1835,6 @@
 				1F5DE7EE15C8BCDC00F5FD5B /* WebViewController.xib in Resources */,
 				1F5DE7F315C8BDE700F5FD5B /* Template_iPAD.xib in Resources */,
 				1F5DE7F515C8BE5800F5FD5B /* WebViewController_iPad.xib in Resources */,
-				1FA03B3A15CC384600DF7EE8 /* chart.png in Resources */,
-				FB810C5816139D8B00081B75 /* icon-72.png in Resources */,
-				FB810C5A16139DDB00081B75 /* icon-144.png in Resources */,
-				FB810C5C16139DE500081B75 /* icon-144.png in Resources */,
-				FBF13A88161DF5ED007DB490 /* eulaViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1950,8 +1910,6 @@
 				FB496CCA15B8A6D5001B16A4 /* VAS002.xcdatamodeld in Sources */,
 				FBE9A69015C34683004BDAD1 /* PDFService.m in Sources */,
 				1F5DE7ED15C8BCDC00F5FD5B /* WebViewController.m in Sources */,
-				FBF6CD4615D56AED00B51908 /* PDFDataSource.m in Sources */,
-				FBF13A87161DF5ED007DB490 /* eulaViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2059,11 +2017,11 @@
 			buildSettings = {
 				ADDITIONAL_SDKS = "";
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: andy flynn (B54H98U83H)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: andy flynn (B54H98U83H)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
 					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
@@ -2076,17 +2034,15 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "VAS002-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = "T2 Mood Tracker";
 				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -2096,11 +2052,11 @@
 			buildSettings = {
 				ADDITIONAL_SDKS = "";
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: andy flynn";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
 					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
@@ -2109,17 +2065,15 @@
 				GCC_PREFIX_HEADER = VAS002_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "VAS002-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = "T2 Mood Tracker";
-				PROVISIONING_PROFILE = "79F330AF-3CB6-43AE-B5AE-254B545848D1";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -2143,7 +2097,7 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1.2;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-all_load",
@@ -2167,7 +2121,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1.2;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -2180,111 +2134,6 @@
 				SDKROOT = iphoneos;
 			};
 			name = Release;
-		};
-		FB810C511613968F00081B75 /* Distribution */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ADDITIONAL_SDKS = "/Library/SDKs/CorePlotSDK/${PLATFORM_NAME}.sdk";
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-all_load",
-					"-lCorePlot",
-				);
-				PREBINDING = NO;
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos;
-			};
-			name = Distribution;
-		};
-		FB810C521613968F00081B75 /* Distribution */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ADDITIONAL_SDKS = "";
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: andy flynn";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../ShinobiCharts\"",
-					"\"$(SRCROOT)\"",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = VAS002_Prefix.pch;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				INFOPLIST_FILE = "VAS002-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../ShinobiCharts\"",
-					"\"$(SRCROOT)\"",
-				);
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = "T2 Mood Tracker";
-				PROVISIONING_PROFILE = "79F330AF-3CB6-43AE-B5AE-254B545848D1";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Distribution;
-		};
-		FB810C531613968F00081B75 /* Distribution */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ADDITIONAL_SDKS = "";
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-all_load",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Distribution;
-		};
-		FB810C541613968F00081B75 /* Distribution */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ADDITIONAL_SDKS = "";
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-all_load",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Distribution;
 		};
 		FBE9A58A15C2F6D7004BDAD1 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2311,7 +2160,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -2334,7 +2182,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -2357,7 +2204,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 			};
 			name = AdHoc;
 		};
@@ -2386,7 +2232,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -2409,7 +2254,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -2432,7 +2276,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
 			};
 			name = AdHoc;
 		};
@@ -2449,7 +2292,7 @@
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_SHADOW = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1.2;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -2468,11 +2311,12 @@
 			buildSettings = {
 				ADDITIONAL_SDKS = "";
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: andy flynn (B54H98U83H)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: andy flynn (B54H98U83H)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/../../../../Downloads/ShinobiCharts\"",
 					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
@@ -2482,10 +2326,9 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "VAS002-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../ShinobiCharts\"",
 					"\"$(SRCROOT)\"",
 				);
 				OTHER_LDFLAGS = "";
@@ -2506,7 +2349,6 @@
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
 				1D6058950D05DD3E006BFB54 /* Release */,
-				FB810C521613968F00081B75 /* Distribution */,
 				FE0A14A0130EEFF30013D958 /* AdHoc */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2517,7 +2359,6 @@
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
 				C01FCF5008A954540054247B /* Release */,
-				FB810C511613968F00081B75 /* Distribution */,
 				FE0A149F130EEFF30013D958 /* AdHoc */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2528,7 +2369,6 @@
 			buildConfigurations = (
 				FBE9A58A15C2F6D7004BDAD1 /* Debug */,
 				FBE9A58B15C2F6D7004BDAD1 /* Release */,
-				FB810C531613968F00081B75 /* Distribution */,
 				FBE9A58C15C2F6D7004BDAD1 /* AdHoc */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2539,7 +2379,6 @@
 			buildConfigurations = (
 				FBE9A5A815C2FB0D004BDAD1 /* Debug */,
 				FBE9A5A915C2FB0D004BDAD1 /* Release */,
-				FB810C541613968F00081B75 /* Distribution */,
 				FBE9A5AA15C2FB0D004BDAD1 /* AdHoc */,
 			);
 			defaultConfigurationIsVisible = 0;

@@ -1,13 +1,34 @@
-//
-//  SymbolViewController.m
-//  VAS002
-//
-//  Created by Melvin Manzano on 6/12/12.
-//  Copyright (c) 2012 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "SymbolViewController.h"
-#import "ChartOptionsViewController.h"
 
 @interface SymbolViewController ()
 
@@ -38,7 +59,7 @@
         _isSub = YES;
     }
     
-   // NSLog(@"symbol view groupName: %@ sub name: %@", groupName, subName);
+    NSLog(@"groupName: %@", groupName);
     
     NSString *dictName = @"LEGEND_SYMBOL_DICTIONARY";
     
@@ -52,11 +73,9 @@
     NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:dictName]];
     UIImage *image;
     
-   //NSLog(@"tSymbolDict:%@", tSymbolDict);
-    
     if (_isSub) 
     {
-        NSDictionary *tSubSymbolDict = [NSDictionary dictionaryWithDictionary:[tSymbolDict objectForKey:groupName]];
+        NSDictionary *tSubSymbolDict = [NSDictionary dictionaryWithDictionary:[tSymbolDict objectForKey:subName]];
         image = [self UIImageForIndex:[[tSubSymbolDict objectForKey:subName] intValue]];
         
         
@@ -82,30 +101,13 @@
 {
     //int count = [self.navigationController.viewControllers count];
     // [self.navigationController popToViewController:[self.navigationController.viewControllers objectAtIndex:count-2]];
-    
+    NSLog(@"gufaw");
     NSArray *buh = self.navigationController.viewControllers;
     NSMutableArray *VCs = [NSMutableArray arrayWithArray:buh];
-    [VCs removeObjectAtIndex:[VCs count] -2];
+    [VCs removeObjectAtIndex:[VCs count] - 2];
     self.navigationController.viewControllers = VCs;
+    
     [self.navigationController popViewControllerAnimated:YES];
-     
-    /*
-    ChartOptionsViewController *chartOptionsViewController = [[ChartOptionsViewController alloc] initWithNibName:@"ChartOptionsViewController" bundle:nil];
-    if (_isSub) 
-    {
-        chartOptionsViewController.editGroupName = groupName;
-
-    }
-    else 
-    {
-        //chartOptionsViewController.editGroupName = groupName;
-
-    }
-    
-    [self.navigationController pushViewController:chartOptionsViewController animated:YES];
-    
-    [chartOptionsViewController release];
-     */
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification 
@@ -116,12 +118,12 @@
         //iPad
         if(device.orientation == UIDeviceOrientationLandscapeLeft || device.orientation == UIDeviceOrientationLandscapeRight)
         {
-          //  NSLog(@"ipad land");
+            NSLog(@"ipad land");
             
         }
         else 
         {
-           // NSLog(@"ipad portrait");
+            NSLog(@"ipad portrait");
             
         }
         
@@ -131,12 +133,12 @@
         //iPhone
         if (device.orientation == UIDeviceOrientationPortrait || device.orientation == UIDeviceOrientationPortraitUpsideDown) 
         {
-         //   NSLog(@"iphone portrait");
+            NSLog(@"iphone portrait");
             
         }
         else if(device.orientation == UIDeviceOrientationLandscapeLeft || device.orientation == UIDeviceOrientationLandscapeRight)
         {
-          //  NSLog(@"iphone land");
+            NSLog(@"iphone land");
             
         }
         
@@ -166,7 +168,7 @@
     
     if (_isSub) 
     {
-        //NSLog(@"sub");
+        NSLog(@"sub");
         NSMutableDictionary *tSubSymbolDict = [NSMutableDictionary dictionaryWithDictionary:[tSymbolDict objectForKey:groupName]];
         
         [tSubSymbolDict setObject:[NSString stringWithFormat:@"%i", tag] forKey:subName];
@@ -174,7 +176,7 @@
     }
     else 
     {
-      //  NSLog(@"nosub");
+        NSLog(@"nosub");
         
         [tSymbolDict setValue:[NSString stringWithFormat:@"%i", tag] forKey:groupName];
     }

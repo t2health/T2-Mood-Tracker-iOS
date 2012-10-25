@@ -39,18 +39,18 @@
 			</object>
 			<object class="IBUIView" id="123004066">
 				<reference key="NSNextResponder"/>
-				<int key="NSvFlags">274</int>
+				<int key="NSvFlags">258</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="IBUIView" id="106244237">
 						<reference key="NSNextResponder" ref="123004066"/>
-						<int key="NSvFlags">306</int>
+						<int key="NSvFlags">290</int>
 						<object class="NSMutableArray" key="NSSubviews">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBUITextView" id="518004118">
 								<reference key="NSNextResponder" ref="106244237"/>
 								<int key="NSvFlags">274</int>
-								<string key="NSFrame">{{6, 20}, {297, 140}}</string>
+								<string key="NSFrame">{{6, 27}, {297, 157}}</string>
 								<reference key="NSSuperview" ref="106244237"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="888282173"/>
@@ -66,14 +66,14 @@
 								<string key="IBUIText"/>
 								<object class="IBUITextInputTraits" key="IBUITextInputTraits">
 									<int key="IBUIAutocapitalizationType">2</int>
-									<int key="IBUIReturnKeyType">6</int>
+									<int key="IBUIReturnKeyType">9</int>
 									<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								</object>
 								<object class="IBUIFontDescription" key="IBUIFontDescription">
 									<int key="type">1</int>
 									<double key="pointSize">14</double>
 								</object>
-								<object class="NSFont" key="IBUIFont" id="569141364">
+								<object class="NSFont" key="IBUIFont">
 									<string key="NSName">Helvetica</string>
 									<double key="NSSize">14</double>
 									<int key="NSfFlags">16</int>
@@ -82,7 +82,7 @@
 							<object class="IBUIButton" id="400651942">
 								<reference key="NSNextResponder" ref="106244237"/>
 								<int key="NSvFlags">289</int>
-								<string key="NSFrame">{{277, 0}, {17, 19}}</string>
+								<string key="NSFrame">{{271, 0}, {24, 24}}</string>
 								<reference key="NSSuperview" ref="106244237"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="518004118"/>
@@ -118,7 +118,7 @@
 								</object>
 							</object>
 						</object>
-						<string key="NSFrame">{{6, 7}, {308, 167}}</string>
+						<string key="NSFrame">{{6, 7}, {308, 190}}</string>
 						<reference key="NSSuperview" ref="123004066"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="400651942"/>
@@ -190,7 +190,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 					<object class="IBUILabel" id="888282173">
 						<reference key="NSNextResponder" ref="123004066"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{20, 7}, {262, 17}}</string>
+						<string key="NSFrame">{{20, 7}, {262, 24}}</string>
 						<reference key="NSSuperview" ref="123004066"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="297183832"/>
@@ -209,9 +209,13 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 							<string key="name">Helvetica</string>
 							<string key="family">Helvetica</string>
 							<int key="traits">0</int>
-							<double key="pointSize">14</double>
+							<double key="pointSize">18</double>
 						</object>
-						<reference key="IBUIFont" ref="569141364"/>
+						<object class="NSFont" key="IBUIFont">
+							<string key="NSName">Helvetica</string>
+							<double key="NSSize">18</double>
+							<int key="NSfFlags">16</int>
+						</object>
 					</object>
 				</object>
 				<string key="NSFrameSize">{320, 419}</string>
@@ -4734,8 +4738,8 @@ AAgAAAAIAAIACAACAAAAAgAAAAEAAQABAAE</bytes>
 						<reference key="object" ref="106244237"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="400651942"/>
 							<reference ref="518004118"/>
+							<reference ref="400651942"/>
 						</object>
 						<reference key="parent" ref="123004066"/>
 						<string key="objectName">BackShadow</string>

@@ -1,13 +1,34 @@
-//
-//  ChartOptionsViewController.m
-//  VAS002
-//
-//  Created by Melvin Manzano on 5/24/12.
-//  Copyright (c) 2012 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "SChartOptionsViewController.h"
-
 #import "GroupsViewController.h"
 #import "FlurryUtility.h"
 #import "VASAnalytics.h"
@@ -23,9 +44,11 @@
 @implementation SChartOptionsViewController
 
 @synthesize managedObjectContext;
+@synthesize fetchedResultsController;
 @synthesize switchDictionary;
+@synthesize groupsDictionary;
 @synthesize _tableView, pickerView, userSettingsDictionary;
-@synthesize colorPicker, symbolPicker , editGroupName;
+@synthesize colorPicker, symbolPicker, colorsDictionary, symbolsDictionary, editGroupName;
 @synthesize scalesDictionary;
 @synthesize scalesArray, ledgendColorsDictionary, groupName;
 
@@ -36,7 +59,7 @@ int editWhat;
 - (void)viewDidLoad {
     [super viewDidLoad];
     _tableView.backgroundView = nil;
-    
+
     // Default to color
     editWhat = 0;
 	pickerView.hidden = YES;
@@ -46,49 +69,44 @@ int editWhat;
 	self.managedObjectContext = appDelegate.managedObjectContext;
     
 	self.title = @"Customize Charting";
-
-   //[self fillScalesDictionary];
-
+    // [_tableView setBackgroundView:nil];
+    //  [_tableView setBackgroundView:[[[UIView alloc] init] autorelease]];
+    // [_tableView setBackgroundColor:UIColor.clearColor];
+    
+	
 	[FlurryUtility report:EVENT_EDIT_GROUP_ACTIVITY];
-    
-    // NavBar Button
-    
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-
-   // NSLog(@"groupName: %@", self.groupName);
     [self fillScalesDictionary];
+	[self fillGroupsDictionary];
+    [self fillColors];
+    [self fillSymbols];
+    
 	//[_tableView reloadData];
 }
 
 - (void)viewDidUnload {
+	self.fetchedResultsController = nil;
 }
 
+#pragma mark Create dictionaries
 
+- (void)fillGroupsDictionary {
+	NSArray *groupsArray = [[self fetchedResultsController] fetchedObjects];
+	
+	self.groupsDictionary = nil;
+	self.groupsDictionary = [NSMutableDictionary dictionary];
+	
+	for (Group *aGroup in groupsArray) {
+		[self.groupsDictionary setObject:aGroup forKey:aGroup.title];
+	}
+}
 
 // Called from ColorPicker
 - (void)refreshTable
 {
     [_tableView reloadData];
-}
-
-- (void)popToGroups
-{
-    NSLog(@"pop");
-    NSArray *buh = self.navigationController.viewControllers;
-    NSMutableArray *VCs = [NSMutableArray arrayWithArray:buh];
-
-    NSLog(@"buh:%@", buh);
-    for (int i = buh.count-1; i > 1; i--) 
-    {
-        [VCs removeObjectAtIndex:i];
-    }
-    self.navigationController.viewControllers = VCs;
-    
-    [self.navigationController popViewControllerAnimated:NO];
-    
 }
 
 #pragma mark colors
@@ -125,7 +143,22 @@ int editWhat;
 	return color;
 }
 
-
+- (void)fillColors {
+	if (self.colorsDictionary == nil) {
+		self.colorsDictionary = [NSMutableDictionary dictionary];
+		
+		NSArray *objects = [self.groupsDictionary allKeys];
+		NSInteger index = 0;
+		
+		for (NSString *groupTitle in objects) {
+			UIColor *color = [self UIColorForIndex:index];
+			[self.colorsDictionary setObject:color forKey:groupTitle];
+			index++;
+		}
+	}
+    
+    // NSLog(@"colorDict: %@", ledgendColorsDictionary);
+}
 
 -(UIImage *)UIImageForIndex:(NSInteger)index {
 	NSArray *imageArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"Symbol_Clover.png"], [UIImage imageNamed:@"Symbol_Club.png"], [UIImage imageNamed:@"Symbol_Cross.png"], [UIImage imageNamed:@"Symbol_Davidstar.png"], [UIImage imageNamed:@"Symbol_Diamondclassic.png"], [UIImage imageNamed:@"Symbol_Diamondring.png"], [UIImage imageNamed:@"Symbol_Doublehook.png"], [UIImage imageNamed:@"Symbol_Fivestar.png"], [UIImage imageNamed:@"Symbol_Heart.png"], [UIImage imageNamed:@"Symbol_Triangle.png"], [UIImage imageNamed:@"Symbol_Circle.png"], [UIImage imageNamed:@"Symbol_Hourglass.png"], [UIImage imageNamed:@"Symbol_Moon.png"], [UIImage imageNamed:@"Symbol_Skew.png"], [UIImage imageNamed:@"Symbol_Pentagon.png"], [UIImage imageNamed:@"Symbol_Spade.png"], nil];
@@ -159,6 +192,24 @@ int editWhat;
 	return image;
 }
 
+- (void)fillSymbols
+{
+	if (self.symbolsDictionary == nil) {
+		self.symbolsDictionary = [NSMutableDictionary dictionary];
+		
+		NSArray *objects = [self.groupsDictionary allKeys];
+		NSInteger index = 0;
+		
+		for (NSString *groupTitle in objects) {
+            
+			UIImage *image = [self UIImageForIndex:index];
+            
+			[self.symbolsDictionary setObject:image forKey:groupTitle];
+			index++;
+		}
+	}    
+    // NSLog(@"symbolsDictionary: %@", symbolsDictionary);
+}
 
 
 
@@ -209,7 +260,7 @@ int editWhat;
     controller.groupName = groupName;
     controller.subName = editGroupName;
     controller.delegate = self;
-    [self.navigationController pushViewController:controller animated:NO];
+    [self.navigationController pushViewController:controller animated:YES];
     
 }
 
@@ -300,8 +351,6 @@ int editWhat;
 		NSError *error = nil;
 		NSArray *objects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
 		if (!error) {
-            
-            
 			for (Scale *aScale in objects) {
 				[scales setObject:aScale forKey:aScale.minLabel];
 			}
@@ -312,20 +361,9 @@ int editWhat;
 			
 			NSMutableArray *sclArray = [NSMutableArray array];
 			for (NSString *minLabel in sortedKeys) {
-                if ([minLabel isEqualToString:@""]) 
-                {
-                    
-                }
-                else 
-                {
-                    [sclArray addObject:[self.scalesDictionary objectForKey:minLabel]];
-                    
-                }
-                
+				[sclArray addObject:[self.scalesDictionary objectForKey:minLabel]];
 			}
 			self.scalesArray = [NSArray arrayWithArray:sclArray];
-            NSLog(@"scalesArray: '%@'",scalesArray);
-            
 		}
 		else {
 			[Error showErrorByAppendingString:@"Unable to fetch scale data" withError:error];
@@ -348,31 +386,33 @@ int editWhat;
 #pragma mark Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-
+	NSInteger numberOfSections = [[[self fetchedResultsController] sections] count];
+    // NSLog(@"sections: %i", numberOfSections);
     
-	return 1;
+	return numberOfSections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    
-	NSInteger numberOfRows = [self.scalesArray count];
-    
-    
-    
+	NSInteger numberOfRows = [self.scalesDictionary count];
 	return numberOfRows;
     
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {	
+	NSArray *sections = [[self fetchedResultsController] sections];
+	NSString *sectionName = [[sections objectAtIndex:section] name];
+	return sectionName;
+}
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     // NSLog(@"indexpath");
     
-    //static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"Cell";
     
     // Perm fix for tableview WEIRD Bug from v2.0; 5/15/2012 Mel Manzano
-    NSString *CellIdentifier = [NSString stringWithFormat:@"Cell %d, %d", indexPath.row, indexPath.section];
+    //NSString *CellIdentifier = [NSString stringWithFormat:@"Cell %d, %d", indexPath.row, indexPath.section];
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
@@ -391,59 +431,48 @@ int editWhat;
     
     
 	NSInteger row = [indexPath indexAtPosition:1];
-    NSLog(@"row: '%i'",row);
-    
-    
-    
+	
 	Scale *scale = [self.scalesArray objectAtIndex:row];
 	//NSString *gName = [NSString stringWithFormat:@"%@/%@", scale.minLabel, scale.maxLabel];
-    if ([scale.minLabel isEqualToString:@""]) 
-    {
-        
-    }
-    else 
-    {
-        
-        
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        
-        
-        NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]];
-        NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]];
-        
-        NSDictionary *symbolDictionary = [tSymbolDict objectForKey:self.groupName];
-        NSDictionary *colorDictionary = [tColorDict objectForKey:self.groupName];
-        
-        
-        
-        // the image
-        UIImage *image = [self UIImageForIndex:[[symbolDictionary objectForKey:scale.minLabel] intValue]];
-        // the color
-        NSData *data = [colorDictionary objectForKey:scale.minLabel];
-        
-        UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-        
-        
-        UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.frame = CGRectMake(200, 20, 43, 43);
-        [button setBackgroundImage:[self imageNamed:image withColor:color] forState:UIControlStateNormal];
-        [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
-        button.titleLabel.text = scale.minLabel;
-        button.titleLabel.hidden = YES;
-        cell.accessoryView = button;
-        
-        
-        cell.textLabel.text = scale.minLabel;
-        cell.textLabel.textColor = color;
-        cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
-        
-        
-        cell.detailTextLabel.text = scale.maxLabel;
-        cell.detailTextLabel.textColor = color;
-        cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:14];
-        
-        cell.textLabel.textAlignment = UITextAlignmentRight;
-    }
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    
+    NSDictionary *tSymbolDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_SYMBOL_DICTIONARY"]];
+    NSDictionary *tColorDict = [NSDictionary dictionaryWithDictionary:[defaults objectForKey:@"LEGEND_SUB_COLOR_DICTIONARY"]];
+    
+    NSDictionary *symbolDictionary = [tSymbolDict objectForKey:self.groupName];
+    NSDictionary *colorDictionary = [tColorDict objectForKey:self.groupName];
+    
+    
+    
+    // the image
+    UIImage *image = [self UIImageForIndex:[[symbolDictionary objectForKey:scale.minLabel] intValue]];
+    // the color
+    NSData *data = [colorDictionary objectForKey:scale.minLabel];
+    
+    UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    
+    UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(200, 20, 43, 43);
+    [button setBackgroundImage:[self imageNamed:image withColor:color] forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
+    button.titleLabel.text = scale.minLabel;
+    button.titleLabel.hidden = YES;
+    cell.accessoryView = button;
+    
+    
+    cell.textLabel.text = scale.minLabel;
+	cell.textLabel.textColor = color;
+	cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
+    
+	
+	cell.detailTextLabel.text = scale.maxLabel;
+	cell.detailTextLabel.textColor = color;
+    cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:14];
+    
+	cell.textLabel.textAlignment = UITextAlignmentRight;
 }
 
 - (UIImage *)imageNamed:(UIImage *)name withColor:(UIColor *)color
@@ -489,6 +518,63 @@ int editWhat;
 }
 
 
+#pragma mark group methods
+
+
+-(void)switchFlipped:(id)sender {
+	NSEnumerator *enumerator = [self.switchDictionary keyEnumerator];
+	id key;
+	
+	UISwitch *currentValue;
+	NSString *switchTitle = @"";
+	while ((key = [enumerator nextObject])) {
+		currentValue = [self.switchDictionary objectForKey:key];
+		if (currentValue == sender) {
+			switchTitle = key;
+			Group *aGroup = [self.groupsDictionary objectForKey:switchTitle];
+            
+			UISwitch *theSwitch = (UISwitch *)currentValue;
+			BOOL isOn = theSwitch.on;
+            
+			if ([self numberSwitchesOn] > 0) {
+				NSNumber *isOnNumber = [NSNumber numberWithBool:isOn];
+				aGroup.visible = isOnNumber;
+				NSString *flurryKey = EVENT_GROUP_ACTIVATED;
+				if (aGroup.visible ==  NO) {
+					flurryKey = EVENT_GROUP_DEACTIVATED;
+				}
+				NSDictionary *usrDict = [NSDictionary dictionaryWithObjectsAndKeys:aGroup.title,flurryKey, nil];
+				[FlurryUtility report:flurryKey withData:usrDict];
+				
+				NSError *error = nil;
+				if (![self.managedObjectContext save:&error]) {
+					[Error showErrorByAppendingString:@"Unable to save Category edits." withError:error];
+				}
+				break;
+			}
+			else {
+				theSwitch.on = YES;
+				NSString *titleString = [NSString stringWithFormat:@"Minimum Categories"];
+				UIAlertView *immutableAlert = [[UIAlertView alloc]initWithTitle:titleString message:@"You must have at least one Category on." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+				[immutableAlert show];
+				[immutableAlert release];
+			}			
+		}
+	}	
+}
+
+- (NSInteger) numberSwitchesOn {
+	NSInteger numberOn = 0;
+	
+	for (NSString *switchTitle in self.switchDictionary) {
+		UISwitch *currentSwitch = [self.switchDictionary objectForKey:switchTitle];
+		if (currentSwitch.on == YES) {
+			numberOn++;
+		}
+	}
+	
+	return numberOn;
+}
 
 #pragma mark Table view delegate
 
@@ -510,6 +596,53 @@ int editWhat;
     return NO;
 }
 
+#pragma mark Fetched results controller
+
+/**
+ Returns the fetched results controller. Creates and configures the controller if necessary.
+ */
+- (SafeFetchedResultsController *)fetchedResultsController {
+    if (fetchedResultsController != nil) {
+        return fetchedResultsController;
+    }
+	
+	// Create and configure a fetch request with the Group entity.
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Group" inManagedObjectContext:self.managedObjectContext];
+	[fetchRequest setEntity:entity];
+	
+	// Create the sort descriptors array.
+	NSSortDescriptor *sectionTitleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"section" ascending:YES];
+    //	NSSortDescriptor *titleDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES];
+	NSSortDescriptor *menuIndexDescriptor = [[NSSortDescriptor alloc] initWithKey:@"menuIndex" ascending:YES];
+	
+	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sectionTitleDescriptor, menuIndexDescriptor, nil];
+	[fetchRequest setSortDescriptors:sortDescriptors];
+	
+	//Create predicate
+	NSString *showGraphPredicateString = [NSString stringWithFormat:@"rateable = YES"];
+	NSPredicate *showGraphPredicate = [NSPredicate predicateWithFormat:showGraphPredicateString];
+	
+    [NSFetchedResultsController deleteCacheWithName:nil]; 
+	[fetchRequest setPredicate:showGraphPredicate];
+	
+	// Create and initialize the fetch results controller.
+	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
+									 self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
+	self.fetchedResultsController.safeDelegate = self;
+	
+	[sectionTitleDescriptor autorelease];
+	[menuIndexDescriptor autorelease];
+	[sortDescriptors  autorelease];
+	[fetchRequest autorelease];
+    
+	NSError *error = nil;
+	if (![[self fetchedResultsController] performFetch:&error]) {
+		[Error showErrorByAppendingString:@"Unable to fetch data for groups." withError:error];
+	}
+    
+	return self.fetchedResultsController;
+}    
 
 #pragma mark Memory management
 
@@ -517,8 +650,11 @@ int editWhat;
 	// Not sure why I have to explicitly set the delegate to nil, but if I don'tthe delegate will 
 	// persist even after the View Controller has been deallocated.
 	//[_tableView release];
+	self.fetchedResultsController.delegate = nil;
+	[self.fetchedResultsController release];
 	[self.managedObjectContext release];
 	[self.switchDictionary release];
+	[self.groupsDictionary release];
 	
     [super dealloc];
 }

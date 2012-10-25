@@ -1,10 +1,32 @@
-//
-//  ReminderSettingsViewController.m
-//  VAS002
-//
-//  Created by Hasan Edain on 1/13/11.
-//  Copyright 2011 GDIT. All rights reserved.
-//
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 
 #import "ReminderSettingsViewController.h"
 #import "HourSelectorViewController.h"
@@ -31,7 +53,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    table.backgroundView = nil;
+	
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 	
@@ -331,42 +353,6 @@
 			break;
 	}
 	return sectionName;
-}
-
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
-    NSLog(@"***** FUNCTION %s *****", __FUNCTION__);
-    
-    // create the parent view that will hold header Label
-	UIView* customView = [[[UIView alloc] initWithFrame:CGRectMake(10.0, 0.0, 300.0, 44.0)] autorelease];
-	
-	// create the button object
-	UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-	headerLabel.backgroundColor = [UIColor clearColor];
-	headerLabel.opaque = NO;
-	headerLabel.textColor = [UIColor whiteColor];
-	headerLabel.highlightedTextColor = [UIColor whiteColor];
-	headerLabel.font = [UIFont boldSystemFontOfSize:20];
-	headerLabel.frame = CGRectMake(10.0, 0.0, 300.0, 44.0);
-    
-	// If you want to align the header text as centered
-	// headerLabel.frame = CGRectMake(150.0, 0.0, 300.0, 44.0);
-    
-    NSString *sectionName = @"";
-    if (section == 1) 
-    {
-        sectionName = @"Days(s)";
-    }
-    else
-    {
-        sectionName = @"Time(s)";
-    }
-    
-    headerLabel.text = sectionName;
-    
-	[customView addSubview:headerLabel];
-    [headerLabel release];
-	return customView;
 }
 
 // Customize the appearance of table view cells.
@@ -802,16 +788,14 @@
 - (void)addNotificationForDate:(NSDate *)date andMessage:(NSString *)message {
     Class notificationClass = (NSClassFromString(@"UILocalNotification"));
 	if (notificationClass != nil) {
-        
-        
 		UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-        
+	
 		localNotification.fireDate = date;
 		localNotification.alertBody = message;
 		localNotification.soundName = UILocalNotificationDefaultSoundName;
 		localNotification.applicationIconBadgeNumber = 1;
 		localNotification.repeatInterval = NSWeekCalendarUnit;
-        
+	
 		[[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
 		[localNotification release];
 	}
@@ -820,19 +804,19 @@
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-	[gregorian release];
+	[self.gregorian release];
 	
-	[morningReminderStateSwitch release];
-	[noonReminderStateSwitch release];
-	[eveningReminderStateSwitch release];
+	[self.morningReminderStateSwitch release];
+	[self.noonReminderStateSwitch release];
+	[self.eveningReminderStateSwitch release];
 	
-	[mondayReminderStateSwitch release];
-	[tuesdayReminderStateSwitch release];
-	[wednesdayReminderStateSwitch release];
-	[thursdayReminderStateSwitch release];
-	[fridayReminderStateSwitch release];
-	[saturdayReminderStateSwitch release];
-	[sundayReminderStateSwitch release];
+	[self.mondayReminderStateSwitch release];
+	[self.tuesdayReminderStateSwitch release];
+	[self.wednesdayReminderStateSwitch release];
+	[self.thursdayReminderStateSwitch release];
+	[self.fridayReminderStateSwitch release];
+	[self.saturdayReminderStateSwitch release];
+	[self.sundayReminderStateSwitch release];
 	
     [super dealloc];
 }

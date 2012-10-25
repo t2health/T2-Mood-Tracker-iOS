@@ -5,7 +5,35 @@
 //  Created by Melvin Manzano on 4/24/12.
 //  Copyright (c) 2012 GDIT. All rights reserved.
 //
-
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
 #import <CoreData/CoreData.h>
@@ -16,8 +44,6 @@
 #import "ShinobiCharts/ShinobiChart+Screenshot.h"
 #import <MessageUI/MFMailComposeViewController.h>
 #import <dispatch/dispatch.h>
-#import "HRColorPickerViewController.h"
-
 
 @class ViewNotesViewController;
 @class SubLegendTableViewController;
@@ -25,7 +51,7 @@
 @class OptionsTableViewController;
 
 
-@interface SGraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource, HRColorPickerViewControllerDelegate, HRColorPickerViewControllerDelegate> 
+@interface SGraphViewController : UIViewController <SChartDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UIGestureRecognizerDelegate, UIPickerViewDelegate, UIPickerViewDataSource> 
 {
     
     ShinobiChart            *chart;
@@ -48,6 +74,7 @@
     
     NSMutableDictionary *switchDictionary;
 	NSMutableDictionary *ledgendColorsDictionary;
+	NSDictionary *groupsDictionary;
     NSArray *groupsArray;
     NSDictionary *scalesDictionary;
 	NSArray *scalesArray;
@@ -59,6 +86,7 @@
     IBOutlet NotesTableViewController *notesTableViewController;
     IBOutlet OptionsTableViewController *optionsTableViewController;
     
+    NSMutableDictionary *symbolsDictionary;
     IBOutlet UITableView *_tableView;
     IBOutlet UIView *optionView;
     IBOutlet UISwitch *legendSwitch;
@@ -77,15 +105,12 @@
     
     IBOutlet UIBarButtonItem *doneButton;	// this button appears only when the date picker is open
     IBOutlet UIPickerView *rangePicker;
-    IBOutlet UIView *pickerView;
-    IBOutlet UIView *pickerView_iPad;
 
 }
 
 @property (nonatomic, retain) IBOutlet UIButton *legendButton;
 @property (nonatomic, retain) IBOutlet UIPickerView *rangePicker;
-@property (nonatomic, retain) IBOutlet UIView *pickerView;
-@property (nonatomic, retain) IBOutlet UIView *pickerView_iPad;
+
 @property (nonatomic, retain) IBOutlet UIView *menuView;
 @property (nonatomic, retain) IBOutlet UIView *containerView;
 @property (nonatomic, retain) IBOutlet UIView *graphView;
@@ -95,6 +120,7 @@
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSMutableDictionary *switchDictionary;
 @property (nonatomic, retain) NSMutableDictionary *ledgendColorsDictionary;
+@property (nonatomic, retain) NSDictionary *groupsDictionary;
 @property (nonatomic, retain) NSArray *groupsArray;
 @property (nonatomic, retain) IBOutlet UILabel *loadingLabel;
 @property (nonatomic, retain) NSString *groupName;
@@ -121,6 +147,7 @@
 @property (nonatomic, retain) IBOutlet UISwitch *legendSwitch;
 @property (nonatomic, retain) IBOutlet UISwitch *symbolSwitch;
 @property (nonatomic, retain) IBOutlet UISwitch *gradientSwitch;
+@property (nonatomic, retain) NSMutableDictionary *symbolsDictionary;
 
 @property (nonatomic, retain) IBOutlet UIView *legendView;
 
@@ -133,16 +160,16 @@
 - (void)updateGraphData;
 - (void)redrawGraph;
 
-- (void) imageTapped:(UITapGestureRecognizer *)gesture;
-
 - (void)optionButtonClicked;
 - (void)shareClick;
 
 - (void)createSwitches;
 - (void)switchFlipped:(id)sender;
 - (void)switchProcess;
+- (void)fillGroupsDictionary;
 - (void)fillScalesDictionary;
 - (void)fillColors;
+- (void)fillSymbols;
 - (void)fillOptions;
 
 - (void)saveToGallery;
@@ -153,8 +180,7 @@
 
 - (void)resignLegend;
 - (void)showButtons:(int)howMany;
-- (void) loadingSymbol;
-- (void) loadingGradient;
+
 
 - (void)legendToggle;
 - (void)symbolToggle;

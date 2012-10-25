@@ -3,9 +3,35 @@
 //  VAS002
 //
 //  Created by Melvin Manzano on 5/24/12.
-//  Copyright (c) 2012 GDIT. All rights reserved.
-//
-
+/*
+ *
+ * T2 Mood Tracker
+ *
+ * Copyright © 2009-2012 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright © 2009-2012 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2MoodTracker002
+ * Government Agency Original Software Title: T2 Mood Tracker
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.kayl2@us.army.mil
+ * Government Agency Point of Contact for Original Software: robert.kayl2@us.army.mil
+ *
+ */
 #import "ChartOptionsViewController.h"
 #import "SChartOptionsViewController.h"
 #import "GroupsViewController.h"
@@ -49,28 +75,20 @@ int editWhat;
     //  [_tableView setBackgroundView:[[[UIView alloc] init] autorelease]];
     // [_tableView setBackgroundColor:UIColor.clearColor];
     
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(popToGroups)];
-    backButton.title = @"Back";
-	self.navigationItem.leftBarButtonItem = backButton;
-    [backButton release];
+	
 	[FlurryUtility report:EVENT_EDIT_GROUP_ACTIVITY];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    
 	[self fillGroupsDictionary];
     [self fillColors];
     [self fillSymbols];
     
-	[_tableView reloadData];
+	//[_tableView reloadData];
 }
 
 - (void)viewDidUnload {
 	self.fetchedResultsController = nil;
-}
-- (void)popNav
-{
-    [self.navigationController popViewControllerAnimated:YES];
 }
 
 #pragma mark Create dictionaries
@@ -219,7 +237,7 @@ int editWhat;
     controller.subName = @"";
     controller.delegate = self;
     [self.navigationController pushViewController:controller animated:YES];
-
+    
 }
 
 - (void)checkButtonTapped:(id)sender event:(id)event
@@ -235,7 +253,9 @@ int editWhat;
     NSData *data = [tColorDict objectForKey:editGroupName];
     // the color
     UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
     [self openPicker:color];
+    
     
 }
 
@@ -345,10 +365,10 @@ int editWhat;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     // NSLog(@"indexpath");
     
-    //static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"Cell";
     
     // Perm fix for tableview WEIRD Bug from v2.0; 5/15/2012 Mel Manzano
-    NSString *CellIdentifier = [NSString stringWithFormat:@"Cell %d, %d", indexPath.row, indexPath.section];
+    //NSString *CellIdentifier = [NSString stringWithFormat:@"Cell %d, %d", indexPath.row, indexPath.section];
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
@@ -364,8 +384,7 @@ int editWhat;
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath 
 {	
-    self.fetchedResultsController.delegate = nil;
-    self.fetchedResultsController = nil;
+    
     
 	Group *group = [[self fetchedResultsController] objectAtIndexPath:indexPath];
 	cell.textLabel.text = group.title;
@@ -386,18 +405,14 @@ int editWhat;
     
     UIColor *color = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     
-    if (data != nil) 
-    {
-        UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.frame = CGRectMake(200, 20, 43, 43);
-        [button setBackgroundImage:[self imageNamed:image withColor:color] forState:UIControlStateNormal];
-        [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
-        button.titleLabel.text = group.title;
-        button.titleLabel.hidden = YES;
-        cell.accessoryView = button;
-    }
-
     
+    UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(200, 20, 43, 43);
+    [button setBackgroundImage:[self imageNamed:image withColor:color] forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
+    button.titleLabel.text = group.title;
+    button.titleLabel.hidden = YES;
+    cell.accessoryView = button;
     //cell.textLabel.textColor = color;
     
     
@@ -408,24 +423,6 @@ int editWhat;
     //cell.imageView.image = [UIImage imageNamed:@"check.png"];
     //NSLog(@"cells made");
 }
-
-- (void)popToGroups
-{
-    NSLog(@"pop");
-    NSArray *buh = self.navigationController.viewControllers;
-    NSMutableArray *VCs = [NSMutableArray arrayWithArray:buh];
-    
-    NSLog(@"buh:%@", buh);
-    for (int i = buh.count-1; i > 1; i--) 
-    {
-        [VCs removeObjectAtIndex:i];
-    }
-    self.navigationController.viewControllers = VCs;
-    
-    [self.navigationController popViewControllerAnimated:YES];
-    
-}
-
 
 - (UIImage *)imageNamed:(UIImage *)name withColor:(UIColor *)color
 {
@@ -531,9 +528,6 @@ int editWhat;
 #pragma mark Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    self.fetchedResultsController.delegate = nil;
-    self.fetchedResultsController = nil;
-    
 	Group *group = [[self fetchedResultsController] objectAtIndexPath:indexPath];
 	//[self editColor];
     editGroupName = group.title;
@@ -589,9 +583,9 @@ int editWhat;
 	[fetchRequest setPredicate:showGraphPredicate];
 	
 	// Create and initialize the fetch results controller.
-	fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
-									 managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
-	fetchedResultsController.safeDelegate = self;
+	self.fetchedResultsController = [[SafeFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:
+									 self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Groups"];
+	self.fetchedResultsController.safeDelegate = self;
 	
 	[sectionTitleDescriptor autorelease];
 	[menuIndexDescriptor autorelease];
@@ -603,7 +597,7 @@ int editWhat;
 		[Error showErrorByAppendingString:@"Unable to fetch data for groups." withError:error];
 	}
     
-	return fetchedResultsController;
+	return self.fetchedResultsController;
 }    
 
 #pragma mark Memory management
@@ -613,10 +607,10 @@ int editWhat;
 	// persist even after the View Controller has been deallocated.
 	//[_tableView release];
 	self.fetchedResultsController.delegate = nil;
-	//[fetchedResultsController release];
-	[managedObjectContext release];
-	[switchDictionary release];
-	[groupsDictionary release];
+	[self.fetchedResultsController release];
+	[self.managedObjectContext release];
+	[self.switchDictionary release];
+	[self.groupsDictionary release];
 	
     [super dealloc];
 }
